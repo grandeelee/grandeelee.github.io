@@ -13,7 +13,7 @@ avatar: https://grandeelee.github.io/images/lufi_small.png
 
 title: backyard
 theme: jekyll-theme-cayman
-show_downloads: "true"
+show_downloads: true
 #
 # Flags below are optional
 #
