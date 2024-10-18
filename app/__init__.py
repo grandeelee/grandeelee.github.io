@@ -19,7 +19,11 @@ def create_app():
 
     my_db = MongoEngine(app)
     login_manager = LoginManager(app)
-    login_manager.login_view = 'login'
+    login_manager.login_view = 'auth.login'
     return app, my_db, login_manager
 
 app, my_db, login_manager = create_app()
+
+from app.auth import auth
+app.register_blueprint(auth)
+

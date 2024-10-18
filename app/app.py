@@ -1,12 +1,10 @@
 from app import app
 from flask import request, redirect, url_for, render_template, flash
-from flask_login import login_user, logout_user, current_user, login_required
+from flask_login import login_required
 import csv
-import re
 
 # ====== models =======
-from model import User, Package, PromotionPackage, Promotion
-from forms import LoginForm
+from model import Package, PromotionPackage, Promotion
 
 all_packages = []
 with open("./promotionPackage", 'r') as f:
@@ -31,37 +29,7 @@ with open("./promotionPackage", 'r') as f:
 @app.route('/index')
 @app.route('/homepage')
 def home():
-    return redirect(url_for("login"))
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('packages'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        # if request.method == 'POST' and form.validate():
-        # email = request.form.get('email')
-        # password = request.form.get('pswd')
-        # remember = request.form.get('remember')
-        check_user = User.getUser(form.email.data)
-        if not check_user:
-            form.email.errors.append("email not found")
-            return render_template("login.html", form=form)
-            # also need check 
-        elif not check_user.checkPassword(check_user.password, form.password.data):
-            form.password.errors.append("password incorrect")
-            return render_template("login.html", form=form)
-        else:
-            login_user(check_user, remember=form.remember.data)
-            flash("you are logged in")
-            return redirect(url_for('packages'))
-
-    return render_template("login.html", form=form)
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for("auth.login"))
 
 
 @app.route('/packages', methods=['GET', 'POST'])
@@ -96,17 +64,7 @@ def book(hotel_name):
     # get check in/out date
     return render_template("book.html", package=package)
 
-@app.route("/registration", methods=['POST', 'GET'])
-def registration():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        pswd = request.form.get('pswd')
-        name = request.form.get('name')
-        User.createUser(email, name, pswd)
-        return render_template('registration.html')
 
-    if request.method == 'GET':
-        return render_template('registration.html')
     
 @app.route("/upload", methods=['POST', 'GET'])
 def upload():
