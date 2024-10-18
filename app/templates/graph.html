@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Blogs{% endblock %}
+
+{% block content %}
+
+
+
+<div class="m-3"> <canvas id="myChart"></canvas> </div>
+<br><br><br><br><br>
+<div class="m-3"> <canvas id="myChart1"></canvas> </div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $.ajax({
+            url: "/graph",
+            type: 'POST',
+            data: {
+            },
+            success: function (result) {
+                const obj = JSON.parse(result);
+                const labels = obj.labels;
+                const datasets = obj.datasets;
+
+                const options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                };
+
+                const ctx = document.getElementById('myChart');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: options
+                });
+            }
+        });
+
+        $.ajax({
+            url: "/graph",
+            type: 'POST',
+            data: {
+            },
+            success: function (result) {
+                const obj = JSON.parse(result);
+                const labels = obj.labels;
+                const datasets = obj.datasets;
+
+                const options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        deferred: {
+                            yOffset: '80%', // defer until 50% of the canvas height are inside the viewport
+                            delay: 100      // delay of 500 ms after the canvas is considered inside the viewport
+                        }
+                    }
+                };
+
+                const ctx = document.getElementById('myChart1');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    plugins: [ChartDeferred],
+                    options: options
+                });
+            }
+        });
+    });
+
+</script>
+
+
+{% endblock %}

@@ -29,3 +29,6 @@ app.register_blueprint(auth)
 
 from book import book
 app.register_blueprint(book)
+
+from analytics import analytics
+app.register_blueprint(analytics)   
