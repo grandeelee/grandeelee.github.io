@@ -6,7 +6,7 @@ from auth.model import LoginForm, User
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('packages'))
+        return redirect(url_for('book.packages'))
     form = LoginForm()
     if form.validate_on_submit():
         # if request.method == 'POST' and form.validate():
@@ -24,7 +24,7 @@ def login():
         else:
             login_user(check_user, remember=form.remember.data)
             flash("you are logged in")
-            return redirect(url_for('packages'))
+            return redirect(url_for('book.packages'))
 
     return render_template("login.html", form=form)
 

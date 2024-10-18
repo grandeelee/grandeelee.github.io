@@ -24,6 +24,8 @@ def create_app():
 
 app, my_db, login_manager = create_app()
 
-from app.auth import auth
+from auth import auth
 app.register_blueprint(auth)
 
+from book import book
+app.register_blueprint(book)
