@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Listings</title>
+    
+    <!-- Favicon (change the href to your icon path) -->
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/906/906175.png" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f0f4f8;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #0077b6;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 1rem;
+        }
+
+        /* Card container */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 2rem;
+            justify-content: center;
+        }
+
+        /* Individual card */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            width: 220px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .card i {
+            font-size: 2rem;
+            color: #0077b6;
+            margin-bottom: 0.5rem;
+        }
+
+        .card h3 {
+            margin: 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div>Andrew's Classes</div>
+        <div>
+            <a href="#"><i class="fas fa-home"></i> Home</a>
+            <a href="#"><i class="fas fa-user"></i> Andrew</a>
+            <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+        </div>
+    </div>
+
+    <div class="card-container">
+        <div class="card">
+            <i class="fas fa-code"></i>
+            <h3>CS101</h3>
+            <p>Introduction to Programming</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-calculator"></i>
+            <h3>MA102</h3>
+            <p>Discrete Mathematics</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-flask"></i>
+            <h3>CH103</h3>
+            <p>General Chemistry</p>
+        </div>
+        <div class="card">
+            <i class="fas fa-brain"></i>
+            <h3>PS104</h3>
+            <p>Introduction to Psychology</p>
+        </div>
+    </div>
+
+</body>
+</html>
