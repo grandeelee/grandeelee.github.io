@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Class Learning Page</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -67,30 +69,16 @@
       <h3>Lesson 2: Styling with CSS</h3>
       <p>Discover how to make your pages visually appealing.</p>
     </div>
-  </section>
 
-  <section>
-    <h2>🔗 Resources</h2>
-    <div class="resource">
-      <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">MDN HTML Guide</a></p>
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-4 col-sm-3 col-md-2 col-lg-2" style="background-color: #f8c471; padding: 20px;">Sidebar</div>
+        <div class="col-xs-4 col-sm-6 col-md-8 col-lg-8" style="background-color: #aed6f1; padding: 20px;">Main Content</div>
+        <div class="col-xs-4 col-sm-3 col-md-2 col-lg-2" style="background-color: #a9dfbf; padding: 20px;">Extras</div>
+
+        
     </div>
-    <div class="resource">
-      <p><a href="https://www.w3schools.com/css/" target="_blank">W3Schools CSS Tutorial</a></p>
     </div>
-  </section>
-
-  <section>
-    <h2>📬 Contact Us</h2>
-    <form>
-      <label for="name">Your Name:</label>
-      <input type="text" id="name" name="name" required>
-
-      <label for="message">Message:</label>
-      <textarea id="message" name="message" rows="4" required></textarea>
-
-      <button type="submit">Send</button>
-    </form>
-  </section>
 
 </body>
 </html>
