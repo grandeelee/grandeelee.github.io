@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nova Studio | Creative Design Agency</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    .hero {
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      padding: 100px 0;
+      text-align: center;
+    }
+    .service-icon {
+      font-size: 3rem;
+      color: #007bff;
+    }
+    .testimonial {
+      background-color: #f8f9fa;
+      padding: 40px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Nova Studio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="display-4 fw-bold">Design That Inspires</h1>
+      <p class="lead">We create modern, clean, and responsive designs that stand out.</p>
+      <a href="#contact" class="btn btn-primary btn-lg mt-3">Work With Us</a>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services" class="py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Our Services</h2>
+      <div class="row g-4">
+        <div class="col-md-4 text-center">
+          <div class="service-icon mb-3">🎨</div>
+          <h5>Brand Identity</h5>
+          <p>Custom logos, color palettes, and brand kits tailored to your vision.</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="service-icon mb-3">💻</div>
+          <h5>Web Design</h5>
+          <p>Responsive websites built for performance and aesthetics.</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="service-icon mb-3">📱</div>
+          <h5>UI/UX Design</h5>
+          <p>Crafting intuitive mobile and web experiences your users will love.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" class="bg-light py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">What Clients Say</h2>
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="testimonial">
+            <p>"Nova Studio transformed our brand image. Their designs are sharp and modern!"</p>
+            <h6 class="mt-3 mb-0">— Taylor R., Startup Founder</h6>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="testimonial">
+            <p>"Super responsive and creative. They nailed the project ahead of schedule!"</p>
+            <h6 class="mt-3 mb-0">— Jamie L., Marketing Lead</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Let's Talk</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <form>
+            <div class="mb-3">
+              <label for="name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="name" placeholder="Jane Doe">
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" placeholder="jane@example.com">
+            </div>
+            <div class="mb-3">
+              <label for="message" class="form-label">Message</label>
+              <textarea class="form-control" id="message" rows="5" placeholder="Tell us about your project..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-3">
+    <p class="mb-0">© 2025 Nova Studio. All rights reserved.</p>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
