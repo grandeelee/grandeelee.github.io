@@ -1,219 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TG 2 Class Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Awesome Icon</title>
+    <!--
+        Include the Font Awesome CDN link.
+        This is necessary for the icon classes to work.
+    -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        .icon-container {
+            font-size: 5rem; /* Make the icon large for visibility */
+            color: #555;
+            text-align: center;
+        }
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f0f4ff;
-      color: #333;
-      line-height: 1.6;
-      padding: 0;
-      text-align: center;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    h1 {
-      font-size: 3em;
-      font-weight: 800;
-      color: #4b7bec;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 1.1em;
-      color: #666;
-      margin-bottom: 40px;
-    }
-
-    /* Flip card styles */
-    .flip-card {
-      perspective: 1000px;
-      cursor: pointer;
-    }
-
-    .flip-card-inner {
-      position: relative;
-      width: 100%;
-      height: 220px;
-      text-align: center;
-      transition: transform 0.6s;
-      transform-style: preserve-3d;
-      border-radius: 20px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .flip-card.flipped .flip-card-inner {
-      transform: rotateY(180deg);
-    }
-
-    .flip-card-front, .flip-card-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      border-radius: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .flip-card-front {
-      background: white;
-      font-weight: 600;
-      font-size: 1.2em;
-    }
-
-    .flip-card-front i {
-      font-size: 2em;
-      margin-bottom: 10px;
-      color: #4b7bec;
-    }
-
-    .flip-card-back {
-      background: #ffffff;
-      color: #555;
-      font-style: italic;
-      font-size: 1em;
-      transform: rotateY(180deg);
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
-    }
-
-    footer {
-      margin-top: auto;
-    }
-  </style>
+        .icon-description {
+            font-size: 1.2rem;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Bootstrap Navbar/Header -->
-  <nav class="navbar navbar-dark bg-primary mb-4">
-    <div class="container-fluid justify-content-center">
-      <span class="navbar-brand mb-0 h1 fs-3">ICT239 TG02</span>
+    <div class="icon-container">
+        <!-- The Apple icon from Font Awesome -->
+        <i class="fa-brands fa-apple"></i>
     </div>
-  </nav>
 
-  <div class="container">
-    <div class="row">
-      <!-- Left empty column -->
-      <div class="col-lg-2 d-none d-lg-block"></div>
-
-      <!-- Main content column -->
-      <div class="col-12 col-lg-8">
-        <header>
-          <h1>Our Class</h1>
-          <p>Click on any card to flip it.</p>
-        </header>
-
-        <main>
-          <div class="row g-4">
-            
-            <div class="col-sm-6 col-md-4">
-              <div class="flip-card">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <i class="fa-solid fa-user"></i>
-                    <div>Afiq</div>
-                  </div>
-                  <div class="flip-card-back">Always donning a puffer jacket</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-md-4">
-              <div class="flip-card">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <i class="fa-solid fa-comment-dots"></i>
-                    <div>Hui Xuen</div>
-                  </div>
-                  <div class="flip-card-back">Love to chit chat</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-md-4">
-              <div class="flip-card">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <i class="fa-solid fa-shirt"></i>
-                    <div>Richmond</div>
-                  </div>
-                  <div class="flip-card-back">Zara Lover!</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-md-4">
-              <div class="flip-card">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <i class="fa-solid fa-burger"></i>
-                    <div>Mavis</div>
-                  </div>
-                  <div class="flip-card-back">Mos Burger Lover!</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-sm-6 col-md-4">
-              <div class="flip-card">
-                <div class="flip-card-inner">
-                  <div class="flip-card-front">
-                    <i class="fa-solid fa-beer-mug-empty"></i>
-                    <div>Lester</div>
-                  </div>
-                  <div class="flip-card-back">Likes to drink beer</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </main>
-      </div>
-
-      <!-- Right empty column -->
-      <div class="col-lg-2 d-none d-lg-block"></div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="bg-light py-3 mt-5">
-    <div class="container text-center">
-      <span class="text-muted">Singapore University of Social Sciences</span>
-    </div>
-  </footer>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // Add flip on click
-    document.querySelectorAll('.flip-card').forEach(card => {
-      card.addEventListener('click', () => {
-        card.classList.toggle('flipped');
-      });
-    });
-  </script>
+    <p class="icon-description">This is a Font Awesome Apple icon styled with CSS!</p>
 
 </body>
 </html>
