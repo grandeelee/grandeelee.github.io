@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class Learning Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    header {
+      background: #0077cc;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    section {
+      padding: 20px;
+    }
+    .lesson, .resource {
+      background: white;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    form {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Welcome to Our Class Learning Page</h1>
+    <p>Explore lessons, resources, and stay connected</p>
+  </header>
+
+  <section>
+    <h2>📚 Lessons</h2>
+    <div class="lesson">
+      <h3>Lesson 1: Introduction to HTML</h3>
+      <p>Learn the basics of HTML structure and tags.</p>
+    </div>
+    <div class="lesson">
+      <h3>Lesson 2: Styling with CSS</h3>
+      <p>Discover how to make your pages visually appealing.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>🔗 Resources</h2>
+    <div class="resource">
+      <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTML" target="_blank">MDN HTML Guide</a></p>
+    </div>
+    <div class="resource">
+      <p><a href="https://www.w3schools.com/css/" target="_blank">W3Schools CSS Tutorial</a></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>📬 Contact Us</h2>
+    <form>
+      <label for="name">Your Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+</body>
+</html>
