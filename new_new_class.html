@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bouncing Balls Animation</title>
+  <style>
+    body { text-align: center; margin: 0; background: #222; }
+    canvas { background: #fff; display: block; margin: 2em auto; border-radius: 8px; }
+    h2 { color: #fafafa; }
+  </style>
+</head>
+<body>
+  <h2>Bouncing Balls Animation</h2>
+  <canvas id="canvas" width="400" height="250"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const balls = [];
+    const colors = ["#e74c3c", "#3498db", "#f1c40f", "#2ecc71", "#9b59b6"];
+
+    function Ball() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.r = Math.random() * 18 + 12;
+      this.dx = (Math.random() - 0.5) * 4;
+      this.dy = (Math.random() - 0.5) * 4;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    for(let i=0; i<7; i++) balls.push(new Ball());
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      balls.forEach(ball => {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.closePath();
+
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        // Bounce logic
+        if(ball.x + ball.r > canvas.width || ball.x - ball.r < 0) ball.dx *= -1;
+        if(ball.y + ball.r > canvas.height || ball.y - ball.r < 0) ball.dy *= -1;
+      });
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script>
+</body>
+</html>
