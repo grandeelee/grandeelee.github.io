@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TG 2 Class Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* A simple CSS reset for consistency */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- Basic Body and Typography Styles --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f4ff; /* A light, cheerful blue background */
+            color: #333;
+            line-height: 1.6;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            font-weight: 800;
+            color: #4b7bec; /* A vibrant blue */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        p {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        /* --- Main Content Grid --- */
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Card Styles --- */
+        .card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Card hover and active states */
+        .card:hover {
+            transform: translateY(-5px); /* Lifts the card on hover */
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Active state for when the card is clicked */
+        .card.active {
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            transform: scale(1.02);
+        }
+
+        /* Styling for the hidden fact content */
+        .card-fact {
+            font-style: italic;
+            color: #888;
+            font-size: 0.9em;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+        }
+
+        /* When card is active, show the fact */
+        .card.active .card-fact {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Our Class</h1>
+        <p>Click on any card.</p>
+    </header>
+
+    <main>
+        <div class="class-grid">
+            <!-- Example Card - Copy and paste this block for each person -->
+            <div class="card">
+                <h3>Afiq</h3>
+                <div class="card-fact">Always donning a puffer jacket</div>
+            </div>
+            
+            <div class="card">
+                <h3>Hui Xuen</h3>
+                <div class="card-fact">Love to chit chat</div>
+            </div>
+            
+            <div class="card">
+                <h3>Richmond</h3>
+                <div class="card-fact">Zara Lover!</div>
+            </div>
+
+            <!-- Add more cards here! -->
+            <div class="card">
+                <h3>Mavis</h3>
+                <div class="card-fact">Mos Burger Lover!</div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <!-- Simple, unobtrusive footer -->
+    </footer>
+
+    <script>
+        // Get all elements with the class 'card'
+        const cards = document.querySelectorAll('.card');
+
+        // Loop through each card and add a click event listener
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Toggle the 'active' class on the clicked card
+                // This will trigger the CSS transitions to show the fact
+                card.classList.toggle('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
