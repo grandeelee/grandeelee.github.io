@@ -1,514 +1,990 @@
 <!DOCTYPE html>
-<html lang="en" style="scroll-behavior: smooth;">
-
+<html lang="en">
 <head>
-    <!-- changes -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grandee Lee | Personal Portfolio</title>
-    <!-- Tailwind CSS CDN for utility-first styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter for clean typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link href="custom.css" rel="stylesheet">
-    <!-- Favicon -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        /* Custom styles for the body font and fade-in animation */
+        :root {
+            --c1: #e2c6b5;
+            --c2: #c8a48a;
+            --c3: #a77b5b;
+            --c4: #7b4a3a;
+            --c5: #4e2b1e;
+            --cream: #f5ede5;
+            --cream-dark: #ede2d5;
+            --text-dark: #3b1f14;
+            --text-mid: #5a3a2c;
+            --text-light: #7a6558;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            /* bg-gray-50 from Tailwind palette */
+            background: var(--cream);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Styles for the fade-in animation, initially hidden and slightly translated */
-        .fade-in {
+        /* ── PROGRESS BAR ── */
+        #progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--c3), var(--c2), var(--c1));
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        /* ── NAV ── */
+        #nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 0 clamp(1.5rem, 5vw, 4rem);
+            transition: background 0.5s ease, backdrop-filter 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        #nav.scrolled {
+            background: rgba(245, 237, 229, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 1px 0 rgba(167, 123, 91, 0.15);
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--c1);
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        #nav.scrolled .nav-logo { color: var(--c5); }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: clamp(1rem, 3vw, 2.5rem);
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(226, 198, 181, 0.8);
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 4px;
+            transition: color 0.3s ease;
+        }
+
+        #nav.scrolled .nav-links a { color: var(--text-mid); }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--c4), var(--c3));
+            border-radius: 2px;
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .nav-links a:hover { color: var(--c1); }
+        #nav.scrolled .nav-links a:hover { color: var(--c5); }
+        .nav-links a:hover::after,
+        .nav-links a.active::after { width: 100%; }
+        .nav-links a.active { color: var(--c1); }
+        #nav.scrolled .nav-links a.active { color: var(--c5); }
+
+        /* Hamburger */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--c1);
+            border-radius: 2px;
+            transition: transform 0.4s ease, opacity 0.3s ease;
+        }
+        #nav.scrolled .hamburger span { background: var(--c5); }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Mobile overlay */
+        #mobile-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--cream);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1s ease-in-out, transform 0.7s ease-in-out;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #mobile-overlay.open { opacity: 1; pointer-events: all; }
+        #mobile-overlay a {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--c5);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        #mobile-overlay a:hover { color: var(--c3); }
+
+        /* ── SECTIONS SHARED ── */
+        .section {
+            position: relative;
+            padding: clamp(90px, 14vw, 150px) clamp(1.5rem, 6vw, 5rem);
+            overflow: hidden;
         }
 
-        /* Class added by JavaScript when element is visible, makes it opaque and moves it to original position */
-        .fade-in.is-visible {
-            opacity: 1;
-            transform: translateY(0);
+        .section-inner {
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        /* Custom styles for the floating text effect */
-        .floating-text {
-            /* Initially give a subtle shadow and enable 3D transforms */
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-            transition: text-shadow 0.1s linear;
-            /* Smooth transition for shadow */
-            will-change: text-shadow;
-            /* Optimize performance for shadow changes */
+        .section-eyebrow {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--c3);
+            margin-bottom: 0.6rem;
+        }
+
+        .section-heading {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            color: var(--c5);
+            line-height: 1.1;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-rule {
+            display: block;
+            width: 48px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--c4), var(--c2));
+            border-radius: 2px;
+            margin-bottom: clamp(2rem, 5vw, 3.5rem);
+        }
+
+        /* ── HERO ── */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 45%, var(--c3) 100%);
+            padding: 0 clamp(1.5rem, 6vw, 4rem);
+        }
+
+        #hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 15% 85%, rgba(226,198,181,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse 55% 70% at 85% 15%, rgba(226,198,181,0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Ambient orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            filter: blur(60px);
+        }
+        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(167,123,91,0.18) 0%, transparent 70%); top: -120px; right: -80px; }
+        .orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(123,74,58,0.15) 0%, transparent 70%); bottom: -80px; left: -60px; }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 860px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--c2);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 9vw, 7.5rem);
+            font-weight: 900;
+            color: var(--c1);
+            line-height: 1.0;
+            margin-bottom: clamp(1rem, 3vw, 1.8rem);
+            letter-spacing: -1px;
+        }
+
+        .hero-name .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .hero-name .word span {
+            display: inline-block;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            font-weight: 300;
+            color: rgba(226,198,181,0.78);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto clamp(2rem, 5vw, 3rem);
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .btn-outline {
+            color: var(--c1);
+            border: 1px solid rgba(226,198,181,0.3);
+        }
+        .btn-outline:hover {
+            background: rgba(226,198,181,0.12);
+            border-color: rgba(226,198,181,0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-filled {
+            background: linear-gradient(135deg, var(--c1), var(--c2));
+            color: var(--c5);
+            box-shadow: 0 4px 24px rgba(200, 164, 138, 0.35);
+        }
+        .btn-filled:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(200, 164, 138, 0.5);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: clamp(1.5rem, 5vh, 3rem);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(226,198,181,0.45);
+            font-size: 0.6rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 52px;
+            background: linear-gradient(to bottom, rgba(226,198,181,0.6), transparent);
+        }
+
+        /* ── ABOUT ── */
+        #about {
+            background: linear-gradient(180deg, var(--cream) 0%, var(--cream-dark) 100%);
+        }
+
+        .about-card {
+            background: white;
+            border-radius: 24px;
+            padding: clamp(2rem, 5vw, 3.5rem);
+            border: 1px solid rgba(200, 164, 138, 0.18);
+            box-shadow: 0 4px 40px rgba(59,31,20,0.07);
+        }
+
+        .about-text {
+            font-size: clamp(1.05rem, 1.8vw, 1.2rem);
+            line-height: 1.9;
+            color: var(--text-mid);
+            text-align: center;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        .about-text strong { color: var(--c5); font-weight: 600; }
+
+        /* ── RESEARCH ── */
+        #research { background: var(--cream-dark); }
+
+        .research-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .paper {
+            background: white;
+            border-radius: 18px;
+            padding: clamp(1.2rem, 3vw, 1.8rem) clamp(1.4rem, 3vw, 2rem);
+            border: 1px solid rgba(200,164,138,0.14);
+            box-shadow: 0 2px 16px rgba(59,31,20,0.04);
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+            transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+            cursor: default;
+        }
+
+        .paper:hover {
+            box-shadow: 0 10px 40px rgba(59,31,20,0.1);
+            border-color: rgba(167,123,91,0.25);
+            transform: translateY(-3px);
+        }
+
+        .paper-year {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: white;
+            background: linear-gradient(135deg, var(--c4), var(--c3));
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            margin-top: 3px;
+        }
+
+        .paper-body { flex: 1; min-width: 0; }
+
+        .paper-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 1.8vw, 1.08rem);
+            font-weight: 700;
+            color: var(--c5);
+            line-height: 1.4;
+            margin-bottom: 0.35rem;
+        }
+
+        .paper-authors {
+            font-size: clamp(0.8rem, 1.3vw, 0.88rem);
+            color: var(--text-light);
+            line-height: 1.5;
+            margin-bottom: 0.25rem;
+        }
+
+        .paper-venue {
+            font-size: clamp(0.78rem, 1.3vw, 0.85rem);
+            color: var(--c3);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* ── TEACHING ── */
+        #teaching { background: linear-gradient(180deg, var(--cream-dark) 0%, var(--cream) 100%); }
+
+        .teaching-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+            gap: 1.2rem;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(1.4rem, 3vw, 2rem);
+            border: 1px solid rgba(200,164,138,0.14);
+            box-shadow: 0 2px 16px rgba(59,31,20,0.04);
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.35s ease, transform 0.35s ease;
+        }
+
+        .course-card:hover {
+            box-shadow: 0 10px 40px rgba(59,31,20,0.1);
+            transform: translateY(-4px);
+        }
+
+        .course-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(167,123,91,0.12), rgba(200,164,138,0.18));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--c3);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        .course-code {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--c3);
+            margin-bottom: 0.3rem;
+        }
+
+        .course-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+            font-weight: 700;
+            color: var(--c5);
+            line-height: 1.35;
+            margin-bottom: 0.4rem;
+        }
+
+        .course-inst {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .course-desc {
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        .course-links {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .course-links a {
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: var(--c3);
+            text-decoration: none;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid rgba(167,123,91,0.3);
+            border-radius: 20px;
+            transition: all 0.25s ease;
+        }
+
+        .course-links a:hover {
+            background: var(--c3);
+            color: white;
+            border-color: var(--c3);
+        }
+
+        /* ── CV SECTION ── */
+        #cv-section {
+            background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 50%, var(--c3) 100%);
+            text-align: center;
+        }
+
+        #cv-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 55% at 15% 85%, rgba(226,198,181,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse 55% 70% at 85% 15%, rgba(226,198,181,0.05) 0%, transparent 50%);
+        }
+
+        #cv-section .section-inner { position: relative; z-index: 2; }
+        #cv-section .section-eyebrow { color: var(--c2); }
+        #cv-section .section-heading { color: var(--c1); }
+        #cv-section .section-rule { background: linear-gradient(90deg, var(--c2), var(--c1)); margin: 0 auto 2rem; }
+
+        .cv-body {
+            font-size: clamp(1rem, 1.8vw, 1.15rem);
+            color: rgba(226,198,181,0.82);
+            line-height: 1.85;
+            max-width: 560px;
+            margin: 0 auto 2.5rem;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--c5);
+            padding: clamp(2rem, 5vw, 3rem);
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            width: 40px; height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(200,164,138,0.2);
+            color: var(--c2);
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            background: rgba(167,123,91,0.2);
+            border-color: var(--c3);
+            color: var(--c1);
+            transform: translateY(-2px);
+        }
+
+        .footer-copy {
+            font-size: 0.78rem;
+            color: rgba(200,164,138,0.4);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            #mobile-overlay { display: flex; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
+<body>
 
-<body class="antialiased">
+<!-- Progress bar -->
+<div id="progress-bar"></div>
 
-    <!-- Header Section: Fixed at the top, becomes solid on scroll -->
-    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <!-- Logo/Name: Simple text logo linking to home -->
-                <div class="flex-shrink-0">
-                    <a href="#home" class="text-2xl font-bold text-gray-900">GL</a>
-                </div>
-                <!-- Navigation Links and Dark Mode Toggle: Hidden on small screens, visible on medium and larger -->
-                <div class="hidden md:flex md:items-center">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#about"
-                            class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                        <a href="#research"
-                            class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Research</a>
-                        <a href="#teaching"
-                            class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Teaching</a>
-                        <!-- Blog Link (commented out) -->
-                        <!-- <a href="#blog" class="text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">Blog</a> -->
-                    </div>
-                    <!-- Dark Mode Toggle Button -->
-                    <button id="theme-toggle"
-                        class="ml-4 p-2 rounded-full hover:bg-gray-200 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg id="theme-toggle-light-icon" class="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <svg id="theme-toggle-dark-icon" class="hidden h-6 w-6 text-gray-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </nav>
-    </header>
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#hero" class="nav-logo">GL</a>
+        <ul class="nav-links">
+            <li><a href="#hero" class="nav-link active">Home</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#research" class="nav-link">Research</a></li>
+            <li><a href="#teaching" class="nav-link">Teaching</a></li>
+            <li><a href="#cv-section" class="nav-link">CV</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
 
+<!-- Mobile overlay -->
+<div id="mobile-overlay">
+    <a href="#hero">Home</a>
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#teaching">Teaching</a>
+    <a href="#cv-section">CV</a>
+</div>
 
-    <main>
-        <!-- Home Section: Full screen hero section with name, title, and social links -->
-        <section id="home"
-            class="min-h-screen flex items-center justify-center bg-gray-50 text-center px-4 sm:px-6 lg:px-8 fade-in">
-            <div class="max-w-4xl mx-auto">
-                <!-- 'Grandee Lee' text with white color and floating effect -->
-                <h1 id="grandee-lee-text"
-                    class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight floating-text">
-                    Grandee Lee
-                </h1>
-                <!-- Social Media and CV links -->
-                <div class="mt-8 flex justify-center items-center space-x-4">
-                    <a href="mailto:grandeelee@suss.edu.sg"
-                        class="text-gray-500 hover:text-indigo-600 transition-colors" aria-label="Email">
-                        <!-- Email Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                        </svg>
-                    </a>
-                    <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer"
-                        class="text-gray-500 hover:text-indigo-600 transition-colors" aria-label="LinkedIn">
-                        <!-- LinkedIn Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                            <rect x="2" y="9" width="4" height="12" />
-                            <circle cx="4" cy="4" r="2" />
-                        </svg>
-                    </a>
-                    <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer"
-                        class="text-gray-500 hover:text-indigo-600 transition-colors" aria-label="GitHub">
-                        <!-- GitHub Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                        </svg>
-                    </a>
-                    <a href="https://www.suss.edu.sg/academics/schools-college/faculty-listing/detail/dr-grandee-lee"
-                        target="_blank" rel="noopener noreferrer"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                        <!-- CV Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="mr-2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="16" y1="13" x2="8" y2="13" />
-                            <line x1="16" y1="17" x2="8" y2="17" />
-                            <polyline points="10 9 9 9 8 9" />
-                        </svg>
-                        View CV
-                    </a>
-                </div>
-            </div>
-        </section>
+<main>
 
-        <!-- Alternating background sections for visual separation -->
-        <div class="bg-white">
-            <!-- About Section -->
-            <section id="about" class="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 fade-in">
-                <div class="w-full max-w-5xl mx-auto">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-12 text-center">About Me</h2>
-                    <div class="bg-white p-8 rounded-lg shadow-sm max-w-3xl mx-auto">
-                        <p class="text-lg text-gray-700 leading-relaxed text-center">
-                            My research interests include dialogue system evaluation and dialogue generation, the
-                            application of large language models in educational settings, machine learning for
-                            learning/teaching assessment, and multi-agent simulation.
-                        </p>
-                    </div>
-                </div>
-            </section>
-        </div>
+    <!-- HERO -->
+    <section id="hero" class="section">
+        <div class="orb orb-1" id="orb1"></div>
+        <div class="orb orb-2" id="orb2"></div>
 
-        <div class="bg-gray-50">
-            <!-- Research Section: Populated dynamically by JavaScript -->
-            <section id="research" class="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 fade-in">
-                <div class="w-full max-w-5xl mx-auto pt-12">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-12 text-center">Selected Publications
-                    </h2>
-                    <div id="research-list" class="space-y-4">
-                        <!-- Research items will be injected here by JavaScript -->
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <div class="bg-white">
-            <!-- Teaching Section: Populated dynamically by JavaScript -->
-            <section id="teaching" class="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 fade-in">
-                <div class="w-full max-w-5xl mx-auto pt-12">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-12 text-center">Teaching</h2>
-                    <div id="teaching-list" class="space-y-12">
-                        <!-- Teaching items will be injected here by JavaScript -->
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">ICT162: Object-Oriented Programming</h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Singapore University of Social Sciences
-                            </p>
-                            <p class="text-gray-600 mt-3">Course covering the principles and practices of
-                                object-oriented programming.</p>
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">ICT239: Web Application Development</h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Singapore University of Social Sciences
-                            </p>
-                            <p class="text-gray-600 mt-3">Focuses on the fundamentals of developing modern web
-                                applications.</p>
-                            <p class="text-gray-600 mt-3"><a href="new_class.html" class="text-indigo-500 hover:underline">Jul2025-TG1</a> | <a href="TG02.html" class="text-indigo-500 hover:underline">Jul2025-TG2</a></p>
-
-
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">ICT304: NLP Foundation for Generative AI
-                                </h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Singapore University of Social Sciences
-                            </p>
-                            <p class="text-gray-600 mt-3">Introducing Natural Language Processing (NLP) concepts and
-                                their applications in generative AI.</p>
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">ICT302: Generative AI: Theory and
-                                    Practice</h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Singapore University of Social Sciences
-                            </p>
-                            <p class="text-gray-600 mt-3">An exploration of the theory behind generative AI models and
-                                their practical applications.</p>
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">T16502: AI, ChatGPT and Machine
-                                    Translation</h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Nanyang Technological University (M.A. in
-                                Translation and Interpretation)</p>
-                            <p class="text-gray-600 mt-3">A master's level course on the impact of AI, particularly
-                                models like ChatGPT, on machine translation.</p>
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">EE2211: Introduction to Machine Learning
-                                </h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">National University of Singapore (ECE)</p>
-                            <p class="text-gray-600 mt-3">Teaching introductory concepts of machine learning to
-                                engineering students.</p>
-                        </div>
-                        <div
-                            class="p-6 bg-white rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 fade-in">
-                            <div class="flex items-center mb-2">
-                                <!-- Book Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="h-6 w-6 text-indigo-500 mr-3">
-                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                </svg>
-                                <h3 class="text-xl font-semibold text-gray-900">Introduction to Generative AI - Ngram Language Model
-                                </h3>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-1 font-medium">Lecture Notes</p>
-                            <p class="text-gray-600 mt-3"><a href="chapters/generative_ai_ngrams.pdf" class="text-indigo-500 hover:underline" target="_blank">PDF</a></p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Blog Section (commented out for now) -->
-        <!--
-        <div class="bg-gray-50">
-            <section id="blog" class="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 fade-in">
-                <div class="w-full max-w-5xl mx-auto">
-                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-12 text-center">Recent Blog Posts</h2>
-                    <div id="blog-list" class="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                        -->
-        <!-- Blog items will be injected here by JavaScript -->
-        <!--
-                    </div>
-                </div>
-            </section>
-        </div>
-        -->
-    </main>
-
-    <!-- Footer Section -->
-    <footer class="bg-gray-800 text-white">
-        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
-            <!-- Social Media Icons in the footer -->
-            <div class="flex justify-center space-x-6 mb-4">
-                <a href="mailto:grandeelee@suss.edu.sg" class="text-gray-400 hover:text-white transition-colors"
-                    aria-label="Email">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2" />
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                    </svg>
+        <div class="hero-content" id="hero-content">
+            <p class="hero-tag" id="hero-tag">Welcome to my portfolio</p>
+            <h1 class="hero-name" aria-label="Grandee Lee">
+                <span class="word"><span>Grandee</span></span>
+                <!-- <span>&nbsp;</span> -->
+                <span class="word"><span>Lee</span></span>
+            </h1>
+            <p class="hero-subtitle" id="hero-subtitle">
+                Researcher &amp; Educator at the Intersection of<br>AI, Language, and Learning
+            </p>
+            <div class="hero-actions" id="hero-actions">
+                <a href="mailto:grandeelee@suss.edu.sg" class="btn btn-outline">
+                    <i class="fa-solid fa-envelope"></i> Email
                 </a>
-                <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer"
-                    class="text-gray-400 hover:text-white transition-colors" aria-label="LinkedIn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-                        <rect x="2" y="9" width="4" height="12" />
-                        <circle cx="4" cy="4" r="2" />
-                    </svg>
+                <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i class="fa-brands fa-linkedin"></i> LinkedIn
                 </a>
-                <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer"
-                    class="text-gray-400 hover:text-white transition-colors" aria-label="GitHub">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-                    </svg>
+                <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+                <a href="https://www.suss.edu.sg/academics/schools-college/faculty-listing/detail/dr-grandee-lee" target="_blank" rel="noopener noreferrer" class="btn btn-filled">
+                    <i class="fa-solid fa-file-lines"></i> View CV
                 </a>
             </div>
-            <p class="text-sm text-gray-400">&copy; 2025 Grandee Lee. All Rights Reserved.</p>
         </div>
-    </footer>
 
-    <script>
-        // Data Objects: These arrays hold the content for the Research, Teaching, and Blog sections.
-        const researchPapers = [
-            { title: "Beyond Single-Event Extraction: Towards Efficient Document-Level Multi-Event Argument Extraction", authors: "Wanlong Liu, Li Zhou, DingYi Zeng, Yichen Xiao, Shaohuan Cheng, Chen Zhang, Grandee Lee, Malu Zhang and Wenyu Chen", journal: "The 62nd Annual Meeting of the Association for Computational Linguistics (ACL)", year: "2024", url: "#" },
-            { title: "Revisiting Self-training for Few-shot Learning of Language Model", authors: "Yiming Chen, Yan Zhang, Chen Zhang, Grandee Lee, Ran Cheng and Haizhou Li", journal: "EMNLP 2021", year: "2021", url: "#" },
-            { title: "DynaEval: Unifying Turn and Dialogue Level Evaluation", authors: "Chen Zhang, Yiming Chen, Luis Fernando D'Haro, Yan Zhang, Grandee Lee, Haizhou Li", journal: "Association for Computational Linguistics (ACL), Long Paper", year: "2021", url: "#" },
-            { title: "D-score: Holistic Dialogue Evaluation without Reference", authors: "Chen Zhang, Grandee Lee, Luis Fernando D'Haro, Haizhou Li", journal: "IEEE/ACM Transaction on Audio, Speech, and Language Processing", year: "2021", url: "#" },
-            { title: "Modeling Code-Switch Languages Using Bilingual Parallel Corpus", authors: "Grandee Lee, Haizhou Li", journal: "Association for Computational Linguistics (ACL), Long Paper", year: "2020", url: "#" },
-            { title: "Self-and-Mixed Attention Decoder with Deep Acoustic Structure for Transformer-based LVCSR", authors: "Xinyuan Zhou, Grandee Lee, Emre Yılmaz, Yanhua Long, Jiaen Liang, Haizhou Li", journal: "INTERSPEECH", year: "2020", url: "#" },
-            { title: "End-to-end code-switching TTS with cross-lingual language model", authors: "Xuehao Zhou, Xiaohai Tian, Grandee Lee, Rohan Kumar Das, Haizhou Li", journal: "ICASSP. IEEE.", year: "2020", url: "#" },
-            { title: "End-to-end code-switching ASR for low-resourced language pairs", authors: "Xianghu Yue, Grandee Lee, Emre Yılmaz, Fang Deng, Haizhou Li", journal: "ASRU", year: "2019", url: "#" },
-            { title: "Linguistically motivated parallel data augmentation for code-switch language modeling", authors: "Grandee Lee, Xianghu Yue, Haizhou Li", journal: "INTERSPEECH", year: "2019", url: "#" },
-            { title: "Word and class common space embedding for code-Switch language modeling", authors: "Grandee Lee, Haizhou Li", journal: "ICASSP. IEEE.", year: "2019", url: "#" },
-            { title: "Phonetically aware exemplar-based prosody transformation", authors: "Berrak Sisman, Grandee Lee, Haizhou Li", journal: "Proc. Odyssey 2018 The Speaker and Language Recognition Workshop.", year: "2018", url: "#" },
-            { title: "On the analysis and evaluation of prosody conversion techniques", authors: "Berrak Sisman, Grandee Lee, Haizhou Li, Kay Chen Tan", journal: "Asian Language Processing (IALP). Singapore. Dec 5.", year: "2017", url: "#" },
-            { title: "A review of the mandarin-english code-switching corpus: SEAME", authors: "Grandee Lee, Thi-Nga Ho, Eng-Siong Chng, Haizhou Li", journal: "Asian Language Processing (IALP). Singapore. Dec 5.", year: "2017", url: "#" }
-        ].sort((a, b) => b.year - a.year); // Sort by year in descending order
+        <div class="scroll-hint" id="scroll-hint">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
 
-        // Blog Posts (commented out)
-        /*
-        const blogPosts = [
-            { title: "The Role of AI in Modern Drug Discovery", date: "May 15, 2024", url: "#", excerpt: "An overview of how artificial intelligence is revolutionizing the pharmaceutical industry, from target identification to clinical trial optimization..." },
-            { title: "A Layman's Guide to Single-Cell RNA Sequencing", date: "March 02, 2024", url: "#", excerpt: "Breaking down the complex technology of scRNA-seq and explaining its profound impact on our understanding of cellular heterogeneity..." }
-        ];
-        */
+    <!-- ABOUT -->
+    <section id="about" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal-up">About Me</p>
+            <h2 class="section-heading reveal-up">A bit about my work</h2>
+            <span class="section-rule reveal-rule"></span>
+            <div class="about-card reveal-card">
+                <p class="about-text">
+                    My research interests include <strong>dialogue system evaluation</strong> and <strong>dialogue generation</strong>, the application of <strong>large language models in educational settings</strong>, <strong>machine learning for learning &amp; teaching assessment</strong>, and <strong>multi-agent simulation</strong>.
+                </p>
+            </div>
+        </div>
+    </section>
 
-        // Function to dynamically populate the content sections using the data objects.
-        function populateContent() {
-            // Populate Research section
-            const researchList = document.getElementById('research-list');
-            researchList.innerHTML = ''; // Clear existing content to avoid duplication on re-render
-            researchPapers.forEach(paper => {
-                researchList.innerHTML += `
-                    <div class="fade-in mb-4 pb-2 border-b border-gray-200 last:border-b-0">
-                       <h3 class="text-lg font-semibold text-gray-900">${paper.title}</h3>
-                       <p class="text-sm text-gray-700 mt-1">${paper.authors} (${paper.year}). <em>${paper.journal}</em>.</p>
-                       <a href="${paper.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center mt-2 text-indigo-600 hover:text-indigo-800 font-medium text-sm">
-                            Read Paper <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                       </a>
-                    </div>
-                `;
-            });
+    <!-- RESEARCH -->
+    <section id="research" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal-up">Contributions</p>
+            <h2 class="section-heading reveal-up">Selected Publications</h2>
+            <span class="section-rule reveal-rule"></span>
+            <div class="research-list" id="research-list">
+                <!-- populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- TEACHING -->
+    <section id="teaching" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal-up">Education</p>
+            <h2 class="section-heading reveal-up">Teaching</h2>
+            <span class="section-rule reveal-rule"></span>
+            <div class="teaching-grid" id="teaching-list">
+                <!-- populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CV -->
+    <section id="cv-section" class="section">
+        <div class="section-inner">
+            <p class="section-eyebrow reveal-up">Resume</p>
+            <h2 class="section-heading reveal-up">Curriculum Vitae</h2>
+            <span class="section-rule reveal-rule" style="margin: 0 auto 2rem;"></span>
+            <p class="cv-body reveal-up">
+                View my full academic CV with complete publication list, teaching history, grants, and conference presentations.
+            </p>
+            <div class="reveal-up">
+                <a href="https://www.suss.edu.sg/academics/schools-college/faculty-listing/detail/dr-grandee-lee" target="_blank" rel="noopener noreferrer" class="btn btn-filled">
+                    <i class="fa-solid fa-file-lines"></i> View Full CV
+                </a>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grandee Lee. All Rights Reserved.</p>
+</footer>
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function () {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ── DATA ──────────────────────────────────────────────────
+    const papers = [
+        { year: "2024", title: "Beyond Single-Event Extraction: Towards Efficient Document-Level Multi-Event Argument Extraction", authors: "Wanlong Liu, Li Zhou, DingYi Zeng, Yichen Xiao, Shaohuan Cheng, Chen Zhang, Grandee Lee, Malu Zhang and Wenyu Chen", venue: "The 62nd Annual Meeting of the Association for Computational Linguistics (ACL)" },
+        { year: "2021", title: "Revisiting Self-training for Few-shot Learning of Language Model", authors: "Yiming Chen, Yan Zhang, Chen Zhang, Grandee Lee, Ran Cheng and Haizhou Li", venue: "EMNLP 2021" },
+        { year: "2021", title: "DynaEval: Unifying Turn and Dialogue Level Evaluation", authors: "Chen Zhang, Yiming Chen, Luis Fernando D'Haro, Yan Zhang, Grandee Lee, Haizhou Li", venue: "Association for Computational Linguistics (ACL), Long Paper" },
+        { year: "2021", title: "D-score: Holistic Dialogue Evaluation Without Reference", authors: "Chen Zhang, Grandee Lee, Luis Fernando D'Haro, Haizhou Li", venue: "IEEE/ACM Transaction on Audio, Speech, and Language Processing" },
+        { year: "2020", title: "Modeling Code-Switch Languages Using Bilingual Parallel Corpus", authors: "Grandee Lee, Haizhou Li", venue: "Association for Computational Linguistics (ACL), Long Paper" },
+        { year: "2020", title: "Self-and-Mixed Attention Decoder with Deep Acoustic Structure for Transformer-based LVCSR", authors: "Xinyuan Zhou, Grandee Lee, Emre Yılmaz, Yanhua Long, Jiaen Liang, Haizhou Li", venue: "INTERSPEECH" },
+        { year: "2020", title: "End-to-end code-switching TTS with cross-lingual language model", authors: "Xuehao Zhou, Xiaohai Tian, Grandee Lee, Rohan Kumar Das, Haizhou Li", venue: "ICASSP. IEEE." },
+        { year: "2019", title: "End-to-end code-switching ASR for low-resourced language pairs", authors: "Xianghu Yue, Grandee Lee, Emre Yılmaz, Fang Deng, Haizhou Li", venue: "ASRU" },
+        { year: "2019", title: "Linguistically motivated parallel data augmentation for code-switch language modeling", authors: "Grandee Lee, Xianghu Yue, Haizhou Li", venue: "INTERSPEECH" },
+        { year: "2019", title: "Word and class common space embedding for code-Switch language modeling", authors: "Grandee Lee, Haizhou Li", venue: "ICASSP. IEEE." },
+        { year: "2018", title: "Phonetically aware exemplar-based prosody transformation", authors: "Berrak Sisman, Grandee Lee, Haizhou Li", venue: "Proc. Odyssey 2018 The Speaker and Language Recognition Workshop." },
+        { year: "2017", title: "On the analysis and evaluation of prosody conversion techniques", authors: "Berrak Sisman, Grandee Lee, Haizhou Li, Kay Chen Tan", venue: "Asian Language Processing (IALP). Singapore. Dec 5." },
+        { year: "2017", title: "A review of the mandarin-english code-switching corpus: SEAME", authors: "Grandee Lee, Thi-Nga Ho, Eng-Siong Chng, Haizhou Li", venue: "Asian Language Processing (IALP). Singapore. Dec 5." }
+    ];
+
+    const courses = [
+        { code: "ICT162", title: "Object-Oriented Programming", inst: "Singapore University of Social Sciences", desc: "Course covering the principles and practices of object-oriented programming." },
+        { code: "ICT239", title: "Web Application Development", inst: "Singapore University of Social Sciences", desc: "Focuses on the fundamentals of developing modern web applications.", links: [{ text: "Jul2025-TG1", url: "new_class.html" }, { text: "Jul2025-TG2", url: "TG02.html" }] },
+        { code: "ICT304", title: "NLP Foundation for Generative AI", inst: "Singapore University of Social Sciences", desc: "Introducing Natural Language Processing (NLP) concepts and their applications in generative AI." },
+        { code: "ICT302", title: "Generative AI: Theory and Practice", inst: "Singapore University of Social Sciences", desc: "An exploration of the theory behind generative AI models and their practical applications." },
+        { code: "T16502", title: "AI, ChatGPT and Machine Translation", inst: "Nanyang Technological University (M.A. in Translation and Interpretation)", desc: "A master's level course on the impact of AI, particularly models like ChatGPT, on machine translation." },
+        { code: "EE2211", title: "Introduction to Machine Learning", inst: "National University of Singapore (ECE)", desc: "Teaching introductory concepts of machine learning to engineering students." },
+        { code: "N/A", title: "Introduction to Generative AI — Ngram Language Model", inst: "Lecture Notes", desc: "", links: [{ text: "PDF", url: "chapters/generative_ai_ngrams.pdf", target: "_blank" }] }
+    ];
+
+    // ── POPULATE DOM ──────────────────────────────────────────
+    const researchList = document.getElementById('research-list');
+    researchList.innerHTML = papers.map(p => `
+        <article class="paper">
+            <span class="paper-year">${p.year}</span>
+            <div class="paper-body">
+                <h3 class="paper-title">${p.title}</h3>
+                <p class="paper-authors">${p.authors}</p>
+                <p class="paper-venue">${p.venue}</p>
+            </div>
+        </article>
+    `).join('');
+
+    const teachingList = document.getElementById('teaching-list');
+    teachingList.innerHTML = courses.map(c => {
+        const linksHtml = c.links
+            ? `<div class="course-links">${c.links.map(l => `<a href="${l.url}" target="${l.target || '_self'}">${l.text}</a>`).join('')}</div>`
+            : '';
+        return `
+        <article class="course-card">
+            <div class="course-icon"><i class="fa-solid fa-book-open"></i></div>
+            <p class="course-code">${c.code}</p>
+            <h3 class="course-title">${c.title}</h3>
+            <p class="course-inst">${c.inst}</p>
+            ${c.desc ? `<p class="course-desc">${c.desc}</p>` : ''}
+            ${linksHtml}
+        </article>
+        `;
+    }).join('');
+
+    // ── HERO ENTRANCE ─────────────────────────────────────────
+    // Set initial states
+    gsap.set(['#orb1', '#orb2'], { opacity: 0, scale: 0.6 });
+    gsap.set('#hero-tag', { opacity: 0, y: 24 });
+    gsap.set('.hero-name .word span', { y: '110%', opacity: 0 });
+    gsap.set('#hero-subtitle', { opacity: 0, y: 28 });
+    gsap.set('#hero-actions .btn', { opacity: 0, y: 20 });
+    gsap.set('#scroll-hint', { opacity: 0 });
+
+    const heroTl = gsap.timeline({ delay: 0.15 });
+
+    heroTl
+        .to(['#orb1', '#orb2'], { opacity: 1, scale: 1, duration: 2.5, ease: 'power2.out', stagger: 0.3 }, 0)
+        .to('#hero-tag', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.2)
+        .to('.hero-name .word span', {
+            y: '0%', opacity: 1, duration: 1.1, ease: 'power4.out', stagger: 0.12
+        }, 0.5)
+        .to('#hero-subtitle', { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, 0.9)
+        .to('#hero-actions .btn', {
+            opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.1
+        }, 1.15)
+        .to('#scroll-hint', { opacity: 1, duration: 0.8, ease: 'power2.out' }, 1.6);
+
+    // Scroll-out parallax for hero
+    gsap.to('#hero-content', {
+        y: -90,
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '#hero',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 0.9
         }
+    });
 
-        // Header scroll effect: Adds background and shadow to the header when scrolled down.
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('header');
-            if (window.scrollY > 10) {
-                // Add classes for a subtle background, shadow, and blur effect
-                header.classList.add('bg-white/80', 'shadow-md', 'backdrop-blur-sm');
-            } else {
-                // Remove classes when at the top of the page
-                header.classList.remove('bg-white/80', 'shadow-md', 'backdrop-blur-sm');
+    gsap.to('#scroll-hint', {
+        opacity: 0,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '#hero',
+            start: '25% top',
+            end: '55% top',
+            scrub: 1
+        }
+    });
+
+    // ── SCROLL ENTRANCE HELPERS ───────────────────────────────
+    function revealSection(sectionSelector) {
+        const sec = document.querySelector(sectionSelector);
+        if (!sec) return;
+
+        const eyebrows = sec.querySelectorAll('.reveal-up');
+        const rule = sec.querySelector('.reveal-rule');
+        const card = sec.querySelector('.reveal-card');
+
+        gsap.set(eyebrows, { opacity: 0, y: 30 });
+        if (rule) gsap.set(rule, { opacity: 0, scaleX: 0, transformOrigin: 'left center' });
+        if (card) gsap.set(card, { opacity: 0, y: 40 });
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: sec,
+                start: 'top 78%',
+                toggleActions: 'play none none none'
             }
         });
 
-        // Fade-in animation on scroll: Uses Intersection Observer API for performance.
-        const fadeInObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Add 'is-visible' class to trigger the fade-in animation
-                    entry.target.classList.add('is-visible');
-                    // Stop observing once the element has faded in to optimize performance
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
-        // Dark Mode Toggle Logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const lightIcon = document.getElementById('theme-toggle-light-icon');
-        const darkIcon = document.getElementById('theme-toggle-dark-icon');
-        const body = document.body;
+        tl.to(eyebrows, { opacity: 1, y: 0, duration: 0.65, ease: 'power3.out', stagger: 0.1 });
 
-        // Function to set the theme
-        function setTheme(isDarkMode) {
-            if (isDarkMode) {
-                body.classList.add('dark');
-                lightIcon.classList.add('hidden');
-                darkIcon.classList.remove('hidden');
-                shadowColor = 'rgba(255, 255, 255, 0.5)'; // Dark mode shadow color
-            } else {
-                body.classList.remove('dark');
-                lightIcon.classList.remove('hidden');
-                darkIcon.classList.add('hidden');
-                shadowColor = 'rgba(0, 0, 0, 0.3)'; // Light mode shadow color
+        if (rule) tl.to(rule, { opacity: 1, scaleX: 1, duration: 0.6, ease: 'power3.out' }, '-=0.3');
+
+        if (card) tl.to(card, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.4');
+    }
+
+    revealSection('#about');
+    revealSection('#research');
+    revealSection('#teaching');
+    revealSection('#cv-section');
+
+    // ── PAPER STAGGER ─────────────────────────────────────────
+    gsap.set('.paper', { opacity: 0, y: 36, scale: 0.98 });
+    ScrollTrigger.batch('.paper', {
+        start: 'top 88%',
+        onEnter: batch => gsap.to(batch, {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.65, ease: 'power3.out',
+            stagger: 0.07
+        }),
+        once: true
+    });
+
+    // ── COURSE CARDS STAGGER ──────────────────────────────────
+    gsap.set('.course-card', { opacity: 0, y: 36, scale: 0.97 });
+    ScrollTrigger.batch('.course-card', {
+        start: 'top 88%',
+        onEnter: batch => gsap.to(batch, {
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.65, ease: 'power3.out',
+            stagger: 0.08
+        }),
+        once: true
+    });
+
+    // ── PROGRESS BAR ──────────────────────────────────────────
+    ScrollTrigger.create({
+        trigger: 'main',
+        start: 'top top',
+        end: 'bottom bottom',
+        onUpdate: self => {
+            gsap.to('#progress-bar', {
+                width: (self.progress * 100) + '%',
+                duration: 0.15,
+                ease: 'none'
+            });
+        }
+    });
+
+    // ── SCROLLED NAV CLASS ────────────────────────────────────
+    ScrollTrigger.create({
+        trigger: '#about',
+        start: 'top 80%',
+        onEnter: () => document.getElementById('nav').classList.add('scrolled'),
+        onLeaveBack: () => document.getElementById('nav').classList.remove('scrolled')
+    });
+
+    // ── ACTIVE NAV ────────────────────────────────────────────
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = ['#hero', '#about', '#research', '#teaching', '#cv-section'];
+
+    sections.forEach((id, i) => {
+        ScrollTrigger.create({
+            trigger: id,
+            start: 'top 55%',
+            end: 'bottom 55%',
+            onEnter: () => setActive(i),
+            onEnterBack: () => setActive(i)
+        });
+    });
+
+    function setActive(idx) {
+        navLinks.forEach((l, i) => l.classList.toggle('active', i === idx));
+    }
+
+    // ── SMOOTH SCROLL ─────────────────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', e => {
+            const target = document.querySelector(link.getAttribute('href'));
+            if (target) {
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                closeMenu();
             }
-        }
-
-        // Check for saved theme preference in localStorage or system preference
-        const savedTheme = localStorage.getItem('color-theme');
-        const systemPreference = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        // Apply saved theme or system preference on initial load
-        if (savedTheme === 'dark' || (!savedTheme && systemPreference)) {
-            setTheme(true);
-        } else {
-            setTheme(false);
-        }
-
-        // Add event listener to the toggle button
-        themeToggle.addEventListener('click', () => {
-            const isDarkMode = body.classList.contains('dark');
-            setTheme(!isDarkMode);
-            // Save the user's preference
-            localStorage.setItem('color-theme', !isDarkMode ? 'dark' : 'light');
         });
+    });
 
-        // Run scripts on load: Ensures content is populated and observers are set up after the DOM is ready.
-        document.addEventListener('DOMContentLoaded', () => {
-            populateContent(); // Call function to inject content
-            // Select all elements with the 'fade-in' class and observe them
-            const elements = document.querySelectorAll('.fade-in');
-            elements.forEach(el => fadeInObserver.observe(el));
+    // ── HAMBURGER ─────────────────────────────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const overlay = document.getElementById('mobile-overlay');
 
-            // Dynamic shadow effect for "Grandee Lee"
-            const homeSection = document.getElementById('home');
-            const grandeeLeeText = document.getElementById('grandee-lee-text');
+    hamburger.addEventListener('click', () => {
+        const open = hamburger.classList.toggle('open');
+        overlay.classList.toggle('open', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+    });
 
-            homeSection.addEventListener('mousemove', (e) => {
-                const rect = homeSection.getBoundingClientRect();
-                // Calculate mouse position relative to the center of the text element
-                const mouseX = e.clientX - rect.left - rect.width / 2;
-                const mouseY = e.clientY - rect.top - rect.height / 2;
+    function closeMenu() {
+        hamburger.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
 
-                // Adjust shadow intensity and spread based on mouse position
-                // Max shadow offset, reduced for subtler movement
-                const maxOffset = 10;
-
-                const shadowX = (mouseX / rect.width) * -maxOffset;
-                const shadowY = (mouseY / rect.height) * -maxOffset;
-
-                // Apply dynamic text shadow with reduced blur
-                grandeeLeeText.style.textShadow = `${shadowX}px ${shadowY}px 7px ${shadowColor} `;
-            });
-
-            // Reset shadow when mouse leaves the section
-            homeSection.addEventListener('mouseleave', () => {
-                grandeeLeeText.style.textShadow = `2px 2px 7px ${shadowColor}`; // Default shadow
-            });
-        });
-    </script>
+})();
+</script>
 </body>
-
 </html>
