@@ -227,6 +227,17 @@
             pointer-events: none;
         }
 
+        /* Kinetic Canvas Styling */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none; /* Let user clicks pass through to hero contents */
+        }
+
         /* Ambient orbs */
         .orb {
             position: absolute;
@@ -647,6 +658,9 @@
 
     <!-- HERO -->
     <section id="hero" class="section">
+        <!-- Integrated Interactive Kinetic Grid Canvas -->
+        <canvas id="bg-canvas"></canvas>
+
         <div class="orb orb-1" id="orb1"></div>
         <div class="orb orb-2" id="orb2"></div>
 
@@ -658,7 +672,7 @@
                 <span class="word"><span>Lee</span></span>
             </h1>
             <p class="hero-subtitle" id="hero-subtitle">
-                Researcher &amp; Educator at the Intersection of<br>AI, Language, and Learning
+                Researcher &amp; Educator at the Intersection of<br>AI, Language, Learning and Simulation
             </p>
             <div class="hero-actions" id="hero-actions">
                 <a href="mailto:grandeelee@suss.edu.sg" class="btn btn-outline">
@@ -983,6 +997,280 @@
         overlay.classList.remove('open');
         document.body.style.overflow = '';
     }
+
+    // ── KINETIC GRID ENGINE (MATCHED PALETTE INTEGRATION) ──────
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let dots = [];
+    let ripples = [];
+    const mouse = { x: -1000, y: -1000, px: -1000, py: -1000, active: false };
+
+    // Zen Flow Physics Config
+    const config = {
+        gridSpacing: 36,       // Lattice Spacing: 36
+        baseRadius: 2.0,       // Node size: 2
+        maxRadius: 10.0,       // Max radius: 10
+        influenceRadius: 360,  // Proximity range: 250
+        springTension: 0.18,   // Dynamic Spring Tension (Fast snap recovery)
+        damping: 0.52,         // Kinetic Damping (No trailing lag)
+        repulsionStrength: 5,// Dynamic repulsion force
+
+        rippleSpeed: 9,        // Speedy wave front sweep
+        rippleMaxWidth: 880,   
+        rippleThickness: 40,   
+        rippleIntensity: 5,   
+
+        // Customized color scheme: Matches brown-cream palette of grandeelee portfolio
+        // Base color is a medium warm brown (lighter extension of `--c5` background)
+        baseColor: { r: 123, g: 74, b: 58 },     // Warm Earthy Clay
+        // Hover is a bright glowing sand/cream matching your portfolio highlight `--c1`
+        // hoverColor: { r: 226, g: 198, b: 181 }   // Luminous Sand Accent
+        hoverColor: { r: 200, g: 164, b: 138 }   // Luminous Sand Accent
+    };
+
+    class Ripple {
+        constructor(x, y, multiplier = 1) {
+            this.x = x;
+            this.y = y;
+            this.radius = 0;
+            this.alpha = 1.0;
+            this.multiplier = multiplier;
+        }
+        update() {
+            this.radius += config.rippleSpeed;
+            this.alpha = 1 - (this.radius / config.rippleMaxWidth);
+        }
+        isDead() {
+            return this.radius >= config.rippleMaxWidth || this.alpha <= 0;
+        }
+    }
+
+    class Dot {
+        constructor(x, y) {
+            this.ox = x;
+            this.oy = y;
+            this.x = x;
+            this.y = y;
+            this.vx = 0;
+            this.vy = 0;
+        }
+
+        update() {
+            // Hook's Elastic Spring Force
+            const dxHome = this.ox - this.x;
+            const dyHome = this.oy - this.y;
+            this.vx += dxHome * config.springTension;
+            this.vy += dyHome * config.springTension;
+
+            // Continuous Pointer Repulsion Field
+            const dxMouse = this.x - mouse.x;
+            const dyMouse = this.y - mouse.y;
+            const distToMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+
+            if (distToMouse < config.influenceRadius && distToMouse > 0) {
+                const forceFactor = Math.pow(1 - (distToMouse / config.influenceRadius), 2);
+                const repulsionForce = forceFactor * config.repulsionStrength;
+                const angle = Math.atan2(dyMouse, dxMouse);
+                this.vx += Math.cos(angle) * repulsionForce;
+                this.vy += Math.sin(angle) * repulsionForce;
+            }
+
+            this.vx *= config.damping;
+            this.vy *= config.damping;
+
+            // Kinetic Shockwaves
+            ripples.forEach(ripple => {
+                const dxRipple = this.x - ripple.x;
+                const dyRipple = this.y - ripple.y;
+                const distToRipple = Math.sqrt(dxRipple * dxRipple + dyRipple * dyRipple);
+                const distDiff = Math.abs(distToRipple - ripple.radius);
+
+                if (distDiff < config.rippleThickness) {
+                    const waveFactor = 1 - (distDiff / config.rippleThickness);
+                    const pushPower = waveFactor * ripple.alpha * config.rippleIntensity * ripple.multiplier;
+                    const angle = Math.atan2(dyRipple, dxRipple);
+                    this.vx += Math.cos(angle) * pushPower;
+                    this.vy += Math.sin(angle) * pushPower;
+                }
+            });
+
+            // Prevent lingering floating point calculations when resting
+            if (Math.abs(this.vx) < 0.001) this.vx = 0;
+            if (Math.abs(this.vy) < 0.001) this.vy = 0;
+
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.vx === 0 && this.vy === 0 && distToMouse >= config.influenceRadius) {
+                if (Math.hypot(this.x - this.ox, this.y - this.oy) < 0.05) {
+                    this.x = this.ox;
+                    this.y = this.oy;
+                }
+            }
+        }
+
+        draw() {
+            const dxMouse = mouse.x - this.x;
+            const dyMouse = mouse.y - this.y;
+            const distToMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+
+            let proximityFactor = 0;
+            if (distToMouse < config.influenceRadius) {
+                proximityFactor = 1 - (distToMouse / config.influenceRadius);
+                proximityFactor = Math.pow(proximityFactor, 2);
+            }
+
+            const kineticScale = Math.sqrt(this.vx * this.vx + this.vy * this.vy) * 0.35;
+            let radius = config.baseRadius + (config.maxRadius - config.baseRadius) * proximityFactor + kineticScale;
+            radius = Math.max(config.baseRadius, Math.min(radius, 25));
+
+            const colorBlend = Math.min(1.0, proximityFactor + (kineticScale / 6.0));
+            const r = Math.round(config.baseColor.r + (config.hoverColor.r - config.baseColor.r) * colorBlend);
+            const g = Math.round(config.baseColor.g + (config.hoverColor.g - config.baseColor.g) * colorBlend);
+            const b = Math.round(config.baseColor.b + (config.hoverColor.b - config.baseColor.b) * colorBlend);
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            ctx.fill();
+        }
+    }
+
+    function initGrid() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentNode.getBoundingClientRect();
+        width = rect.width;
+        height = rect.height;
+
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+
+        dots = [];
+        for (let y = config.gridSpacing / 2; y < height + 10; y += config.gridSpacing) {
+            for (let x = config.gridSpacing / 2; x < width + 10; x += config.gridSpacing) {
+                dots.push(new Dot(x, y));
+            }
+        }
+    }
+
+    function animateGrid() {
+        ctx.clearRect(0, 0, width, height);
+
+        ripples = ripples.filter(ripple => {
+            ripple.update();
+            return !ripple.isDead();
+        });
+
+        dots.forEach(dot => {
+            dot.update();
+            dot.draw();
+        });
+
+        requestAnimationFrame(animateGrid);
+    }
+
+    // Monitor window events, map them relative to the Hero section
+    window.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX - rect.left;
+        const clientY = e.clientY - rect.top;
+
+        // Ensure interactions only fire inside the Hero fold
+        if (clientX >= 0 && clientX <= rect.width && clientY >= 0 && clientY <= rect.height) {
+            mouse.px = mouse.x;
+            mouse.py = mouse.y;
+            mouse.x = clientX;
+            mouse.y = clientY;
+
+            if (mouse.active) {
+                const dragDist = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
+                if (dragDist > 25) {
+                    ripples.push(new Ripple(mouse.x, mouse.y, 0.4));
+                }
+            }
+        } else {
+            mouse.x = -1000;
+            mouse.y = -1000;
+            mouse.active = false;
+        }
+    });
+
+    window.addEventListener('mouseleave', () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+        mouse.active = false;
+    });
+
+    window.addEventListener('mousedown', (e) => {
+        if (e.button === 0) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX - rect.left;
+            const clientY = e.clientY - rect.top;
+
+            if (clientX >= 0 && clientX <= rect.width && clientY >= 0 && clientY <= rect.height) {
+                mouse.active = true;
+                ripples.push(new Ripple(clientX, clientY, 1.0));
+            }
+        }
+    });
+
+    window.addEventListener('mouseup', () => {
+        mouse.active = false;
+    });
+
+    // Touch Support for Mobile Viewports
+    window.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const clientX = touch.clientX - rect.left;
+            const clientY = touch.clientY - rect.top;
+
+            if (clientX >= 0 && clientX <= rect.width && clientY >= 0 && clientY <= rect.height) {
+                mouse.x = clientX;
+                mouse.y = clientY;
+                mouse.active = true;
+                ripples.push(new Ripple(clientX, clientY, 1.0));
+            }
+        }
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const clientX = touch.clientX - rect.left;
+            const clientY = touch.clientY - rect.top;
+
+            if (clientX >= 0 && clientX <= rect.width && clientY >= 0 && clientY <= rect.height) {
+                mouse.px = mouse.x;
+                mouse.py = mouse.y;
+                mouse.x = clientX;
+                mouse.y = clientY;
+
+                const dragDist = Math.hypot(mouse.x - mouse.px, mouse.y - mouse.py);
+                if (dragDist > 25) {
+                    ripples.push(new Ripple(mouse.x, mouse.y, 0.4));
+                }
+            }
+        }
+    });
+
+    window.addEventListener('touchend', () => {
+        mouse.active = false;
+    });
+
+    window.addEventListener('resize', () => {
+        initGrid();
+    });
+
+    window.addEventListener('load', () => {
+        initGrid();
+        animateGrid();
+    });
 
 })();
 </script>
