@@ -185,7 +185,7 @@ This is why the seminars ship a `requirements.txt`. **If you ever `pip install` 
 
 ### ✅ Checkpoint 1
 
-<video src="checkpoint-1.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-1.webm" controls muted width="100%"></video>
 
 ```bash
 (venv) $ python -c "import flask; print(flask.__version__)"
@@ -306,7 +306,7 @@ One consequence: **start the server with `flask run` (via `start.sh`), not with 
 
 ### ✅ Checkpoint 2
 
-<video src="checkpoint-2.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-2.webm" controls muted width="100%"></video>
 
 The browser shows "Hello from the shop!" and the terminal shows a log line like `"GET / HTTP/1.1" 200 -`. That log line *is* the request/response conversation from Step 0.
 
@@ -548,7 +548,7 @@ The list of dictionaries is fake data – in Step 6 it will come from a real dat
 
 ### ✅ Checkpoint 3
 
-<video src="checkpoint-3.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-3.webm" controls muted width="100%"></video>
 
 ```bash
 (venv) $ bash start.sh
@@ -810,7 +810,7 @@ Finally, add Login/Register links to the navbar in `templates/base.html`. Find t
 
 ### ✅ Checkpoint 4
 
-<video src="checkpoint-4.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-4.webm" controls muted width="100%"></video>
 
 Restart the server if it isn't running (`bash start.sh`) and visit <http://127.0.0.1:5000/register>.
 
@@ -981,11 +981,11 @@ In **`templates/login.html`** change `href="/register"` → `href="{{ url_for('r
 
 *Flash messages (shown once):*
 
-<video src="checkpoint-5-flash.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-5-flash.webm" controls muted width="100%"></video>
 
 *Register and log in:*
 
-<video src="checkpoint-5-login-register.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-5-login-register.webm" controls muted width="100%"></video>
 
 ---
 
@@ -1221,7 +1221,7 @@ The template used `product.desc` for the description; the model calls the field 
 
 ### ✅ Checkpoint 6
 
-<video src="checkpoint-6.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-6.webm" controls muted width="100%"></video>
 
 1. `bash start.sh`, open <http://127.0.0.1:5000/> → **eight** products, loaded from MongoDB.
 2. Register a new account. You are sent to the login page.
@@ -1787,7 +1787,7 @@ The two other forms need no changes: `login.html` has no `action`, so after Flas
 
 ### ✅ Checkpoint 7
 
-<video src="checkpoint-7.webm" controls muted width="100%"></video>
+<video src="/checkpoints-for-walkthrough/checkpoint-7.webm" controls muted width="100%"></video>
 
 1. Logged out, click **Cart** → you're taken to the login page, and the address bar shows `/login?next=%2Fcart`. A banner says "Please log in to continue."
 2. Log in → you land on **/cart** (that's `next` working), which says "Your cart is empty".
