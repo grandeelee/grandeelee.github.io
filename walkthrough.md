@@ -1,3 +1,4 @@
+{% raw %}
 # Seminar 4 – Build a Shopping Site from Scratch (Seminar 1 to 3 in One Go)
 
 In this walkthrough you will build, **from an empty folder**, a small but real Flask web application: an online shop called **ESSENTIALS**.
@@ -2317,3 +2318,4 @@ WTForms==3.1.2
 5. **Admin-only page** – only `current_user.email == "admin@abc.com"` may add products (see how Seminar 3's `base.html` checks this).
 6. **Configuration** – move the secret key and database host into environment variables.
 
+{% endraw %}
