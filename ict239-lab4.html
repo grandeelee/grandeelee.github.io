@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MongoEngine Query Drills | Grandee Lee</title>
+<meta name="description" content="Lab 4 interactive drills: MongoEngine advanced querying and filtering a cart through a ReferenceField, continuing the ICT239 Flask walkthrough.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+    :root {
+        --c1: #e2c6b5;
+        --c2: #c8a48a;
+        --c3: #a77b5b;
+        --c4: #7b4a3a;
+        --c5: #4e2b1e;
+        --cream: #f5ede5;
+        --cream-dark: #ede2d5;
+        --text-dark: #3b1f14;
+        --text-mid: #5a3a2c;
+        --text-light: #7a6558;
+
+        --accent: var(--c3);
+        --accent-dark: var(--c4);
+        --accent-soft: rgba(167, 123, 91, 0.12);
+        --border: rgba(200, 164, 138, 0.28);
+
+        --code-bg: #282c34;
+        --code-bg-2: #21252b;
+        --code-line: #3a3f4b;
+        --code-text: #abb2bf;
+        --code-muted: #7f8790;
+        --code-kw: #c678dd;
+        --code-str: #98c379;
+        --code-dec: #e5c07b;
+        --code-com: #5c6370;
+
+        --success: #3f7d52;
+        --success-bg: #e4efe6;
+        --success-border: #9dc7a8;
+        --danger: #a9432f;
+        --danger-bg: #f7e7e2;
+        --danger-border: #dba493;
+
+        --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--cream);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 clamp(1.2rem, 4vw, 2.5rem) 5rem;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+        color: var(--c5);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: clamp(1.4rem, 3vw, 1.8rem);
+        font-weight: 900;
+        margin-top: 3.2rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--border);
+        scroll-margin-top: 84px;
+    }
+    h3 {
+        font-size: clamp(1.05rem, 2vw, 1.25rem);
+        font-weight: 700;
+        color: var(--c4);
+        margin-top: 2rem;
+        scroll-margin-top: 84px;
+    }
+    h4 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        color: var(--text-light);
+        margin: 1.8rem 0 0.6rem;
+    }
+
+    p { color: var(--text-mid); max-width: 68ch; }
+    .muted { color: var(--text-light); }
+    .lede { font-size: 1.02rem; color: rgba(226,198,181,0.85); max-width: 640px; }
+
+    a { color: var(--accent); text-decoration-color: rgba(167,123,91,0.4); text-underline-offset: 3px; }
+    a:hover { color: var(--accent-dark); }
+
+    code.inline {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--cream-dark);
+        color: var(--c5);
+        border: 1px solid var(--border);
+        padding: 0.12em 0.42em;
+        border-radius: 6px;
+        font-size: 0.88em;
+    }
+
+    ul.notes { padding-left: 1.2rem; max-width: 68ch; color: var(--text-mid); }
+    ul.notes li { margin-bottom: 0.55rem; }
+
+    /* ---- top nav (matches walkthrough.html) ---- */
+    #nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(245, 237, 229, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 1px 0 rgba(167, 123, 91, 0.15);
+        padding: 0 clamp(1.2rem, 4vw, 3rem);
+    }
+    .nav-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        gap: 1rem;
+    }
+    .nav-back {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--c5);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .nav-back i { font-size: 0.85rem; color: var(--c3); transition: transform 0.25s ease; }
+    .nav-back:hover i { transform: translateX(-3px); }
+    .nav-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        display: none;
+    }
+    @media (min-width: 700px) { .nav-title { display: block; } }
+
+    /* ---- hero band ---- */
+    #doc-hero {
+        position: relative;
+        background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 45%, var(--c3) 100%);
+        padding: clamp(2.6rem, 7vw, 4.5rem) clamp(1.5rem, 6vw, 4rem);
+        overflow: hidden;
+    }
+    #doc-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 70% 55% at 12% 90%, rgba(226,198,181,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 70% at 88% 10%, rgba(226,198,181,0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    .doc-hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; text-align: center; }
+    .doc-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        text-transform: uppercase;
+        color: var(--c2);
+        margin-bottom: 1rem;
+    }
+    .doc-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: clamp(1.8rem, 4.6vw, 2.7rem);
+        color: var(--c1);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    /* ---- score badge ---- */
+    #score-badge {
+        position: sticky;
+        top: 76px;
+        z-index: 30;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: rgba(245, 237, 229, 0.96);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 18px 8px 13px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--c5);
+        box-shadow: 0 4px 20px rgba(59,31,20,0.12);
+        margin: 1.6rem 0 0;
+    }
+    #score-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c3); flex-shrink: 0; }
+    #score-badge.complete .dot { background: var(--success); }
+    #score-badge.complete { border-color: var(--success-border); color: var(--success); background: var(--success-bg); }
+
+    /* ---- instructions box ---- */
+    .howto {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+        padding: 1.2rem 1.4rem;
+        margin-top: 1.6rem;
+        display: flex;
+        gap: 14px;
+    }
+    .howto .icon {
+        width: 30px; height: 30px; flex-shrink: 0;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--c4);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+    }
+    .howto p { margin: 0; font-size: 0.94rem; }
+    .howto p + p { margin-top: 6px; }
+
+    /* ---- tables ---- */
+    table.grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        background: white;
+    }
+    .table-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+    }
+    table.grid th, table.grid td { text-align: left; padding: 0.7rem 1rem; vertical-align: top; }
+    table.grid th {
+        background: var(--cream-dark);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--c5);
+        font-weight: 700;
+    }
+    table.grid td { border-top: 1px solid var(--border); color: var(--text-mid); line-height: 1.6; }
+    table.grid tr:hover td { background: rgba(167,123,91,0.04); }
+    table.grid code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+
+    .doc-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* ---- code panel ---- */
+    .panel { margin-top: 1.2rem; }
+    .panel-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--text-light);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .panel-label .file-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c3); }
+
+    pre.code {
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: var(--radius);
+        padding: 1.3rem 1.4rem;
+        overflow-x: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        line-height: 1.7;
+        margin: 0;
+        border: 1px solid rgba(167,123,91,0.15);
+        box-shadow: 0 8px 30px rgba(59,31,20,0.14);
+    }
+    pre.code .kw { color: var(--code-kw); }
+    pre.code .str { color: var(--code-str); }
+    pre.code .com { color: var(--code-com); font-style: italic; }
+    pre.code .dec { color: var(--code-dec); }
+
+    /* ---- blank dropdown ---- */
+    select.blank {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        font-weight: 600;
+        background: var(--code-bg-2);
+        color: var(--code-text);
+        border: 1.5px dashed var(--code-muted);
+        border-radius: 6px;
+        padding: 1px 6px;
+        margin: 0 1px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        min-width: 5.5ch;
+    }
+    select.blank:hover { border-color: var(--c2); }
+    select.blank:focus-visible { outline: 2px solid var(--c2); outline-offset: 2px; }
+    select.blank.correct { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success-border); }
+    select.blank.incorrect { background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger-border); }
+    select.blank option { color: var(--text-dark); background: #fff; }
+
+    /* ---- approach tag ---- */
+    .approach-tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 8px;
+    }
+    .approach-tag.ref { background: var(--accent-soft); color: var(--c4); }
+    .approach-tag.py { background: var(--cream-dark); color: var(--text-light); border: 1px solid var(--border); }
+
+    .callout {
+        border-left: 3px solid var(--c3);
+        background: rgba(167,123,91,0.07);
+        padding: 1rem 1.3rem;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        font-size: 0.93rem;
+        margin-top: 1.2rem;
+        max-width: 68ch;
+    }
+    .callout p { margin: 0; color: var(--text-mid); }
+    .callout p + p { margin-top: 6px; }
+
+    /* ---- footer ---- */
+    .lab-footnote {
+        margin-top: 3.5rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.88rem;
+        color: var(--text-light);
+    }
+    footer {
+        background: var(--c5);
+        padding: clamp(2rem, 5vw, 3rem);
+        text-align: center;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
+    .footer-links a {
+        width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 50%; border: 1px solid rgba(200,164,138,0.2); color: var(--c2);
+        font-size: 0.95rem; text-decoration: none; transition: all 0.3s ease;
+    }
+    .footer-links a:hover { background: rgba(167,123,91,0.2); border-color: var(--c3); color: var(--c1); transform: translateY(-2px); }
+    .footer-copy { font-size: 0.78rem; color: rgba(200,164,138,0.4); }
+
+    /* ---- back to top ---- */
+    #back-to-top {
+        position: fixed;
+        right: clamp(1rem, 3vw, 2.2rem);
+        bottom: clamp(1rem, 3vw, 2.2rem);
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: var(--c5);
+        color: var(--c1);
+        display: flex; align-items: center; justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 24px rgba(59,31,20,0.3);
+        opacity: 0; pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 900;
+        font-size: 0.95rem;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    @media (max-width: 480px) {
+        pre.code { font-size: 0.76rem; padding: 1rem; }
+        table.grid { font-size: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+        <span class="nav-title">ICT239 &middot; Lab 4</span>
+    </div>
+</nav>
+
+<header id="doc-hero">
+    <div class="doc-hero-inner">
+        <p class="doc-eyebrow">ICT239 &middot; Lab 4 &middot; Continues from walkthrough.html, Step 8</p>
+        <h1 class="doc-title">MongoEngine Query Drills</h1>
+        <p class="lede">Product search &amp; filtering, and filtering the cart through a <code class="inline">ReferenceField</code> &mdash; the two advanced-querying techniques from Seminar 4, built on top of the finished ESSENTIALS shop. Every dashed box below is a dropdown: pick the operator, and it turns green if correct, red if not. Nothing else has been removed &mdash; only the operator itself.</p>
+    </div>
+</header>
+
+<main>
+  <div id="score-badge"><span class="dot"></span><span id="score-text">0 / 12 correct</span></div>
+
+  <div class="howto">
+    <div class="icon"><i class="fa-solid fa-circle-question"></i></div>
+    <div>
+      <p><strong>Scope.</strong> This picks up at the finished Step 8 project layout (blueprints, <code class="inline">models/</code>, <code class="inline">controllers/</code>). It only adds methods to files that already exist &mdash; <code class="inline">models/product.py</code>, <code class="inline">models/cart.py</code>, <code class="inline">controllers/shop.py</code>, <code class="inline">shopping.html</code>, <code class="inline">cart.html</code> &mdash; no new model, collection, or blueprint.</p>
+      <p>Your dropdown answers are remembered in this browser if you reopen the file, but nothing is submitted anywhere.</p>
+    </div>
+  </div>
+
+  <h2>Cheat sheet</h2>
+  <p class="muted">Reference this while you work &mdash; it explains what each operator does, but not which blank below needs which one.</p>
+  <div class="table-wrap">
+  <table class="grid">
+    <tr><th>Syntax</th><th>Meaning</th></tr>
+    <tr><td><code>price__gte</code></td><td>price &ge; value</td></tr>
+    <tr><td><code>price__lte</code></td><td>price &le; value</td></tr>
+    <tr><td><code>price__gt</code> / <code>price__lt</code></td><td>price &gt; / &lt; value (strict)</td></tr>
+    <tr><td><code>name__ne</code></td><td>name is not equal to value</td></tr>
+    <tr><td><code>name__icontains</code></td><td>case-insensitive substring match</td></tr>
+    <tr><td><code>field__in</code></td><td>field's value is one of a list/queryset</td></tr>
+    <tr><td><code>field__not__gte</code></td><td>negates any operator that follows it</td></tr>
+    <tr><td><code>Q(a) | Q(b)</code></td><td>OR &mdash; needs <code>from mongoengine import Q</code></td></tr>
+    <tr><td><code>query &amp;= Q(...)</code></td><td>AND another condition onto an existing <code>Q</code></td></tr>
+    <tr><td><code>.order_by("price")</code></td><td>ascending by that field</td></tr>
+    <tr><td><code>.order_by("-price")</code></td><td>descending &mdash; the leading <code>-</code> flips the direction</td></tr>
+  </table>
+  </div>
+  <a class="doc-link" href="https://docs.mongoengine.org/guide/querying.html" target="_blank" rel="noopener">Full MongoEngine querying guide &rarr;</a>
+
+  <!-- ================================================================ -->
+  <h2>Part A &middot; Product search &amp; filtering</h2>
+  <p>Plain keyword arguments to <code class="inline">.objects()</code> are already ANDed together &mdash; <code class="inline">Product.objects(price__gt=20, price__lt=60, name__ne="Notebook")</code> needs no <code class="inline">Q</code> at all. <code class="inline">Q</code> only becomes necessary for an <strong>OR</strong>, a <strong>NOT</strong> on a whole group, or when a query is assembled conditionally out of pieces that are themselves an OR &mdash; which is exactly the situation <code class="inline">filterProducts</code> below is in.</p>
+
+  <h4>app/models/product.py &mdash; add these methods</h4>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>models/product.py</div>
+    <pre class="code">
+<span class="kw">from</span> mongoengine <span class="kw">import</span> Q
+<span class="kw">from</span> mongoengine.errors <span class="kw">import</span> ValidationError
+<span class="kw">from</span> app <span class="kw">import</span> db
+
+
+<span class="kw">class</span> Product(db.Document):
+    meta = {<span class="str">"collection"</span>: <span class="str">"products"</span>}
+    name = db.StringField(required=<span class="kw">True</span>, max_length=60)
+    description = db.StringField(max_length=300)
+    price = db.FloatField(required=<span class="kw">True</span>, min_value=0)
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> getProduct(product_id):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> Product.objects(pk=product_id).first()
+        <span class="kw">except</span> ValidationError:
+            <span class="kw">return</span> <span class="kw">None</span>
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> getAllProducts():
+        <span class="kw">return</span> Product.objects()
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> createProduct(name, description, price):
+        <span class="kw">return</span> Product(name=name, description=description, price=price).save()
+
+    <span class="com"># ---- Part A: advanced querying -----------------------------------------</span>
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> getByPriceRange(min_price=<span class="kw">None</span>, max_price=<span class="kw">None</span>):
+        filters = {}
+        <span class="kw">if</span> min_price <span class="kw">is not</span> <span class="kw">None</span>:
+            filters[<span class="str">"price__</span><select class="blank" id="blank-1" data-answer="gte" aria-label="operator for min_price"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select><span class="str">"</span>] = min_price
+        <span class="kw">if</span> max_price <span class="kw">is not</span> <span class="kw">None</span>:
+            filters[<span class="str">"price__</span><select class="blank" id="blank-2" data-answer="lte" aria-label="operator for max_price"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select><span class="str">"</span>] = max_price
+        <span class="kw">return</span> Product.objects(**filters)
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> _applySort(queryset, sort):
+        sort_map = {
+            <span class="str">"price_asc"</span>: <span class="str">"price"</span>,
+            <span class="str">"price_desc"</span>: <span class="str">"</span><select class="blank" id="blank-8" data-answer="-price" aria-label="sort key for price_desc"><option value="" selected disabled>key</option><option value="-price">-price</option><option value="price">price</option><option value="!price">!price</option><option value="~price">~price</option></select><span class="str">"</span>,
+            <span class="str">"name_asc"</span>: <span class="str">"name"</span>,
+        }
+        <span class="kw">return</span> queryset.<select class="blank" id="blank-9" data-answer="order_by" aria-label="method used to sort"><option value="" selected disabled>method</option><option value="order_by">order_by</option><option value="filter">filter</option><option value="sort">sort</option><option value="limit">limit</option></select>(sort_map.get(sort, <span class="str">"name"</span>))  <span class="com"># "name" is the default order</span>
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> search(keyword):
+        <span class="kw">return</span> Product.objects(Q(name__<select class="blank" id="blank-3" data-answer="icontains" aria-label="operator for name keyword match"><option value="" selected disabled>op</option><option value="icontains">icontains</option><option value="contains">contains</option><option value="iexact">iexact</option><option value="exact">exact</option></select>=keyword) | Q(description__<select class="blank" id="blank-4" data-answer="icontains" aria-label="operator for description keyword match"><option value="" selected disabled>op</option><option value="icontains">icontains</option><option value="contains">contains</option><option value="iexact">iexact</option><option value="exact">exact</option></select>=keyword))
+
+    <span class="dec">@staticmethod</span>
+    <span class="kw">def</span> filterProducts(keyword=<span class="kw">None</span>, min_price=<span class="kw">None</span>, max_price=<span class="kw">None</span>, sort=<span class="kw">None</span>):
+        query = Q()
+        <span class="kw">if</span> keyword:
+            query <select class="blank" id="blank-5" data-answer="&=" aria-label="operator to AND the keyword condition in"><option value="" selected disabled>op</option><option value="&=">&amp;=</option><option value="|=">|=</option><option value="=">=</option><option value="+=">+=</option></select> (Q(name__icontains=keyword) | Q(description__icontains=keyword))
+        <span class="kw">if</span> min_price <span class="kw">is not</span> <span class="kw">None</span>:
+            query &amp;= Q(price__<select class="blank" id="blank-6" data-answer="gte" aria-label="operator for min_price in filterProducts"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select>=min_price)
+        <span class="kw">if</span> max_price <span class="kw">is not</span> <span class="kw">None</span>:
+            query &amp;= Q(price__<select class="blank" id="blank-7" data-answer="lte" aria-label="operator for max_price in filterProducts"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select>=max_price)
+
+        results = Product.objects(query)
+        <span class="kw">return</span> Product._applySort(results, sort)</pre>
+  </div>
+
+  <ul class="notes">
+    <li><code class="inline">getByPriceRange</code> and <code class="inline">search</code> are the two "single technique" building blocks (a comma-separated <code class="inline">**filters</code> dict for the optional range, <code class="inline">Q(...) | Q(...)</code> for OR-matching two fields). <code class="inline">filterProducts</code> is where they get combined, which is the actual capstone requirement &mdash; a single query built from zero to four independent, optional conditions.</li>
+    <li><code class="inline">_applySort</code> centralises the "what happens with an unrecognised or missing <code class="inline">sort</code> value" decision, so <code class="inline">filterProducts</code> never has to special-case a bad <code class="inline">sort</code> argument.</li>
+    <li>Each filter line only gets added to the query when its value <code class="inline">is not None</code> &mdash; this optional-filter pattern is what makes every parameter independently optional. Consider what would go wrong if that check were removed.</li>
+  </ul>
+
+  <h4>app/controllers/shop.py &mdash; updated home()</h4>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>controllers/shop.py</div>
+    <pre class="code">
+<span class="kw">from</span> flask <span class="kw">import</span> Blueprint, render_template, redirect, url_for, flash, request
+<span class="kw">from</span> flask_login <span class="kw">import</span> login_required, current_user
+
+<span class="kw">from</span> models.product <span class="kw">import</span> Product
+<span class="kw">from</span> models.cart <span class="kw">import</span> CartItem
+
+shop = Blueprint(<span class="str">"shop"</span>, __name__)
+
+
+<span class="dec">@shop.route(</span><span class="str">"/"</span><span class="dec">)</span>
+<span class="kw">def</span> home():
+    <span class="com">"""Insert the sample catalogue the first time the shop is opened, then list the products."""</span>
+    <span class="kw">if</span> Product.objects.count() == 0:
+        samples = [
+            (<span class="str">"Linen Shirt"</span>, <span class="str">"Breathable, relaxed fit."</span>, 79.0),
+            (<span class="str">"Canvas Tote"</span>, <span class="str">"Sturdy everyday bag."</span>, 35.5),
+            (<span class="str">"Ceramic Mug"</span>, <span class="str">"Hand-glazed, 350 ml."</span>, 18.0),
+            (<span class="str">"Wool Beanie"</span>, <span class="str">"Soft merino blend."</span>, 24.9),
+            (<span class="str">"Leather Wallet"</span>, <span class="str">"Slim, full-grain leather."</span>, 55.0),
+            (<span class="str">"Cotton Socks (3 pack)"</span>, <span class="str">"Everyday crew socks."</span>, 15.0),
+            (<span class="str">"Desk Lamp"</span>, <span class="str">"Warm light, adjustable arm."</span>, 48.0),
+            (<span class="str">"Notebook"</span>, <span class="str">"A5, 120 pages, dotted."</span>, 9.5),
+        ]
+        <span class="kw">for</span> name, description, price <span class="kw">in</span> samples:
+            Product.createProduct(name, description, price)
+
+    keyword = request.args.get(<span class="str">"keyword"</span>, <span class="str">""</span>).strip() <span class="kw">or</span> <span class="kw">None</span>
+    sort = request.args.get(<span class="str">"sort"</span>) <span class="kw">or</span> <span class="kw">None</span>
+
+    min_price = request.args.get(<span class="str">"min_price"</span>)
+    min_price = <span class="kw">float</span>(min_price) <span class="kw">if</span> min_price <span class="kw">else</span> <span class="kw">None</span>
+
+    max_price = request.args.get(<span class="str">"max_price"</span>)
+    max_price = <span class="kw">float</span>(max_price) <span class="kw">if</span> max_price <span class="kw">else</span> <span class="kw">None</span>
+
+    products = Product.filterProducts(keyword=keyword, min_price=min_price, max_price=max_price, sort=sort)
+    <span class="kw">return</span> render_template(
+        <span class="str">"shopping.html"</span>,
+        products=products,
+        keyword=keyword <span class="kw">or</span> <span class="str">""</span>,
+        min_price=request.args.get(<span class="str">"min_price"</span>, <span class="str">""</span>),
+        max_price=request.args.get(<span class="str">"max_price"</span>, <span class="str">""</span>),
+        sort=sort <span class="kw">or</span> <span class="str">""</span>,
+    )</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;">The raw query-string values (not the parsed floats) are passed back into the template purely so the filter bar can redisplay what was searched for &mdash; the same "sticky form" idea as <code class="inline">form.field.data</code> for the WTForms login/register forms in Step 4 of the walkthrough, done here by hand because this is a plain <code class="inline">GET</code> form, not a <code class="inline">FlaskForm</code>.</p>
+
+  <h4>app/templates/shopping.html &mdash; the filter bar</h4>
+  <p>Insert this <strong>above</strong> the product grid's <code class="inline">&lt;div class="row ..."&gt;</code>:</p>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>templates/shopping.html</div>
+    <pre class="code">&lt;form method="GET" class="row g-2 align-items-end mb-4"&gt;
+  &lt;div class="col-12 col-md-4"&gt;
+    &lt;label class="form-label small"&gt;Keyword&lt;/label&gt;
+    &lt;input type="text" name="keyword" value="{{ keyword }}" class="form-control" placeholder="e.g. mug, leather"&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-2"&gt;
+    &lt;label class="form-label small"&gt;Min price&lt;/label&gt;
+    &lt;input type="number" step="0.01" min="0" name="min_price" value="{{ min_price }}" class="form-control"&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-2"&gt;
+    &lt;label class="form-label small"&gt;Max price&lt;/label&gt;
+    &lt;input type="number" step="0.01" min="0" name="max_price" value="{{ max_price }}" class="form-control"&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-2"&gt;
+    &lt;label class="form-label small"&gt;Sort by&lt;/label&gt;
+    &lt;select name="sort" class="form-select"&gt;
+      &lt;option value="name_asc" {{ "selected" if sort == "name_asc" }}&gt;Name A-Z&lt;/option&gt;
+      &lt;option value="price_asc" {{ "selected" if sort == "price_asc" }}&gt;Price: low to high&lt;/option&gt;
+      &lt;option value="price_desc" {{ "selected" if sort == "price_desc" }}&gt;Price: high to low&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-2 d-grid"&gt;
+    &lt;button type="submit" class="btn btn-dark rounded-0"&gt;Search&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;">This form uses <code class="inline">method="GET"</code> &mdash; it reads and filters data, it does not change anything, so it needs <strong>no CSRF token</strong> (unlike every <code class="inline">POST</code> form for Add / Remove / Empty cart already in the project). Worth re-asking why GET vs POST mattered back in Step 5 of the walkthrough.</p>
+
+  <p>And change the <code class="inline">{% for product in products %}{% else %}</code> fallback text to distinguish "no products at all" from "no products match your filters":</p>
+  <div class="panel">
+    <pre class="code">{% else %}
+  {% if keyword or min_price or max_price %}
+    &lt;p class="text-muted"&gt;No products match your search. &lt;a href="{{ url_for('shop.home') }}"&gt;Clear filters&lt;/a&gt;&lt;/p&gt;
+  {% else %}
+    &lt;p class="text-muted"&gt;No products yet.&lt;/p&gt;
+  {% endif %}
+{% endfor %}</pre>
+  </div>
+
+  <h4>Checkpoint A &mdash; expected behaviour</h4>
+  <div class="table-wrap">
+  <table class="grid">
+    <tr><th>URL</th><th>Result</th></tr>
+    <tr><td><code>/</code></td><td>all 8 products, name A&ndash;Z (the default)</td></tr>
+    <tr><td><code>/?min_price=20&amp;max_price=60</code></td><td>Linen Shirt, Wool Beanie, Leather Wallet, Desk Lamp (check the sample data's exact prices against the boundaries)</td></tr>
+    <tr><td><code>/?keyword=leather</code></td><td>Leather Wallet only (matched via <code>description</code>, not <code>name</code>)</td></tr>
+    <tr><td><code>/?keyword=o&amp;sort=price_desc</code></td><td>every product with "o" in name/description, highest price first</td></tr>
+    <tr><td><code>/?keyword=zzz</code></td><td>"No products match your search" message with a "Clear filters" link</td></tr>
+    <tr><td>Any single parameter dropped from the URL</td><td>the remaining filters still apply correctly (nothing requires all four at once)</td></tr>
+  </table>
+  </div>
+
+  <!-- ================================================================ -->
+  <h2>Part B &middot; Filtering the cart through a reference field</h2>
+  <p>This reuses <code class="inline">CartItem</code> exactly as built in Step 7/8 of the walkthrough &mdash; no new collection, no new model. The only new idea: <code class="inline">CartItem.product</code> is a <code class="inline">ReferenceField(Product)</code>, so MongoDB only stores that product's <code class="inline">_id</code> inside each <code class="inline">CartItem</code> document. Filtering the cart by <strong>price</strong> means filtering by a field that lives on a <em>different</em> collection, reached through that reference.</p>
+
+  <div class="callout">
+    <p><strong>Why this needs a different technique than Part A.</strong> <code class="inline">Product.objects(price__gte=20)</code> works because <code class="inline">price</code> is a field on <code class="inline">Product</code> itself. There is no <code class="inline">price</code> field on <code class="inline">CartItem</code> &mdash; only a <code class="inline">product</code> reference and a <code class="inline">quantity</code>. So <code class="inline">CartItem.objects(price__gte=20)</code> does not work.</p>
+  </div>
+
+  <h3>Approach 1 &mdash; filter in Python</h3>
+  <p>Fetch the cart as normal, then keep only the lines whose <code class="inline">item.product.price</code> is in range:</p>
+  <div class="panel">
+    <div class="panel-label"><span class="approach-tag py">plain python</span></div>
+    <pre class="code">
+<span class="com"># app/models/cart.py</span>
+<span class="dec">@staticmethod</span>
+<span class="kw">def</span> filterCart(user, min_price=<span class="kw">None</span>, max_price=<span class="kw">None</span>):
+    items = CartItem.getCartItems(user)
+    <span class="kw">if</span> min_price <span class="kw">is not</span> <span class="kw">None</span>:
+        items = [i <span class="kw">for</span> i <span class="kw">in</span> items <span class="kw">if</span> i.product.price &gt;= min_price]
+    <span class="kw">if</span> max_price <span class="kw">is not</span> <span class="kw">None</span>:
+        items = [i <span class="kw">for</span> i <span class="kw">in</span> items <span class="kw">if</span> i.product.price &lt;= max_price]
+    <span class="kw">return</span> items</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;">Simple, and fine for a cart, which will only ever hold a handful of lines per user.</p>
+
+  <h3>Approach 2 &mdash; push the filter into the query, through the reference</h3>
+  <p>First find the matching <code class="inline">Product</code>s, then ask MongoEngine to only return <code class="inline">CartItem</code>s whose <code class="inline">product</code> is one of those, using the membership operator from the cheat sheet above:</p>
+  <div class="panel">
+    <div class="panel-label"><span class="approach-tag ref">reaches through ReferenceField</span></div>
+    <pre class="code">
+<span class="com"># app/models/cart.py</span>
+<span class="kw">from</span> models.product <span class="kw">import</span> Product
+
+<span class="dec">@staticmethod</span>
+<span class="kw">def</span> filterCart(user, min_price=<span class="kw">None</span>, max_price=<span class="kw">None</span>):
+    product_filters = {}
+    <span class="kw">if</span> min_price <span class="kw">is not</span> <span class="kw">None</span>:
+        product_filters[<span class="str">"price__</span><select class="blank" id="blank-10" data-answer="gte" aria-label="operator for min_price on the referenced product"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select><span class="str">"</span>] = min_price
+    <span class="kw">if</span> max_price <span class="kw">is not</span> <span class="kw">None</span>:
+        product_filters[<span class="str">"price__</span><select class="blank" id="blank-11" data-answer="lte" aria-label="operator for max_price on the referenced product"><option value="" selected disabled>op</option><option value="gte">gte</option><option value="lte">lte</option><option value="gt">gt</option><option value="lt">lt</option></select><span class="str">"</span>] = max_price
+
+    <span class="kw">if</span> product_filters:
+        matching_products = Product.objects(**product_filters)
+        <span class="kw">return</span> CartItem.objects(user=user, product__<select class="blank" id="blank-12" data-answer="in" aria-label="operator matching against a list of products"><option value="" selected disabled>op</option><option value="in">in</option><option value="nin">nin</option><option value="exists">exists</option><option value="ne">ne</option></select>=matching_products)
+    <span class="kw">return</span> CartItem.objects(user=user)</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;">This works because MongoEngine accepts a queryset (or list) of documents on the right-hand side of that operator and matches against their <code class="inline">_id</code>s under the hood. Contrast the two approaches explicitly: Approach 2 issues two queries but lets MongoDB do the filtering; Approach 1 issues one query but filters in Python afterwards. For a cart (small, per-user) either is acceptable &mdash; the point is recognising that a <code class="inline">ReferenceField</code> is not itself queryable by the referenced document's fields.</p>
+
+  <h3>Sorting the cart</h3>
+  <p><code class="inline">.order_by("product__price")</code> is <strong>not</strong> supported here for the same reason: MongoDB only sees the stored <code class="inline">_id</code>, not the referenced document's fields, so it cannot sort by them at the database level. To sort the cart by price or subtotal, sort in Python after fetching:</p>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>models/cart.py</div>
+    <pre class="code">
+<span class="dec">@staticmethod</span>
+<span class="kw">def</span> getCartItemsSorted(user, sort=<span class="kw">None</span>):
+    items = <span class="kw">list</span>(CartItem.getCartItems(user))
+    <span class="kw">if</span> sort == <span class="str">"price_asc"</span>:
+        items.sort(key=<span class="kw">lambda</span> i: i.product.price)
+    <span class="kw">elif</span> sort == <span class="str">"price_desc"</span>:
+        items.sort(key=<span class="kw">lambda</span> i: i.product.price, reverse=<span class="kw">True</span>)
+    <span class="kw">elif</span> sort == <span class="str">"subtotal_desc"</span>:
+        items.sort(key=<span class="kw">lambda</span> i: i.subtotal, reverse=<span class="kw">True</span>)
+    <span class="kw">return</span> items</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;"><code class="inline">order_by()</code> only ever sorts by fields actually <em>stored</em> on that document (as in Part A, where <code class="inline">price</code> lives directly on <code class="inline">Product</code>); sorting by a referenced document's field has to happen in Python, using the same dereferencing (<code class="inline">item.product.price</code>) that <code class="inline">CartItem.subtotal</code> already relies on in the walkthrough.</p>
+
+  <h4>app/controllers/shop.py &mdash; updated cart() route</h4>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>controllers/shop.py</div>
+    <pre class="code">
+<span class="dec">@shop.route(</span><span class="str">"/cart"</span><span class="dec">)</span>
+<span class="dec">@login_required</span>
+<span class="kw">def</span> cart():
+    min_price = request.args.get(<span class="str">"min_price"</span>)
+    min_price = <span class="kw">float</span>(min_price) <span class="kw">if</span> min_price <span class="kw">else</span> <span class="kw">None</span>
+    max_price = request.args.get(<span class="str">"max_price"</span>)
+    max_price = <span class="kw">float</span>(max_price) <span class="kw">if</span> max_price <span class="kw">else</span> <span class="kw">None</span>
+    sort = request.args.get(<span class="str">"sort"</span>) <span class="kw">or</span> <span class="kw">None</span>
+
+    <span class="kw">if</span> min_price <span class="kw">is not</span> <span class="kw">None</span> <span class="kw">or</span> max_price <span class="kw">is not</span> <span class="kw">None</span>:
+        items = CartItem.filterCart(current_user, min_price, max_price)
+    <span class="kw">else</span>:
+        items = CartItem.getCartItems(current_user)
+
+    <span class="kw">if</span> sort:
+        items = <span class="kw">sorted</span>(
+            items,
+            key=<span class="kw">lambda</span> i: i.product.price <span class="kw">if</span> <span class="str">"price"</span> <span class="kw">in</span> sort <span class="kw">else</span> i.subtotal,
+            reverse=sort.endswith(<span class="str">"_desc"</span>),
+        )
+
+    total = <span class="kw">sum</span>(item.subtotal <span class="kw">for</span> item <span class="kw">in</span> items)
+    <span class="kw">return</span> render_template(
+        <span class="str">"cart.html"</span>,
+        items=items,
+        total=total,
+        min_price=request.args.get(<span class="str">"min_price"</span>, <span class="str">""</span>),
+        max_price=request.args.get(<span class="str">"max_price"</span>, <span class="str">""</span>),
+        sort=sort <span class="kw">or</span> <span class="str">""</span>,
+    )</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;"><code class="inline">total</code> is still computed <strong>after</strong> filtering, over whatever subset of <code class="inline">items</code> is currently shown &mdash; so the total on screen always matches the rows on screen, the same "what you see adds up" invariant the walkthrough's unfiltered cart already had.</p>
+
+  <h4>app/templates/cart.html &mdash; the filter bar</h4>
+  <p>Insert this <strong>above</strong> the <code class="inline">{% if items %}</code> table, inside <code class="inline">{% block content %}</code>:</p>
+  <div class="panel">
+    <div class="panel-label"><span class="file-dot"></span>templates/cart.html</div>
+    <pre class="code">&lt;form method="GET" class="row g-2 align-items-end mb-4"&gt;
+  &lt;div class="col-6 col-md-3"&gt;
+    &lt;label class="form-label small"&gt;Min price&lt;/label&gt;
+    &lt;input type="number" step="0.01" min="0" name="min_price" value="{{ min_price }}" class="form-control"&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-3"&gt;
+    &lt;label class="form-label small"&gt;Max price&lt;/label&gt;
+    &lt;input type="number" step="0.01" min="0" name="max_price" value="{{ max_price }}" class="form-control"&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-3"&gt;
+    &lt;label class="form-label small"&gt;Sort by&lt;/label&gt;
+    &lt;select name="sort" class="form-select"&gt;
+      &lt;option value=""&gt;Cart order&lt;/option&gt;
+      &lt;option value="price_asc" {{ "selected" if sort == "price_asc" }}&gt;Price: low to high&lt;/option&gt;
+      &lt;option value="price_desc" {{ "selected" if sort == "price_desc" }}&gt;Price: high to low&lt;/option&gt;
+      &lt;option value="subtotal_desc" {{ "selected" if sort == "subtotal_desc" }}&gt;Subtotal: high to low&lt;/option&gt;
+    &lt;/select&gt;
+  &lt;/div&gt;
+  &lt;div class="col-6 col-md-3 d-grid"&gt;
+    &lt;button type="submit" class="btn btn-dark rounded-0"&gt;Apply&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+  </div>
+  <p class="muted" style="font-size:0.9rem;">Again a <code class="inline">GET</code> form, so no CSRF token &mdash; unlike the existing <strong>Remove</strong> / <strong>Empty cart</strong> <code class="inline">POST</code> forms directly below it in the same template, which must keep their <code class="inline">csrf_token</code> hidden input.</p>
+
+  <p>And give the empty-cart message the same two-state treatment as the shop page:</p>
+  <div class="panel">
+    <pre class="code">{% else %}
+  {% if min_price or max_price %}
+    &lt;p class="text-muted"&gt;No cart items match that price range. &lt;a href="{{ url_for('shop.cart') }}"&gt;Clear filters&lt;/a&gt;&lt;/p&gt;
+  {% else %}
+    &lt;p class="text-muted"&gt;Your cart is empty. &lt;a href="{{ url_for('shop.home') }}"&gt;Keep shopping&lt;/a&gt;&lt;/p&gt;
+  {% endif %}
+{% endif %}</pre>
+  </div>
+
+  <h4>Checkpoint B &mdash; expected behaviour</h4>
+  <ol style="max-width:68ch;">
+    <li>Add three or four products spanning a wide price range to the cart (reuse the existing <strong>Add</strong> button from Step 7 &mdash; nothing about adding to the cart changes).</li>
+    <li><code class="inline">/cart</code> with no query string &rarr; every line, in insertion order, total = sum of all subtotals (unchanged from the walkthrough).</li>
+    <li><code class="inline">/cart?min_price=20&amp;max_price=60</code> &rarr; only the lines whose <strong>product price</strong> (not quantity or subtotal) falls in that range; the total updates to match only the visible rows.</li>
+    <li><code class="inline">/cart?sort=price_desc</code> &rarr; rows re-ordered highest unit price first; <code class="inline">/cart?sort=subtotal_desc</code> &rarr; ordered by quantity &times; price instead.</li>
+    <li>Combine <code class="inline">min_price</code>, <code class="inline">max_price</code> and <code class="inline">sort</code> in one URL &rarr; filtering and sorting both apply together.</li>
+    <li>Set <code class="inline">min_price</code> above every item's price &rarr; the "No cart items match that price range" message, with a "Clear filters" link, not an empty table or a crash.</li>
+    <li>Clearing the filters (visiting plain <code class="inline">/cart</code>) still shows the full, unfiltered cart &mdash; <code class="inline">db.cart_items.find()</code> in <code class="inline">mongosh</code> still shows every document regardless of what the last filter was.</li>
+  </ol>
+
+  <p class="lab-footnote">Lab 4 &middot; Search &amp; Filtering, continued from <a href="walkthrough.html">the Flask walkthrough</a>. Fill every blank green, then run the checkpoints above against your own running app.</p>
+</main>
+
+<a href="#doc-hero" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grandee Lee. All Rights Reserved.</p>
+</footer>
+
+<script>
+(function () {
+  var STORAGE_KEY = "mongoengine-drills-v1";
+
+  function checkBlank(select) {
+    var val = select.value;
+    select.classList.remove("correct", "incorrect");
+    if (!val) return;
+    if (val === select.dataset.answer) {
+      select.classList.add("correct");
+    } else {
+      select.classList.add("incorrect");
+    }
+  }
+
+  function updateScore() {
+    var selects = document.querySelectorAll("select.blank");
+    var correct = 0;
+    selects.forEach(function (s) {
+      if (s.classList.contains("correct")) correct += 1;
+    });
+    var text = document.getElementById("score-text");
+    var badge = document.getElementById("score-badge");
+    if (text) text.textContent = correct + " / " + selects.length + " correct";
+    if (badge) badge.classList.toggle("complete", correct === selects.length);
+  }
+
+  function persist() {
+    try {
+      var state = {};
+      document.querySelectorAll("select.blank").forEach(function (s) {
+        state[s.id] = s.value;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { /* private mode / blocked storage: ignore */ }
+  }
+
+  function restore() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var state = JSON.parse(raw);
+      document.querySelectorAll("select.blank").forEach(function (s) {
+        if (state[s.id]) {
+          s.value = state[s.id];
+          checkBlank(s);
+        }
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  document.querySelectorAll("select.blank").forEach(function (s) {
+    s.addEventListener("change", function () {
+      checkBlank(s);
+      updateScore();
+      persist();
+    });
+  });
+
+  restore();
+  updateScore();
+
+  var backToTop = document.getElementById("back-to-top");
+  window.addEventListener("scroll", function () {
+    backToTop.classList.toggle("show", window.scrollY > 800);
+  });
+})();
+</script>
+</body>
+</html>
