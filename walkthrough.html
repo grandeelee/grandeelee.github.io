@@ -1,0 +1,2912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flask Walkthrough | Grandee Lee</title>
+<meta name="description" content="Seminar 4 walkthrough: build a Flask + MongoDB shopping site from scratch, step by step.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+    :root {
+        --c1: #e2c6b5;
+        --c2: #c8a48a;
+        --c3: #a77b5b;
+        --c4: #7b4a3a;
+        --c5: #4e2b1e;
+        --cream: #f5ede5;
+        --cream-dark: #ede2d5;
+        --text-dark: #3b1f14;
+        --text-mid: #5a3a2c;
+        --text-light: #7a6558;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--cream);
+        color: var(--text-dark);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+
+    /* ── TOP NAV ── */
+    #nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(245, 237, 229, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 1px 0 rgba(167, 123, 91, 0.15);
+        padding: 0 clamp(1.2rem, 4vw, 3rem);
+    }
+
+    .nav-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        gap: 1rem;
+    }
+
+    .nav-back {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--c5);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .nav-back i { font-size: 0.85rem; color: var(--c3); transition: transform 0.25s ease; }
+    .nav-back:hover i { transform: translateX(-3px); }
+
+    .nav-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        display: none;
+    }
+
+    .toc-toggle {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--c5);
+        color: var(--c1);
+        border: none;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 0.55rem 1rem;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+
+    /* ── HERO / TITLE BAND ── */
+    #doc-hero {
+        position: relative;
+        background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 45%, var(--c3) 100%);
+        padding: clamp(3rem, 8vw, 5.5rem) clamp(1.5rem, 6vw, 4rem);
+        overflow: hidden;
+    }
+    #doc-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 70% 55% at 12% 90%, rgba(226,198,181,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 70% at 88% 10%, rgba(226,198,181,0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    .doc-hero-inner {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .doc-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--c2);
+        margin-bottom: 1rem;
+    }
+    .doc-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: clamp(1.9rem, 5vw, 3.2rem);
+        color: var(--c1);
+        line-height: 1.15;
+        margin-bottom: 1.1rem;
+    }
+    .doc-lede {
+        font-size: clamp(0.98rem, 1.7vw, 1.12rem);
+        font-weight: 300;
+        color: rgba(226,198,181,0.85);
+        line-height: 1.75;
+        max-width: 680px;
+        margin: 0 auto 1.8rem;
+    }
+    .doc-hero-actions { display: flex; justify-content: center; gap: 0.9rem; flex-wrap: wrap; }
+    .btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        font-size: 0.78rem; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+        text-decoration: none; padding: 0.75rem 1.6rem; border-radius: 50px;
+        transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); cursor: pointer; border: none;
+    }
+    .btn-outline { color: var(--c1); border: 1px solid rgba(226,198,181,0.32); background: transparent; }
+    .btn-outline:hover { background: rgba(226,198,181,0.12); border-color: rgba(226,198,181,0.6); transform: translateY(-2px); }
+    .btn-filled { background: linear-gradient(135deg, var(--c1), var(--c2)); color: var(--c5); box-shadow: 0 4px 24px rgba(200,164,138,0.35); }
+    .btn-filled:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(200,164,138,0.5); }
+
+    /* ── LAYOUT ── */
+    #doc-body {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: clamp(2rem, 5vw, 3.5rem) clamp(1.2rem, 4vw, 3rem) 5rem;
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: clamp(2rem, 4vw, 3.5rem);
+        align-items: start;
+    }
+
+    /* ── SIDEBAR TOC ── */
+    #toc {
+        position: sticky;
+        top: 88px;
+        max-height: calc(100vh - 110px);
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    #toc::-webkit-scrollbar { width: 5px; }
+    #toc::-webkit-scrollbar-thumb { background: rgba(167,123,91,0.3); border-radius: 10px; }
+
+    .toc-heading {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--c3);
+        margin-bottom: 0.9rem;
+    }
+
+    #toc ol {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+    #toc a {
+        display: block;
+        font-size: 0.86rem;
+        color: var(--text-mid);
+        text-decoration: none;
+        padding: 0.45rem 0.7rem;
+        border-radius: 10px;
+        border-left: 2px solid transparent;
+        line-height: 1.35;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    #toc a:hover { background: rgba(167,123,91,0.08); color: var(--c5); }
+    #toc a.active { color: var(--c5); font-weight: 600; background: rgba(167,123,91,0.12); border-left-color: var(--c3); }
+
+    /* ── ARTICLE ── */
+    article.doc-content { min-width: 0; }
+
+    article.doc-content > h1:first-child { display: none; } /* title already shown in hero */
+
+    article.doc-content h2 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: clamp(1.5rem, 3vw, 2.05rem);
+        color: var(--c5);
+        line-height: 1.2;
+        margin: 3.2rem 0 1.1rem;
+        padding-top: 0.4rem;
+        scroll-margin-top: 90px;
+    }
+    article.doc-content > h2:first-of-type { margin-top: 0; }
+
+    article.doc-content h3 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: clamp(1.08rem, 2vw, 1.32rem);
+        color: var(--c4);
+        margin: 2.1rem 0 0.8rem;
+        scroll-margin-top: 90px;
+    }
+
+    article.doc-content h4 {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 1.6rem 0 0.6rem;
+        scroll-margin-top: 90px;
+    }
+
+    article.doc-content p {
+        font-size: 0.98rem;
+        line-height: 1.85;
+        color: var(--text-mid);
+        margin-bottom: 1.05rem;
+    }
+
+    article.doc-content strong { color: var(--c5); font-weight: 600; }
+    article.doc-content em { color: var(--text-mid); }
+
+    article.doc-content ul, article.doc-content ol {
+        margin: 0 0 1.2rem 1.4rem;
+        color: var(--text-mid);
+        line-height: 1.8;
+        font-size: 0.98rem;
+    }
+    article.doc-content li { margin-bottom: 0.4rem; }
+    article.doc-content li > ul, article.doc-content li > ol { margin-top: 0.4rem; }
+
+    article.doc-content hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(167,123,91,0.35), transparent);
+        margin: 3rem 0;
+    }
+
+    article.doc-content a {
+        color: var(--c3);
+        font-weight: 500;
+        text-decoration: underline;
+        text-decoration-color: rgba(167,123,91,0.35);
+        text-underline-offset: 3px;
+    }
+    article.doc-content a:hover { color: var(--c4); text-decoration-color: var(--c4); }
+
+    /* inline code */
+    article.doc-content :not(pre) > code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85em;
+        background: var(--cream-dark);
+        color: var(--c5);
+        border: 1px solid rgba(167,123,91,0.18);
+        padding: 0.14em 0.42em;
+        border-radius: 6px;
+    }
+
+    /* code blocks */
+    article.doc-content pre {
+        position: relative;
+        background: #282c34;
+        border-radius: 14px;
+        padding: 1.3rem 1.4rem;
+        margin: 0 0 1.4rem;
+        overflow-x: auto;
+        box-shadow: 0 8px 30px rgba(59,31,20,0.14);
+        border: 1px solid rgba(167,123,91,0.15);
+    }
+    article.doc-content pre code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        line-height: 1.65;
+        background: none;
+        border: none;
+        padding: 0;
+        color: #abb2bf;
+    }
+
+    /* filename labels: <p><strong><code>app/x.py</code></strong></p> right before a code block */
+    article.doc-content p:has(> strong:only-child > code:only-child) {
+        margin-bottom: 0.6rem;
+    }
+    article.doc-content p > strong:only-child > code:only-child {
+        display: inline-block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--c5);
+        background: var(--cream-dark);
+        border: 1px solid rgba(167,123,91,0.25);
+        padding: 0.3rem 0.7rem;
+        border-radius: 8px;
+    }
+
+    /* tables */
+    .table-wrap {
+        overflow-x: auto;
+        margin: 0 0 1.6rem;
+        border-radius: 16px;
+        border: 1px solid rgba(200,164,138,0.22);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+    }
+    article.doc-content table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        font-size: 0.88rem;
+    }
+    article.doc-content th {
+        background: var(--cream-dark);
+        color: var(--c5);
+        font-weight: 700;
+        text-align: left;
+        padding: 0.75rem 1.1rem;
+        font-size: 0.76rem;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+    article.doc-content td {
+        padding: 0.75rem 1.1rem;
+        border-top: 1px solid rgba(200,164,138,0.16);
+        color: var(--text-mid);
+        vertical-align: top;
+        line-height: 1.6;
+    }
+    article.doc-content tr:hover td { background: rgba(167,123,91,0.04); }
+
+    /* blockquotes */
+    article.doc-content blockquote {
+        border-left: 3px solid var(--c3);
+        background: rgba(167,123,91,0.07);
+        border-radius: 0 14px 14px 0;
+        padding: 1rem 1.3rem;
+        margin: 0 0 1.4rem;
+        color: var(--text-mid);
+        font-size: 0.93rem;
+        line-height: 1.75;
+    }
+    article.doc-content blockquote p:last-child { margin-bottom: 0; }
+    article.doc-content blockquote code {
+        background: rgba(255,255,255,0.6);
+    }
+
+    /* checkpoint video cards */
+    .checkpoint-video {
+        margin: 0 0 1.4rem;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(200,164,138,0.22);
+        box-shadow: 0 8px 30px rgba(59,31,20,0.1);
+        background: #000;
+    }
+    .checkpoint-video video { display: block; width: 100%; height: auto; }
+
+    /* checkpoint headings (h3 starting with ✅) get a badge look */
+    article.doc-content h3 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* back-to-top */
+    #back-to-top {
+        position: fixed;
+        right: clamp(1rem, 3vw, 2.2rem);
+        bottom: clamp(1rem, 3vw, 2.2rem);
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: var(--c5);
+        color: var(--c1);
+        display: flex; align-items: center; justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 24px rgba(59,31,20,0.3);
+        opacity: 0; pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 900;
+        font-size: 0.95rem;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    /* footer */
+    footer {
+        background: var(--c5);
+        padding: clamp(2rem, 5vw, 3rem);
+        text-align: center;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
+    .footer-links a {
+        width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 50%; border: 1px solid rgba(200,164,138,0.2); color: var(--c2);
+        font-size: 0.95rem; text-decoration: none; transition: all 0.3s ease;
+    }
+    .footer-links a:hover { background: rgba(167,123,91,0.2); border-color: var(--c3); color: var(--c1); transform: translateY(-2px); }
+    .footer-copy { font-size: 0.78rem; color: rgba(200,164,138,0.4); }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 861px) {
+        .nav-title { display: block; }
+    }
+
+    @media (max-width: 860px) {
+        .toc-toggle { display: inline-flex; }
+        #doc-body { grid-template-columns: 1fr; }
+        #toc {
+            position: fixed;
+            inset: 64px 0 0 0;
+            top: 64px;
+            max-height: none;
+            height: calc(100vh - 64px);
+            background: var(--cream);
+            padding: 1.5rem 1.5rem 3rem;
+            transform: translateX(-100%);
+            transition: transform 0.35s ease;
+            z-index: 950;
+            overflow-y: auto;
+        }
+        #toc.open { transform: translateX(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+        <span class="nav-title">ICT239 &middot; Flask Walkthrough</span>
+        <button class="toc-toggle" id="toc-toggle" aria-label="Toggle contents"><i class="fa-solid fa-list-ul"></i> Contents</button>
+    </div>
+</nav>
+
+<header id="doc-hero">
+    <div class="doc-hero-inner">
+        <p class="doc-eyebrow">ICT239 &middot; Web Application Development</p>
+        <h1 class="doc-title">Build a Shopping Site from Scratch</h1>
+        <p class="doc-lede">
+            A ground-up Flask walkthrough &mdash; from an empty folder to a working MongoDB-backed
+            shop with accounts, logins and a cart &mdash; bringing Seminars 1 to 3 together in one project.
+        </p>
+        <div class="doc-hero-actions">
+            <a href="#step-0-the-big-picture" class="btn btn-filled"><i class="fa-solid fa-play"></i> Start at Step 0</a>
+            <a href="index.html" class="btn btn-outline"><i class="fa-solid fa-house"></i> Back to site</a>
+        </div>
+    </div>
+</header>
+
+<div id="doc-body">
+    <nav id="toc" aria-label="Table of contents">
+        <p class="toc-heading">On this page</p>
+        <ol>
+            <li><a href="#step-0-the-big-picture">Step 0 &middot; The big picture</a></li>
+            <li><a href="#step-1-virtual-environment-packages-and-pip-freeze">Step 1 &middot; venv &amp; pip freeze</a></li>
+            <li><a href="#step-2-the-flask-skeleton-one-endpoint">Step 2 &middot; Flask skeleton</a></li>
+            <li><a href="#step-3-templates-jinja-and-static-files">Step 3 &middot; Templates &amp; Jinja</a></li>
+            <li><a href="#step-4-login-and-register-forms">Step 4 &middot; Login &amp; register forms</a></li>
+            <li><a href="#step-5-redirect-render_template-and-flash">Step 5 &middot; redirect &amp; flash</a></li>
+            <li><a href="#step-6-the-database-mongodb-mongoengine">Step 6 &middot; MongoDB + MongoEngine</a></li>
+            <li><a href="#step-7-flask-login">Step 7 &middot; Flask-Login</a></li>
+            <li><a href="#step-8-blueprints-and-a-proper-folder-structure">Step 8 &middot; Blueprints</a></li>
+            <li><a href="#the-finished-project">The finished project</a></li>
+        </ol>
+    </nav>
+
+    <article class="doc-content">
+<h1 id="seminar-4-build-a-shopping-site-from-scratch-seminar-1-to-3-in-one-go">Seminar 4 – Build a Shopping Site from Scratch (Seminar 1 to 3 in One Go)</h1>
+<p>In this walkthrough you will build, <strong>from an empty folder</strong>, a small but real Flask web application: an online shop called <strong>ESSENTIALS</strong>.</p>
+<p>By the end you will have a site where visitors can:</p>
+<ul>
+<li>browse products that are stored in a <strong>MongoDB database</strong>,</li>
+<li><strong>register</strong> an account and <strong>log in / log out</strong>,</li>
+<li><strong>add products to a cart</strong> (only when logged in),</li>
+</ul>
+<p>…and the code will be organised in the same <em>model / controller / templates</em> structure that the <code>staycation</code> project uses.</p>
+<p>The visual design is the "Minimalist Shop" page from <strong>Seminar 2</strong>. The form handling, database and login parts come from <strong>Seminar 1</strong> and <strong>Seminar 3</strong>.</p>
+<hr />
+<h2 id="table-of-contents">Table of contents</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What you build</th>
+<th>Comes from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#step-0--the-big-picture">0</a></td>
+<td>The big picture (how a web app works)</td>
+<td>–</td>
+</tr>
+<tr>
+<td><a href="#step-1--virtual-environment-packages-and-pip-freeze">1</a></td>
+<td>Virtual environment, installing packages, <code>pip freeze</code></td>
+<td>Seminar 1</td>
+</tr>
+<tr>
+<td><a href="#step-2--the-flask-skeleton-one-endpoint">2</a></td>
+<td>Flask skeleton: <code>__init__.py</code> + <strong>one</strong> endpoint</td>
+<td>Seminar 1</td>
+</tr>
+<tr>
+<td><a href="#step-3--templates-jinja-and-static-files">3</a></td>
+<td>Templates, Jinja, static files → the shop front page</td>
+<td>Seminar 2</td>
+</tr>
+<tr>
+<td><a href="#step-4--login-and-register-forms">4</a></td>
+<td>Login and register forms</td>
+<td>Seminar 1 + Seminar 3</td>
+</tr>
+<tr>
+<td><a href="#step-5--redirect-render_template-and-flash">5</a></td>
+<td><code>redirect</code>, <code>render_template</code>, <code>url_for</code>, <code>flash</code>, URL variables</td>
+<td>Seminar 2</td>
+</tr>
+<tr>
+<td><a href="#step-6--the-database-mongodb--mongoengine">6</a></td>
+<td>The database (MongoDB + MongoEngine)</td>
+<td>Seminar 3</td>
+</tr>
+<tr>
+<td><a href="#step-7--flask-login">7</a></td>
+<td>Flask-Login: real logins, protected pages, a cart</td>
+<td>Seminar 3</td>
+</tr>
+<tr>
+<td><a href="#step-8--blueprints-and-a-proper-folder-structure">8</a></td>
+<td>Blueprints and reorganising into <code>models/</code> + <code>controllers/</code></td>
+<td>Seminar 3 / staycation</td>
+</tr>
+<tr>
+<td><a href="#the-finished-project">End</a></td>
+<td>Final layout, URLs to try, troubleshooting, glossary</td>
+<td>–</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="how-to-use-this-document">How to use this document</h3>
+<ul>
+<li>Work <strong>top to bottom</strong>. Each step builds on the previous one.</li>
+<li>Every code block has a <strong>file name</strong> above it. Create or replace that file with exactly that content.</li>
+<li>Every step ends with a <strong>✅ Checkpoint</strong>. Do not move on until the checkpoint works – bugs are far easier to find when you have only changed a little.</li>
+<li>Commands are for <strong>Linux / macOS</strong> (bash). Windows equivalents are given where they differ.</li>
+<li>Lines starting with <code>$</code> are things you type in a terminal (don't type the <code>$</code>).</li>
+</ul>
+<hr />
+<h2 id="step-0-the-big-picture">Step 0 – The big picture</h2>
+<p>Before writing code, here is the mental model. A web app is a <strong>conversation</strong> between a browser and a server:</p>
+<pre><code>   Browser                                        Your Flask app
+   -------                                        --------------
+   &quot;GET /login please&quot;        ───request──►       finds the function registered for /login
+                                                  (a &quot;view function&quot; / &quot;route&quot;)
+                                                  runs it, builds an HTML page
+   shows the page             ◄──response──       &quot;200 OK  +  &lt;html&gt;…&lt;/html&gt;&quot;
+</code></pre>
+<ul>
+<li>A <strong>request</strong> has a <em>URL</em> (<code>/login</code>), a <em>method</em> (usually <code>GET</code> = "give me a page" or <code>POST</code> = "here is some form data") and possibly data.</li>
+<li>A <strong>response</strong> has a <em>status code</em> (<code>200</code> OK, <code>302</code> redirect, <code>404</code> not found, <code>400</code> bad request) and usually some HTML.</li>
+<li><strong>Flask</strong> is the Python library that lets you say: <em>"when a request for <code>/login</code> arrives, run this Python function and send back whatever it returns."</em></li>
+</ul>
+<p>The pieces you will meet, and where they live in the final project:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Job</th>
+<th>Final location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Route / view function</strong></td>
+<td>Receives a request, decides what to do, returns a response</td>
+<td><code>controllers/</code></td>
+</tr>
+<tr>
+<td><strong>Template</strong> (Jinja + HTML)</td>
+<td>The HTML skeleton with <code>{{ holes }}</code> that Python fills in</td>
+<td><code>templates/</code></td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>Python class that describes a thing stored in the database (User, Product)</td>
+<td><code>models/</code></td>
+</tr>
+<tr>
+<td><strong>Form</strong></td>
+<td>Python class that describes an HTML form and validates what the user typed</td>
+<td><code>models/forms.py</code></td>
+</tr>
+<tr>
+<td><strong>Static files</strong></td>
+<td>CSS, images, JavaScript – sent to the browser as-is</td>
+<td><code>assets/</code></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="step-1-virtual-environment-packages-and-pip-freeze">Step 1 – Virtual environment, packages and <code>pip freeze</code></h2>
+<h3 id="11-why-a-virtual-environment">1.1 Why a virtual environment?</h3>
+<p>Python packages (like Flask) are installed <em>somewhere</em>. If you install everything globally, two projects that need different versions of Flask will fight each other. A <strong>virtual environment</strong> ("venv") is a private folder that holds <em>this project's</em> Python packages only. </p>
+<h3 id="12-check-python">1.2 Check Python</h3>
+<pre><code class="language-bash">$ python3 --version
+</code></pre>
+<p>You should see <code>Python 3.10</code> or newer (this walkthrough was tested on 3.12). On Windows use <code>python</code> instead of <code>python3</code>.</p>
+<h3 id="13-create-the-project-folder-and-the-venv">1.3 Create the project folder and the venv</h3>
+<pre><code class="language-bash">$ mkdir shop-site
+$ cd shop-site
+$ python3 -m venv venv
+</code></pre>
+<ul>
+<li><code>mkdir shop-site</code> / <code>cd shop-site</code> – make the project folder and go inside it. <strong>Everything in this walkthrough happens inside <code>shop-site/</code>.</strong></li>
+<li><code>python3 -m venv venv</code> – "run Python's built-in <code>venv</code> module and create an environment in a folder called <code>venv</code>". You now have a <code>venv/</code> folder. You never edit anything in it.</li>
+</ul>
+<h3 id="14-activate-it">1.4 Activate it</h3>
+<pre><code class="language-bash"># Linux / macOS
+$ source venv/bin/activate
+
+# Windows (Command Prompt)
+&gt; venv\Scripts\activate.bat
+
+# Windows (PowerShell)
+&gt; venv\Scripts\Activate.ps1
+</code></pre>
+<p>Your prompt now starts with <code>(venv)</code>. That means: <em>"<code>python</code> and <code>pip</code> now refer to this project's private copies."</em></p>
+<blockquote>
+<p>⚠️ <strong>You must activate the venv in every new terminal window.</strong> If you get <code>ModuleNotFoundError: No module named 'flask'</code> later, 90 % of the time you forgot this.
+To leave the venv: type <code>deactivate</code>.</p>
+</blockquote>
+<h3 id="15-get-the-pinned-requirementstxt">1.5 Get the pinned <code>requirements.txt</code></h3>
+<p>Your seminar provides a <code>requirements.txt</code>. Copy it into <code>shop-site/</code>:</p>
+<p>Its contents:</p>
+<pre><code class="language-text">blinker==1.7.0
+click==8.1.7
+dnspython==2.6.1
+email-validator==2.1.0.post1
+Flask==2.2.5
+Flask-Login==0.6.3
+flask-mongoengine==1.0.0
+Flask-WTF==1.2.1
+idna==3.6
+itsdangerous==2.1.2
+Jinja2==3.1.3
+MarkupSafe==2.1.5
+mongoengine==0.27.0
+pymongo==4.6.1
+Werkzeug==3.0.1
+WTForms==3.1.2
+</code></pre>
+<p>Each line is <code>package==exact.version</code>. Pinning exact versions matters because libraries change: a newer Flask or <code>flask-mongoengine</code> may behave differently or refuse to import at all. With these pins <strong>everyone gets the same working combination</strong>.</p>
+<p>Only five of these are packages we ask for directly; the rest are <em>their</em> dependencies:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Package</th>
+<th>What it is for</th>
+<th>Used from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Flask</strong> (+ Werkzeug, Jinja2, click, itsdangerous, blinker, MarkupSafe)</td>
+<td>The web framework itself</td>
+<td>Step 2</td>
+</tr>
+<tr>
+<td><strong>Flask-WTF</strong> (+ WTForms)</td>
+<td>Forms and CSRF protection</td>
+<td>Step 4</td>
+</tr>
+<tr>
+<td><strong>email-validator</strong> (+ dnspython, idna)</td>
+<td>Lets the form check that an email looks valid</td>
+<td>Step 4</td>
+</tr>
+<tr>
+<td><strong>flask-mongoengine</strong> (+ mongoengine, pymongo)</td>
+<td>Talk to MongoDB using Python classes</td>
+<td>Step 6</td>
+</tr>
+<tr>
+<td><strong>Flask-Login</strong></td>
+<td>Remember who is logged in</td>
+<td>Step 7</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="16-install-everything-and-check-with-pip-freeze">1.6 Install everything and check with <code>pip freeze</code></h3>
+<pre><code class="language-bash">(venv) $ pip install -r requirements.txt
+</code></pre>
+<p><code>-r</code> means "read the list of packages from this file". <code>pip</code> is Python's package installer; it downloads each package at exactly the pinned version.</p>
+<p>Now compare what is installed with the file:</p>
+<pre><code class="language-bash">(venv) $ pip freeze
+</code></pre>
+<p><code>pip freeze</code> prints every installed package with its <strong>exact version</strong>, in the same format as <code>requirements.txt</code>. The output should be the same 16 lines shown above.</p>
+<p>You would use <code>pip freeze</code> to <em>create</em> a requirements file for your own project:</p>
+<pre><code class="language-bash">(venv) $ pip freeze &gt; requirements.txt
+</code></pre>
+<p><code>&gt;</code> means "send the output into this file instead of the screen". Anyone (including <em>you</em> in six months, or your tutor) can then rebuild the identical environment with:</p>
+<pre><code class="language-bash">$ python3 -m venv venv
+$ source venv/bin/activate
+(venv) $ pip install -r requirements.txt
+</code></pre>
+<p>This is why the seminars ship a <code>requirements.txt</code>. <strong>If you ever <code>pip install</code> an extra package, re-run <code>pip freeze &gt; requirements.txt</code></strong> so the file stays accurate.</p>
+<blockquote>
+<p>Tip: if you use git, add a <code>.gitignore</code> containing the line <code>venv/</code> – never commit the venv itself, only <code>requirements.txt</code>.</p>
+</blockquote>
+<h3 id="checkpoint-1">✅ Checkpoint 1</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-1.webm" controls muted playsinline preload="metadata"></video></div>
+
+<pre><code class="language-bash">(venv) $ python -c &quot;import flask; print(flask.__version__)&quot;
+</code></pre>
+<p>prints <code>2.2.5</code>, and <code>pip freeze | diff - requirements.txt</code> prints nothing (no differences; on Windows just compare the two lists by eye).</p>
+<pre><code class="language-text">shop-site/
+├── venv/               ← private packages (don't touch)
+└── requirements.txt
+</code></pre>
+<hr />
+<h2 id="step-2-the-flask-skeleton-one-endpoint">Step 2 – The Flask skeleton (one endpoint)</h2>
+<p>Now the smallest possible Flask app. We use the same <strong>two-file layout</strong> as Seminars 1–3:</p>
+<ul>
+<li><code>app/__init__.py</code> – <em>creates</em> the Flask application object.</li>
+<li><code>app/app.py</code> – <em>defines the routes</em> (the endpoints).</li>
+<li><code>app/start.sh</code> – one command to run the server.</li>
+</ul>
+<h3 id="21-create-the-app-package">2.1 Create the <code>app</code> package</h3>
+<pre><code class="language-bash">(venv) $ mkdir app
+</code></pre>
+<h3 id="22-app__init__py-create-the-application">2.2 <code>app/__init__.py</code> – create the application</h3>
+<p><strong><code>app/__init__.py</code></strong></p>
+<pre><code class="language-py">from flask import Flask
+
+
+def create_app():
+    app = Flask(__name__)
+    return app
+
+
+app = create_app()
+</code></pre>
+<p>What this does:</p>
+<ul>
+<li>A folder containing a file called <code>__init__.py</code> is a Python <strong>package</strong>. That means other files can write <code>from app import ...</code> to import things defined in this file.</li>
+<li><code>Flask(__name__)</code> creates the application. <code>__name__</code> tells Flask where this package lives so it can later find your <code>templates/</code> folder.</li>
+<li>We wrap creation in a function <code>create_app()</code> (the <em>application factory</em> pattern used in every lab) and then call it once: <code>app = create_app()</code>. Every other file can now do <code>from app import app</code> to get <em>the</em> application.</li>
+</ul>
+<h3 id="23-appapppy-the-one-endpoint">2.3 <code>app/app.py</code> – the one endpoint</h3>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+
+
+@app.route(&quot;/&quot;)
+def home():
+    return &quot;Hello from the shop!&quot;
+</code></pre>
+<ul>
+<li><code>from app import app</code> – get the application object created in <code>__init__.py</code>.</li>
+<li><code>@app.route("/")</code> is a <strong>decorator</strong>. It tells Flask: <em>"when someone requests the URL <code>/</code>, call the function directly below."</em></li>
+<li>The function's <code>return</code> value becomes the <strong>response body</strong>. Right now it's plain text.</li>
+</ul>
+<p>That is a complete web app: <strong>one URL, one function</strong>.</p>
+<h3 id="24-appstartsh-how-to-run-it">2.4 <code>app/start.sh</code> – how to run it</h3>
+<p><strong><code>app/start.sh</code></strong></p>
+<pre><code class="language-bash">export FLASK_APP=app.py; export PYTHONPATH=.; export FLASK_DEBUG=1;
+flask run --host=0.0.0.0
+</code></pre>
+<p>Each part means:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>export FLASK_APP=app.py</code></td>
+<td>Tell the <code>flask</code> command which file contains the routes.</td>
+</tr>
+<tr>
+<td><code>export PYTHONPATH=.</code></td>
+<td>Add the current folder (<code>.</code>) to Python's import search path, so later we can write <code>from forms import ...</code> and <code>from models.users import ...</code>.</td>
+</tr>
+<tr>
+<td><code>export FLASK_DEBUG=1</code></td>
+<td>Debug mode: the server <strong>auto-restarts when you save a file</strong> and shows a helpful error page instead of a blank "Internal Server Error". <em>Never use this on a real public website.</em></td>
+</tr>
+<tr>
+<td><code>flask run --host=0.0.0.0</code></td>
+<td>Start the development server. <code>0.0.0.0</code> lets other devices on your network reach it; use <code>--host=127.0.0.1</code> (or drop the option) to keep it private to your computer.</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>Windows:</strong> replace the first line with these (PowerShell) and then run <code>flask run</code>:
+<code>powershell
+$env:FLASK_APP="app.py"; $env:PYTHONPATH="."; $env:FLASK_DEBUG="1"</code></p>
+</blockquote>
+<h3 id="25-run-it">2.5 Run it</h3>
+<p><strong>Always run from inside the <code>app/</code> folder:</strong></p>
+<pre><code class="language-bash">(venv) $ cd app
+(venv) $ bash start.sh
+</code></pre>
+<p>Output ends with something like:</p>
+<pre><code class="language-text"> * Running on http://127.0.0.1:5000
+</code></pre>
+<p>Open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> in your browser. You should see <strong>Hello from the shop!</strong></p>
+<p>Stop the server with <code>Ctrl + C</code>.</p>
+<h3 id="26-a-note-on-the-odd-looking-from-app-import-app">2.6 A note on the odd-looking <code>from app import app</code></h3>
+<p>You have a <em>folder</em> called <code>app</code> (the package) that contains a <em>file</em> called <code>app.py</code>. When Flask loads <code>app.py</code> it does so as the module <code>app.app</code> (file <code>app.py</code> inside package <code>app</code>). Inside it, <code>from app import app</code> means "from the <strong>package</strong> <code>app</code> (i.e. <code>__init__.py</code>) import the <strong>variable</strong> <code>app</code>". Confusing names, but it works – and it is exactly how Seminars 1–3 and <code>staycation</code> are set up, so we keep it.</p>
+<p>One consequence: <strong>start the server with <code>flask run</code> (via <code>start.sh</code>), not with <code>python app.py</code></strong>, otherwise Python will find <code>app.py</code> when it looks for the package <code>app</code> and the import breaks.</p>
+<h3 id="checkpoint-2">✅ Checkpoint 2</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-2.webm" controls muted playsinline preload="metadata"></video></div>
+
+<p>The browser shows "Hello from the shop!" and the terminal shows a log line like <code>"GET / HTTP/1.1" 200 -</code>. That log line <em>is</em> the request/response conversation from Step 0.</p>
+<p>Try <a href="http://127.0.0.1:5000/nothing">http://127.0.0.1:5000/nothing</a> – you get <strong>404 Not Found</strong>, because no function is registered for that URL.</p>
+<pre><code class="language-text">shop-site/
+├── venv/
+├── requirements.txt
+└── app/
+    ├── __init__.py
+    ├── app.py
+    └── start.sh
+</code></pre>
+<hr />
+<h2 id="step-3-templates-jinja-and-static-files">Step 3 – Templates, Jinja and static files</h2>
+<p>Returning strings from Python doesn't scale to a whole web page. Instead we keep the HTML in <strong>template</strong> files and let Flask fill in the blanks. The template language is <strong>Jinja</strong>.</p>
+<p>We will use the page design from <strong>Seminar 2</strong> (<code>lab2/app/templates/base.html</code> and <code>shopping.html</code>).</p>
+<h3 id="31-two-new-folders">3.1 Two new folders</h3>
+<pre><code class="language-bash">(venv) $ mkdir templates
+(venv) $ mkdir -p assets/css
+</code></pre>
+<p>(You are still inside <code>app/</code>.)</p>
+<ul>
+<li><code>templates/</code> – Flask looks here for HTML templates automatically.</li>
+<li><code>assets/</code> – our <strong>static files</strong> (CSS, images, JS). Flask's default name for this folder is <code>static</code>; Seminars 1–3 rename it to <code>assets</code>, so we do too.</li>
+</ul>
+<p>Tell Flask about the rename in <code>__init__.py</code>:</p>
+<p><strong><code>app/__init__.py</code></strong></p>
+<pre><code class="language-py">from flask import Flask
+
+
+def create_app():
+    app = Flask(__name__)
+    app.static_folder = &quot;assets&quot;  # serve CSS/JS/images from ./assets instead of ./static
+    return app
+
+
+app = create_app()
+</code></pre>
+<h3 id="32-the-css-appassetscsscustomcss">3.2 The CSS – <code>app/assets/css/custom.css</code></h3>
+<p>In Seminar 2 the CSS lived in a <code>&lt;style&gt;</code> tag inside <code>base.html</code>. It is tidier to keep it in its own file:</p>
+<p><strong><code>app/assets/css/custom.css</code></strong></p>
+<pre><code class="language-css">/* Custom CSS adjustments for a vanilla, elegant aesthetic */
+body {
+  background-color: #fafafa;
+  font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.navbar {
+  border-bottom: 1px solid #eaeaea;
+}
+
+.product-card {
+  border: 1px solid #eaeaea;
+  background-color: #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.product-img-placeholder {
+  background-color: #f1f1f1;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+footer {
+  border-top: 1px solid #eaeaea;
+  background-color: #ffffff;
+}
+</code></pre>
+<h3 id="33-the-base-template-apptemplatesbasehtml">3.3 The base template – <code>app/templates/base.html</code></h3>
+<p>Every page on the shop shares the same header (navbar) and footer. Instead of copy-pasting them into every file, we write them <strong>once</strong> in a <em>base template</em> and mark the changing part with a <strong>block</strong>:</p>
+<p><strong><code>app/templates/base.html</code></strong></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;{% block title %}Essentials{% endblock %}&lt;/title&gt;
+  &lt;!-- Bootstrap 5 CSS + Bootstrap Icons via CDN --&gt;
+  &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;
+        integrity=&quot;sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC&quot; crossorigin=&quot;anonymous&quot;&gt;
+  &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;!-- our own CSS, served from the &quot;assets&quot; folder --&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ url_for('static', filename='css/custom.css') }}&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;!-- Header / navbar --&gt;
+  &lt;nav class=&quot;navbar navbar-expand-lg navbar-light bg-white sticky-top py-3&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;a class=&quot;navbar-brand fw-bold text-dark&quot; href=&quot;/&quot;&gt;ESSENTIALS&lt;/a&gt;
+
+      &lt;button class=&quot;navbar-toggler border-0&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarNav&quot;&gt;
+        &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+      &lt;/button&gt;
+
+      &lt;div class=&quot;collapse navbar-collapse justify-content-end&quot; id=&quot;navbarNav&quot;&gt;
+        &lt;ul class=&quot;navbar-nav align-items-center&quot;&gt;
+          &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-dark text-decoration-none&quot; href=&quot;/&quot;&gt;Shop All&lt;/a&gt;&lt;/li&gt;
+          &lt;li class=&quot;nav-item ps-3&quot;&gt;
+            &lt;a class=&quot;btn btn-outline-dark btn-sm rounded-pill px-3 position-relative&quot; href=&quot;#&quot;&gt;
+              &lt;i class=&quot;bi bi-bag me-1&quot;&gt;&lt;/i&gt; Cart
+              &lt;span class=&quot;position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark&quot;&gt;0&lt;/span&gt;
+            &lt;/a&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/nav&gt;
+
+  &lt;!-- Each child page fills in this block --&gt;
+  {% block content %}{% endblock %}
+
+  &lt;!-- Footer --&gt;
+  &lt;footer class=&quot;text-center text-muted py-4 mt-5&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;p class=&quot;small mb-1&quot;&gt;&amp;copy; 2026 Essentials Studio. All rights reserved.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/footer&gt;
+
+  &lt;!-- Bootstrap JS (needed for the collapsing navbar on phones) --&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>The Jinja parts (everything else is ordinary HTML):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{% block title %}Essentials{% endblock %}</code></td>
+<td>A named hole. Child pages can replace it; if they don't, the default text "Essentials" is used.</td>
+</tr>
+<tr>
+<td><code>{% block content %}{% endblock %}</code></td>
+<td>The main hole where each page puts its own content.</td>
+</tr>
+<tr>
+<td><code>{{ url_for('static', filename='css/custom.css') }}</code></td>
+<td>Builds the URL of a static file: <code>/static/css/custom.css</code>. Better than typing the path by hand because Flask works it out for you.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Two small improvements over Seminar 2: we added the <strong>Bootstrap Icons</strong> stylesheet (Seminar 2 used <code>&lt;i class="bi bi-bag"&gt;</code> icons but never loaded the icon CSS, so they were invisible) and the Bootstrap <strong>JavaScript</strong> so the mobile navbar button works.</p>
+<h3 id="34-the-shop-page-apptemplatesshoppinghtml">3.4 The shop page – <code>app/templates/shopping.html</code></h3>
+<p><strong><code>app/templates/shopping.html</code></strong></p>
+<pre><code class="language-html">{% extends &quot;base.html&quot; %}
+
+{% block title %}Shop All{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5 py-4&quot;&gt;
+  &lt;div class=&quot;row g-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4&quot;&gt;
+
+    {% for product in products %}
+    &lt;div class=&quot;col&quot;&gt;
+      &lt;div class=&quot;card h-100 product-card rounded-0&quot;&gt;
+        &lt;div class=&quot;product-img-placeholder&quot;&gt;
+          &lt;i class=&quot;bi bi-image fs-3&quot;&gt;&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;card-body d-flex flex-column p-4&quot;&gt;
+          &lt;h5 class=&quot;card-title fs-6 fw-bold mb-1&quot;&gt;{{ product.name }}&lt;/h5&gt;
+          &lt;p class=&quot;text-muted small mb-3&quot;&gt;{{ product.desc }}&lt;/p&gt;
+          &lt;div class=&quot;d-flex justify-content-between align-items-center mt-auto&quot;&gt;
+            &lt;span class=&quot;fw-semibold&quot;&gt;${{ &quot;%.2f&quot;|format(product.price) }}&lt;/span&gt;
+            &lt;button class=&quot;btn btn-dark btn-sm rounded-0 px-3&quot;&gt;Add&lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    {% else %}
+    &lt;p class=&quot;text-muted&quot;&gt;No products yet.&lt;/p&gt;
+    {% endfor %}
+
+  &lt;/div&gt;
+&lt;/main&gt;
+{% endblock %}
+</code></pre>
+<p>New Jinja ideas here:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>{% extends "base.html" %}</code></td>
+<td>"Start from <code>base.html</code>, then fill in its blocks." Must be the first line.</td>
+</tr>
+<tr>
+<td><code>{% for product in products %}…{% else %}…{% endfor %}</code></td>
+<td>Loop over a list. The <code>else</code> part runs only if the list is empty.</td>
+</tr>
+<tr>
+<td><code>{{ product.name }}</code></td>
+<td>Print a value. Works for dict keys (<code>product["name"]</code>) and object attributes alike.</td>
+</tr>
+<tr>
+<td><code>{{ "%.2f"\|format(product.price) }}</code></td>
+<td>Apply a <strong>filter</strong> (<code>format</code>) to a value. Here: show 79.0 as <code>79.00</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Jinja automatically <strong>escapes</strong> anything inside <code>{{ }}</code> (turns <code>&lt;</code> into <code>&amp;lt;</code>), so a product called <code>&lt;script&gt;</code> cannot inject code into your page. This is a built-in security feature.</p>
+<h3 id="35-send-data-to-the-template-appapppy">3.5 Send data to the template – <code>app/app.py</code></h3>
+<p><code>render_template("file.html", name=value, ...)</code> loads the template and fills it in. Every keyword argument becomes a variable inside the template.</p>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from flask import render_template
+
+
+@app.route(&quot;/&quot;)
+def home():
+    my_products = [
+        {&quot;name&quot;: &quot;Linen Shirt&quot;, &quot;desc&quot;: &quot;Breathable, relaxed fit.&quot;, &quot;price&quot;: 79.0},
+        {&quot;name&quot;: &quot;Canvas Tote&quot;, &quot;desc&quot;: &quot;Sturdy everyday bag.&quot;, &quot;price&quot;: 35.5},
+        {&quot;name&quot;: &quot;Ceramic Mug&quot;, &quot;desc&quot;: &quot;Hand-glazed, 350 ml.&quot;, &quot;price&quot;: 18.0},
+        {&quot;name&quot;: &quot;Wool Beanie&quot;, &quot;desc&quot;: &quot;Soft merino blend.&quot;, &quot;price&quot;: 24.9},
+    ]
+    return render_template(&quot;shopping.html&quot;, products=my_products)
+</code></pre>
+<p>The list of dictionaries is fake data – in Step 6 it will come from a real database. The template won't need to change much, which is the whole point of separating the two.</p>
+<h3 id="checkpoint-3">✅ Checkpoint 3</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-3.webm" controls muted playsinline preload="metadata"></video></div>
+
+<pre><code class="language-bash">(venv) $ bash start.sh
+</code></pre>
+<p>Open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a>. You should see the ESSENTIALS navbar and four product cards with prices such as <code>$79.00</code>. Also try <a href="http://127.0.0.1:5000/static/css/custom.css">http://127.0.0.1:5000/static/css/custom.css</a> – you should see the raw CSS (this proves the <code>assets</code> folder is being served).</p>
+<p>If the page is unstyled, check the browser's developer tools (F12 → Network) to see whether <code>custom.css</code> returned 200 or 404.</p>
+<pre><code class="language-text">app/
+├── __init__.py
+├── app.py
+├── start.sh
+├── assets/
+│   └── css/custom.css
+└── templates/
+    ├── base.html
+    └── shopping.html
+</code></pre>
+<hr />
+<h2 id="step-4-login-and-register-forms">Step 4 – Login and register forms</h2>
+<h3 id="41-the-plain-html-way-seminar-1">4.1 The plain-HTML way (Seminar 1)</h3>
+<p>In Seminar 1 the login page was an HTML <code>&lt;form&gt;</code> and the route read the values with <code>request.form</code>:</p>
+<pre><code class="language-python">@app.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    if request.method == &quot;GET&quot;:
+        return render_template(&quot;login.html&quot;)          # show the empty form
+    elif request.method == &quot;POST&quot;:
+        email = request.form.get(&quot;email&quot;)             # read what the user typed
+        password = request.form.get(&quot;password&quot;)
+        ...
+</code></pre>
+<p>Key facts:</p>
+<ul>
+<li>A route accepts only <code>GET</code> unless you say otherwise. A form that <strong>submits</strong> data uses <code>POST</code>, so the route must declare <code>methods=["GET", "POST"]</code>.</li>
+<li><code>GET</code> = show the form. <code>POST</code> = the user pressed the button; the data is in <code>request.form</code>.</li>
+</ul>
+<p>This works but you'd have to write all the checks yourself ("is the email really an email?", "is the password empty?", "do the two passwords match?") <em>and</em> the HTML for every error message. That's what <strong>Flask-WTF / WTForms</strong> (Seminar 3) is for.</p>
+<h3 id="42-the-packages-for-this-step">4.2 The packages for this step</h3>
+<p>Nothing to install – <strong>Flask-WTF</strong> and <strong>email-validator</strong> came with <code>requirements.txt</code> in Step 1. (If you get an <code>ImportError</code> mentioning either of them, your venv is not activated or you skipped <code>pip install -r requirements.txt</code>.)</p>
+<ul>
+<li><strong>Flask-WTF</strong> (which brings <strong>WTForms</strong>) – define forms as Python classes.</li>
+<li><strong>email-validator</strong> – needed by WTForms' <code>Email()</code> check. Without it you get an <code>ImportError</code> the first time the form is used.</li>
+</ul>
+<h3 id="43-a-secret-key">4.3 A secret key</h3>
+<p>Flask-WTF protects every form against <strong>CSRF</strong> (a malicious website secretly making your browser submit a form to <em>our</em> site). It does this with a hidden random token that is signed with the app's <strong>secret key</strong>. So we must set one in <code>__init__.py</code>:</p>
+<p><strong><code>app/__init__.py</code></strong></p>
+<pre><code class="language-py">from flask import Flask
+
+
+def create_app():
+    app = Flask(__name__)
+    app.static_folder = &quot;assets&quot;  # serve CSS/JS/images from ./assets instead of ./static
+    app.secret_key = &quot;change-me-later&quot;  # needed by Flask-WTF (CSRF) and, later, flash() and sessions
+    return app
+
+
+app = create_app()
+</code></pre>
+<blockquote>
+<p>In a real deployment the secret key must be long, random and <strong>not</strong> stored in your code. Generate one with <code>python -c "import secrets; print(secrets.token_hex(32))"</code> and load it from an environment variable. For this seminar, a placeholder is fine.</p>
+</blockquote>
+<h3 id="44-describe-the-forms-appformspy">4.4 Describe the forms – <code>app/forms.py</code></h3>
+<p><strong><code>app/forms.py</code></strong></p>
+<pre><code class="language-py">from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, Length
+
+
+class LoginForm(FlaskForm):
+    email = StringField(&quot;Email&quot;, validators=[DataRequired(), Email()])
+    password = PasswordField(&quot;Password&quot;, validators=[DataRequired()])
+    remember_me = BooleanField(&quot;Remember me&quot;)
+    submit = SubmitField(&quot;Sign in&quot;)
+
+
+class RegisterForm(FlaskForm):
+    name = StringField(&quot;Name&quot;, validators=[DataRequired()])
+    email = StringField(&quot;Email&quot;, validators=[DataRequired(), Email()])
+    password = PasswordField(&quot;Password&quot;, validators=[DataRequired(), Length(min=6)])
+    confirm = PasswordField(
+        &quot;Confirm password&quot;,
+        validators=[DataRequired(), EqualTo(&quot;password&quot;, message=&quot;Passwords must match&quot;)],
+    )
+    submit = SubmitField(&quot;Register&quot;)
+</code></pre>
+<p>Read a form class like a shopping list of fields:</p>
+<ul>
+<li><code>StringField</code>, <code>PasswordField</code>, <code>BooleanField</code> (a checkbox), <code>SubmitField</code> (the button) – one per HTML input type. The first argument is the <strong>label</strong> text.</li>
+<li><code>validators=[...]</code> – the rules. <code>DataRequired()</code> = must not be empty. <code>Email()</code> = must look like an email. <code>Length(min=6)</code> = at least 6 characters. <code>EqualTo("password")</code> = must be identical to the <code>password</code> field.</li>
+<li>Field names (<code>email</code>, <code>password</code>, …) become the HTML <code>name</code> attributes and the attributes you read later: <code>form.email.data</code>.</li>
+</ul>
+<h3 id="45-a-reusable-template-snippet-apptemplates_render_fieldhtml">4.5 A reusable template snippet – <code>app/templates/_render_field.html</code></h3>
+<p>Each input needs a label, the input, and its error messages. Instead of typing that for every field (Seminar 3's <code>login.html</code> repeats it), we write a Jinja <strong>macro</strong> – a function for templates:</p>
+<p><strong><code>app/templates/_render_field.html</code></strong></p>
+<pre><code class="language-html">{# A Jinja &quot;macro&quot; is a reusable template function. #}
+{% macro render_field(field) %}
+  &lt;div class=&quot;mb-3&quot;&gt;
+    {{ field.label(class=&quot;form-label&quot;) }}
+    {{ field(class=&quot;form-control&quot; ~ (&quot; is-invalid&quot; if field.errors else &quot;&quot;)) }}
+    {% for msg in field.errors %}
+      &lt;div class=&quot;invalid-feedback&quot;&gt;{{ msg }}&lt;/div&gt;
+    {% endfor %}
+  &lt;/div&gt;
+{% endmacro %}
+</code></pre>
+<p><code>field.errors</code> is a list of error messages; it is empty until validation fails. The name starts with <code>_</code> only as a convention meaning "helper, not a full page".</p>
+<h3 id="46-the-login-and-register-pages">4.6 The login and register pages</h3>
+<p><strong><code>app/templates/login.html</code></strong></p>
+<pre><code class="language-html">{% extends &quot;base.html&quot; %}
+{% from &quot;_render_field.html&quot; import render_field %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5&quot; style=&quot;max-width: 480px;&quot;&gt;
+  &lt;h1 class=&quot;h3 mb-4&quot;&gt;Login&lt;/h1&gt;
+
+  &lt;form method=&quot;POST&quot; novalidate&gt;
+    {{ form.hidden_tag() }}  {# the hidden CSRF token #}
+
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+
+    &lt;div class=&quot;form-check mb-3&quot;&gt;
+      {{ form.remember_me(class=&quot;form-check-input&quot;) }}
+      {{ form.remember_me.label(class=&quot;form-check-label&quot;) }}
+    &lt;/div&gt;
+
+    {{ form.submit(class=&quot;btn btn-dark w-100&quot;) }}
+  &lt;/form&gt;
+
+  &lt;p class=&quot;small text-muted mt-3&quot;&gt;No account? &lt;a href=&quot;/register&quot;&gt;Register&lt;/a&gt;&lt;/p&gt;
+&lt;/main&gt;
+{% endblock %}
+</code></pre>
+<p><strong><code>app/templates/register.html</code></strong></p>
+<pre><code class="language-html">{% extends &quot;base.html&quot; %}
+{% from &quot;_render_field.html&quot; import render_field %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5&quot; style=&quot;max-width: 480px;&quot;&gt;
+  &lt;h1 class=&quot;h3 mb-4&quot;&gt;Create an account&lt;/h1&gt;
+
+  &lt;form method=&quot;POST&quot; novalidate&gt;
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.name) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+
+    {{ form.submit(class=&quot;btn btn-dark w-100&quot;) }}
+  &lt;/form&gt;
+
+  &lt;p class=&quot;small text-muted mt-3&quot;&gt;Already registered? &lt;a href=&quot;/login&quot;&gt;Login&lt;/a&gt;&lt;/p&gt;
+&lt;/main&gt;
+{% endblock %}
+</code></pre>
+<p>Things to notice:</p>
+<ul>
+<li><code>{% from "_render_field.html" import render_field %}</code> – import the macro.</li>
+<li><code>{{ form.hidden_tag() }}</code> – outputs the hidden CSRF token input. <strong>Forgetting it makes every submission fail validation.</strong></li>
+<li><code>novalidate</code> on <code>&lt;form&gt;</code> – turns off the browser's own pop-up validation so that <em>our</em> (WTForms) error messages appear instead.</li>
+<li>The <code>&lt;form&gt;</code> has <strong>no <code>action</code> attribute</strong>, so the browser posts back to the same URL it is on. (This matters in Step 7.)</li>
+</ul>
+<h3 id="47-the-routes-appapppy">4.7 The routes – <code>app/app.py</code></h3>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from flask import render_template
+from forms import LoginForm, RegisterForm
+
+
+@app.route(&quot;/&quot;)
+def home():
+    my_products = [
+        {&quot;name&quot;: &quot;Linen Shirt&quot;, &quot;desc&quot;: &quot;Breathable, relaxed fit.&quot;, &quot;price&quot;: 79.0},
+        {&quot;name&quot;: &quot;Canvas Tote&quot;, &quot;desc&quot;: &quot;Sturdy everyday bag.&quot;, &quot;price&quot;: 35.5},
+        {&quot;name&quot;: &quot;Ceramic Mug&quot;, &quot;desc&quot;: &quot;Hand-glazed, 350 ml.&quot;, &quot;price&quot;: 18.0},
+        {&quot;name&quot;: &quot;Wool Beanie&quot;, &quot;desc&quot;: &quot;Soft merino blend.&quot;, &quot;price&quot;: 24.9},
+    ]
+    return render_template(&quot;shopping.html&quot;, products=my_products)
+
+
+@app.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():  # True only for a POST whose fields all pass validation
+        return f&quot;Login form OK for {form.email.data}&quot;
+    return render_template(&quot;login.html&quot;, form=form)
+
+
+@app.route(&quot;/register&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        return f&quot;Register form OK for {form.name.data} &lt;{form.email.data}&gt;&quot;
+    return render_template(&quot;register.html&quot;, form=form)
+</code></pre>
+<p>The pattern is the same for both forms and is worth memorising:</p>
+<pre><code class="language-python">form = LoginForm()                       # 1. create the form object
+if form.validate_on_submit():            # 2. True only if it's a POST *and* all validators pass
+    ...use form.email.data ...           # 3. success path
+return render_template(&quot;login.html&quot;, form=form)   # otherwise (GET, or validation failed): show the form
+</code></pre>
+<p>On a <code>GET</code> the form is empty. On a failed <code>POST</code> the very same <code>form</code> object still holds what the user typed and the error messages, so re-rendering the template shows them.</p>
+<p>For now a successful submit just returns a string. We'll do something sensible with it in the next step.</p>
+<p>Finally, add Login/Register links to the navbar in <code>templates/base.html</code>. Find the line with <code>Shop All</code> and add two lines after it:</p>
+<pre><code class="language-html">          &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-dark text-decoration-none&quot; href=&quot;/&quot;&gt;Shop All&lt;/a&gt;&lt;/li&gt;
+          &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-secondary text-decoration-none&quot; href=&quot;/login&quot;&gt;Login&lt;/a&gt;&lt;/li&gt;
+          &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-secondary text-decoration-none&quot; href=&quot;/register&quot;&gt;Register&lt;/a&gt;&lt;/li&gt;
+</code></pre>
+<p>(The next step replaces these hard-coded paths with <code>url_for</code>.)</p>
+<h3 id="checkpoint-4">✅ Checkpoint 4</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-4.webm" controls muted playsinline preload="metadata"></video></div>
+
+<p>Restart the server if it isn't running (<code>bash start.sh</code>) and visit <a href="http://127.0.0.1:5000/register">http://127.0.0.1:5000/register</a>.</p>
+<ol>
+<li>Press <strong>Register</strong> with everything empty → red "This field is required." under each field.</li>
+<li>Type <code>abc</code> as the email → "Invalid email address."</li>
+<li>Type different passwords in <em>Password</em> and <em>Confirm</em> → "Passwords must match".</li>
+<li>Fill it in correctly → the page shows <code>Register form OK for …</code>.</li>
+</ol>
+<pre><code class="language-text">app/
+├── __init__.py
+├── app.py
+├── forms.py                       ← new
+├── start.sh
+├── assets/css/custom.css
+└── templates/
+    ├── _render_field.html         ← new
+    ├── base.html
+    ├── login.html                 ← new
+    ├── register.html              ← new
+    └── shopping.html
+</code></pre>
+<hr />
+<h2 id="step-5-redirect-render_template-and-flash">Step 5 – <code>redirect</code>, <code>render_template</code> and <code>flash</code></h2>
+<p>Seminar 2 is about how a route <em>responds</em>. There are two main ways:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>What it does</th>
+<th>Browser sees</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>return render_template("x.html", ...)</code></td>
+<td>Build a page and send it now</td>
+<td><code>200 OK</code> + HTML</td>
+</tr>
+<tr>
+<td><code>return redirect(url_for("other_route"))</code></td>
+<td>Tell the browser "go to <em>that</em> URL instead"</td>
+<td><code>302 Found</code> + a <code>Location</code> header; the browser then makes a <strong>new</strong> GET request</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="51-why-redirect-after-a-successful-form">5.1 Why redirect after a successful form?</h3>
+<p>At the end of Step 4 a successful <code>POST</code> returned a page directly. If the user then presses <strong>F5 / Refresh</strong>, the browser asks <em>"resubmit the form data?"</em> and – if they agree – repeats the POST (creating a second account, or ordering twice!). The standard cure is the <strong>Post → Redirect → Get</strong> pattern: after handling a POST, <code>redirect()</code> to a normal <code>GET</code> page. Refreshing then just reloads that page.</p>
+<h3 id="52-url_for-dont-hard-code-urls">5.2 <code>url_for</code> – don't hard-code URLs</h3>
+<p><code>url_for("login")</code> returns the URL of the route whose <strong>function is called <code>login</code></strong>: <code>"/login"</code>. If you later change the route to <code>@app.route("/signin")</code>, every <code>url_for("login")</code> follows automatically, while a hard-coded <code>"/login"</code> would silently break. It also works inside templates: <code>{{ url_for('login') }}</code>.</p>
+<h3 id="53-url-variables-and-query-strings-seminar-2">5.3 URL variables and query strings (Seminar 2)</h3>
+<p>Seminar 2 experimented with three ways of getting input from the URL. We'll keep them as small "playground" routes so you can try them:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Route rule</th>
+<th>How the value arrives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/greet/Ann</code></td>
+<td><code>"/greet/&lt;name&gt;"</code></td>
+<td>as the function argument <code>name</code> (a string)</td>
+</tr>
+<tr>
+<td><code>/add/2/3</code></td>
+<td><code>"/add/&lt;int:a&gt;/&lt;int:b&gt;"</code></td>
+<td><code>int:</code> converts to numbers; <code>/add/2/x</code> gives 404</td>
+</tr>
+<tr>
+<td><code>/greetWithArgs?friend=bob</code></td>
+<td><code>"/greetWithArgs"</code></td>
+<td><strong>query string</strong>: <code>request.args.get("friend")</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Seminar 2's <code>greetWithArgs</code> did <code>request.args.get('friend').title()</code>. If you visit the page <em>without</em> <code>?friend=…</code>, <code>get</code> returns <code>None</code> and <code>None.title()</code> <strong>crashes</strong>. We pass a default instead: <code>request.args.get("friend", "stranger")</code>.</p>
+</blockquote>
+<h3 id="54-flash-a-one-time-message">5.4 <code>flash</code> – a one-time message</h3>
+<p><code>flash("text")</code> stores a message in the user's <strong>session</strong> (a small cookie signed with the secret key – another reason the key is needed). On the <em>next</em> page, <code>get_flashed_messages()</code> returns it and removes it, so it is shown exactly once. Perfect with redirects: <em>do something → flash("Done!") → redirect → the next page shows "Done!"</em>.</p>
+<h3 id="55-update-appapppy">5.5 Update <code>app/app.py</code></h3>
+<p>We also add a pretend user so you can practise both the "wrong password" and "success" paths <em>before</em> we have a database:</p>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from flask import render_template, request, redirect, url_for, flash
+from forms import LoginForm, RegisterForm
+
+# A pretend &quot;database&quot; with one user. Step 6 replaces this with real MongoDB.
+FAKE_USER = {&quot;email&quot;: &quot;demo@shop.com&quot;, &quot;password&quot;: &quot;password&quot;}
+
+
+@app.route(&quot;/&quot;)
+def home():
+    my_products = [
+        {&quot;name&quot;: &quot;Linen Shirt&quot;, &quot;desc&quot;: &quot;Breathable, relaxed fit.&quot;, &quot;price&quot;: 79.0},
+        {&quot;name&quot;: &quot;Canvas Tote&quot;, &quot;desc&quot;: &quot;Sturdy everyday bag.&quot;, &quot;price&quot;: 35.5},
+        {&quot;name&quot;: &quot;Ceramic Mug&quot;, &quot;desc&quot;: &quot;Hand-glazed, 350 ml.&quot;, &quot;price&quot;: 18.0},
+        {&quot;name&quot;: &quot;Wool Beanie&quot;, &quot;desc&quot;: &quot;Soft merino blend.&quot;, &quot;price&quot;: 24.9},
+    ]
+    return render_template(&quot;shopping.html&quot;, products=my_products)
+
+
+# ---- Playground routes (from lab 2) -------------------------------------------------
+@app.route(&quot;/greet/&lt;name&gt;&quot;)
+def greet(name):
+    return f&quot;Hello, {name}!&quot;
+
+
+@app.route(&quot;/add/&lt;int:a&gt;/&lt;int:b&gt;&quot;)
+def add(a, b):
+    return str(a + b)
+
+
+@app.route(&quot;/greetWithArgs&quot;)
+def greetWithArgs():
+    name = request.args.get(&quot;friend&quot;, &quot;stranger&quot;).title()
+    return redirect(url_for(&quot;greet&quot;, name=name))
+
+
+# ---- Login / Register ---------------------------------------------------------------
+@app.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.email.data != FAKE_USER[&quot;email&quot;]:
+            form.email.errors.append(&quot;Email not found&quot;)
+        elif form.password.data != FAKE_USER[&quot;password&quot;]:
+            form.password.errors.append(&quot;Password incorrect&quot;)
+        else:
+            flash(&quot;You were successfully logged in&quot;)
+            return redirect(url_for(&quot;home&quot;))
+    return render_template(&quot;login.html&quot;, form=form)
+
+
+@app.route(&quot;/register&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        flash(&quot;Thanks for registering! (Nothing is saved yet.)&quot;)
+        return redirect(url_for(&quot;login&quot;))
+    return render_template(&quot;register.html&quot;, form=form)
+</code></pre>
+<p>Notice how validation errors specific to <em>our</em> logic are added by hand: <code>form.email.errors.append("Email not found")</code>. <code>_render_field.html</code> will display them like any other error.</p>
+<h3 id="56-show-flashed-messages-in-basehtml">5.6 Show flashed messages in <code>base.html</code></h3>
+<p>Insert this block <strong>just above</strong> the line <code>&lt;!-- Each child page fills in this block --&gt;</code>:</p>
+<pre><code class="language-html">  &lt;!-- Flash messages: one-time notes stored in the session --&gt;
+  &lt;div class=&quot;container mt-3&quot;&gt;
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        &lt;div class=&quot;alert alert-dark alert-dismissible fade show&quot; role=&quot;alert&quot;&gt;
+          {{ message }}
+          &lt;button type=&quot;button&quot; class=&quot;btn-close&quot; data-bs-dismiss=&quot;alert&quot;&gt;&lt;/button&gt;
+        &lt;/div&gt;
+      {% endfor %}
+    {% endwith %}
+  &lt;/div&gt;
+</code></pre>
+<p>(<code>{% with %}</code> just creates a temporary variable. This is the same idea as the flash block in Seminar 2's <code>base.html</code>, dressed up with Bootstrap's alert style.)</p>
+<h3 id="57-replace-hard-coded-paths-with-url_for">5.7 Replace hard-coded paths with <code>url_for</code></h3>
+<p>In <strong><code>templates/base.html</code></strong> change the four links:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Old</th>
+<th>New</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>href="/"</code> (brand, twice: <code>ESSENTIALS</code> and <code>Shop All</code>)</td>
+<td><code>href="{{ url_for('home') }}"</code></td>
+</tr>
+<tr>
+<td><code>href="/login"</code></td>
+<td><code>href="{{ url_for('login') }}"</code></td>
+</tr>
+<tr>
+<td><code>href="/register"</code></td>
+<td><code>href="{{ url_for('register') }}"</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>In <strong><code>templates/login.html</code></strong> change <code>href="/register"</code> → <code>href="{{ url_for('register') }}"</code>, and in <strong><code>templates/register.html</code></strong> change <code>href="/login"</code> → <code>href="{{ url_for('login') }}"</code>.</p>
+<h3 id="checkpoint-5">✅ Checkpoint 5</h3>
+<ul>
+<li><a href="http://127.0.0.1:5000/greet/Ann">http://127.0.0.1:5000/greet/Ann</a> → <code>Hello, Ann!</code></li>
+<li><a href="http://127.0.0.1:5000/add/2/3">http://127.0.0.1:5000/add/2/3</a> → <code>5</code></li>
+<li><a href="http://127.0.0.1:5000/greetWithArgs?friend=bob">http://127.0.0.1:5000/greetWithArgs?friend=bob</a> → the address bar changes to <code>/greet/Bob</code> (that's the redirect) and you see <code>Hello, Bob!</code></li>
+<li>Register with valid details → you land on the <strong>Login</strong> page with a dark banner "Thanks for registering!". Refresh – the banner is gone (shown once).</li>
+<li>Log in as <code>demo@shop.com</code> / <code>password</code> → back on the shop page with "You were successfully logged in". A wrong password shows "Password incorrect".</li>
+<li>In the terminal you can see the <code>302</code> lines: <code>"POST /login" 302</code> followed by <code>"GET /" 200</code>.</li>
+</ul>
+<p><em>Flash messages (shown once):</em></p>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-5-flash.webm" controls muted playsinline preload="metadata"></video></div>
+
+<p><em>Register and log in:</em></p>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-5-login-register.webm" controls muted playsinline preload="metadata"></video></div>
+
+<hr />
+<h2 id="step-6-the-database-mongodb-mongoengine">Step 6 – The database (MongoDB + MongoEngine)</h2>
+<p>Right now everything is forgotten when the server restarts and registering doesn't really register anyone. We need <strong>persistent storage</strong>.</p>
+<h3 id="61-what-is-mongodb">6.1 What is MongoDB?</h3>
+<p>MongoDB is a <strong>document database</strong>. Compare with a spreadsheet:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Spreadsheet idea</th>
+<th>MongoDB name</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The whole workbook</td>
+<td><strong>database</strong></td>
+<td><code>shop</code></td>
+</tr>
+<tr>
+<td>A sheet</td>
+<td><strong>collection</strong></td>
+<td><code>products</code>, <code>users</code></td>
+</tr>
+<tr>
+<td>A row</td>
+<td><strong>document</strong> (JSON-like)</td>
+<td><code>{"name": "Linen Shirt", "price": 79.0}</code></td>
+</tr>
+<tr>
+<td>A column</td>
+<td><strong>field</strong></td>
+<td><code>price</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Every document automatically gets a unique <code>_id</code> (an <code>ObjectId</code> like <code>64f1…</code>). We'll use it later to identify products and users.</p>
+<p><strong>MongoEngine</strong> is a Python library that lets you describe documents as Python classes (like <code>class Product(db.Document)</code>) so you can write <code>Product.objects(name="Desk Lamp")</code> instead of raw database commands. We use it through a small wrapper called <strong>flask-mongoengine</strong>, which connects MongoEngine to Flask and gives us a <code>db</code> object.</p>
+<h3 id="62-get-a-mongodb-server-running">6.2 Get a MongoDB server running</h3>
+<p>The Python code only <em>talks</em> to MongoDB; a MongoDB <strong>server</strong> must be running on your machine (default port <strong>27017</strong>). Choose one:</p>
+<p><strong>Option A – Docker (quickest if you have Docker):</strong></p>
+<pre><code class="language-bash">$ docker run -d --name shop-mongo -p 27017:27017 -v shop-mongo-data:/data/db mongo:7
+</code></pre>
+<p><code>-d</code> runs it in the background, <code>-p 27017:27017</code> exposes the port, <code>-v …</code> keeps your data in a Docker volume. Next time: <code>docker start shop-mongo</code>. (On Linux you may need <code>sudo</code>, or to add yourself to the <code>docker</code> group.)</p>
+<p><strong>Option B – Install natively</strong> – follow the official guide for your OS at <a href="https://www.mongodb.com/docs/manual/administration/install-community/">https://www.mongodb.com/docs/manual/administration/install-community/</a> (macOS: <code>brew tap mongodb/brew &amp;&amp; brew install mongodb-community</code> then <code>brew services start mongodb-community</code>; Windows: the MSI installer; Ubuntu: add MongoDB's apt repository, it isn't in the default one).</p>
+<p><strong>Option C – MongoDB Atlas</strong> (free cloud database): create a free cluster at <a href="https://www.mongodb.com/atlas">https://www.mongodb.com/atlas</a>, then in <code>__init__.py</code> (Step 6.4) replace the settings dictionary with <code>{"host": "mongodb+srv://USER:PASSWORD@YOURCLUSTER.mongodb.net/shop"}</code>.</p>
+<p><strong>Option D – Use Vocareum</strong> no further action is needed. MongoDB is already set up on Vocareum Lab.</p>
+<p><strong>Check that it is running</strong> (optional but recommended). With Docker:</p>
+<pre><code class="language-bash">$ docker exec -it shop-mongo mongosh
+test&gt; show dbs
+</code></pre>
+<p>If you get a prompt and a list, MongoDB is alive. Type <code>exit</code> to leave.</p>
+<h3 id="63-the-packages-for-this-step">6.3 The packages for this step</h3>
+<p>Nothing to install – <strong>flask-mongoengine</strong>, <strong>mongoengine</strong> and <strong>pymongo</strong> came with <code>requirements.txt</code> in Step 1. <strong>pymongo</strong> is the official low-level MongoDB driver, <strong>mongoengine</strong> builds the "Python classes ↔ documents" layer on top of it, and <strong>flask-mongoengine</strong> plugs that into Flask.</p>
+<h3 id="64-connect-app__init__py">6.4 Connect – <code>app/__init__.py</code></h3>
+<p><strong><code>app/__init__.py</code></strong></p>
+<pre><code class="language-py">from flask import Flask
+from flask_mongoengine import MongoEngine
+
+
+def create_app():
+    app = Flask(__name__)
+    app.static_folder = &quot;assets&quot;
+    app.secret_key = &quot;change-me-later&quot;
+    # Settings for MongoDB. The database (&quot;shop&quot;) is created on first write.
+    app.config[&quot;MONGODB_SETTINGS&quot;] = [
+        {
+            &quot;db&quot;: &quot;shop&quot;,         # database name
+            &quot;host&quot;: &quot;localhost&quot;,  # where mongod is running
+            &quot;port&quot;: 27017,        # MongoDB's default port
+        }
+    ]
+    db = MongoEngine(app)  # opens the connection and gives us db.Document, db.StringField, ...
+    return app, db
+
+
+app, db = create_app()
+</code></pre>
+<p><code>MONGODB_SETTINGS</code> tells flask-mongoengine where the server is (this is the same setting Seminar 3 used), and <code>db = MongoEngine(app)</code> sets up the connection. The connection is made <strong>lazily</strong> (on the first query), so the app will <em>start</em> even if MongoDB is off – you'd get the error on the first page that needs data (see Troubleshooting).</p>
+<p>The <code>db</code> object is what you build models from: <code>db.Document</code>, <code>db.StringField</code>, <code>db.FloatField</code>, … Because <code>create_app()</code> now returns two things, the last line is <code>app, db = create_app()</code>.</p>
+<h3 id="65-describe-the-data-appmodelspy">6.5 Describe the data – <code>app/models.py</code></h3>
+<p><strong><code>app/models.py</code></strong></p>
+<pre><code class="language-py">from werkzeug.security import generate_password_hash, check_password_hash
+from app import db
+
+
+class User(db.Document):
+    meta = {&quot;collection&quot;: &quot;users&quot;}
+    email = db.StringField(required=True, unique=True)
+    name = db.StringField(required=True)
+    password = db.StringField(required=True)  # stores the HASH, never the plain password
+
+    @staticmethod
+    def getUser(email):
+        return User.objects(email=email).first()  # None if not found
+
+    @staticmethod
+    def createUser(email, name, password):
+        user = User.getUser(email)
+        if not user:
+            user = User(email=email, name=name, password=generate_password_hash(password))
+            user.save()
+        return user
+
+    def checkPassword(self, password):
+        return check_password_hash(self.password, password)  # True / False
+
+
+class Product(db.Document):
+    meta = {&quot;collection&quot;: &quot;products&quot;}
+    name = db.StringField(required=True, max_length=60)
+    description = db.StringField(max_length=300)
+    price = db.FloatField(required=True, min_value=0)
+
+    @staticmethod
+    def getAllProducts():
+        return Product.objects()
+
+    @staticmethod
+    def createProduct(name, description, price):
+        return Product(name=name, description=description, price=price).save()
+</code></pre>
+<p>Line-by-line ideas:</p>
+<ul>
+<li><code>class User(db.Document)</code> – each instance is one document in the collection named in <code>meta</code>.</li>
+<li><code>db.StringField(required=True, unique=True)</code> – field types and constraints. <code>unique=True</code> makes MongoDB refuse two users with the same email.</li>
+<li><strong>Passwords are never stored.</strong> <code>generate_password_hash(password)</code> (from Werkzeug, which Flask already installed) produces a salted one-way hash such as <code>scrypt:32768:8:1$…</code>. To log in we hash what the user typed and compare via <code>check_password_hash</code>. Even you, the developer, cannot read anyone's password from the database.</li>
+<li><code>@staticmethod</code> helper methods (<code>getUser</code>, <code>createUser</code>, …) keep all database code <em>in the model</em>, so the routes stay short. This is the style of Seminar 3's <code>models.py</code>.</li>
+<li><code>.objects(email=email).first()</code> – "find documents where <code>email</code> equals this value; give me the first one, or <code>None</code>".</li>
+<li><code>Product.objects()</code> – every product.</li>
+</ul>
+<blockquote>
+<p><strong>Why <code>from app import db</code>?</strong> The <code>db</code> object is created in <code>__init__.py</code>, so any model file imports it from the <code>app</code> package. This is exactly how Seminar 3's <code>models.py</code> does it.</p>
+</blockquote>
+<h3 id="66-use-the-models-in-the-routes-appapppy">6.6 Use the models in the routes – <code>app/app.py</code></h3>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from flask import render_template, request, redirect, url_for, flash
+from forms import LoginForm, RegisterForm
+from models import User, Product
+
+
+@app.route(&quot;/&quot;)
+def home():
+    &quot;&quot;&quot;Delete all products and insert the sample catalogue.&quot;&quot;&quot;
+    Product.objects.delete()
+    samples = [
+        (&quot;Linen Shirt&quot;, &quot;Breathable, relaxed fit.&quot;, 79.0),
+        (&quot;Canvas Tote&quot;, &quot;Sturdy everyday bag.&quot;, 35.5),
+        (&quot;Ceramic Mug&quot;, &quot;Hand-glazed, 350 ml.&quot;, 18.0),
+        (&quot;Wool Beanie&quot;, &quot;Soft merino blend.&quot;, 24.9),
+        (&quot;Leather Wallet&quot;, &quot;Slim, full-grain leather.&quot;, 55.0),
+        (&quot;Cotton Socks (3 pack)&quot;, &quot;Everyday crew socks.&quot;, 15.0),
+        (&quot;Desk Lamp&quot;, &quot;Warm light, adjustable arm.&quot;, 48.0),
+        (&quot;Notebook&quot;, &quot;A5, 120 pages, dotted.&quot;, 9.5),
+    ]
+    for name, description, price in samples:
+        Product.createProduct(name, description, price)
+
+    products = Product.getAllProducts()
+    return render_template(&quot;shopping.html&quot;, products=products)
+
+
+# ---- Playground routes (from lab 2) -------------------------------------------------
+@app.route(&quot;/greet/&lt;name&gt;&quot;)
+def greet(name):
+    return f&quot;Hello, {name}!&quot;
+
+
+@app.route(&quot;/add/&lt;int:a&gt;/&lt;int:b&gt;&quot;)
+def add(a, b):
+    return str(a + b)
+
+
+@app.route(&quot;/greetWithArgs&quot;)
+def greetWithArgs():
+    name = request.args.get(&quot;friend&quot;, &quot;stranger&quot;).title()
+    return redirect(url_for(&quot;greet&quot;, name=name))
+
+
+# ---- Login / Register ---------------------------------------------------------------
+@app.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.getUser(form.email.data)
+        if not user:
+            form.email.errors.append(&quot;Email not found&quot;)
+        elif not user.checkPassword(form.password.data):
+            form.password.errors.append(&quot;Password incorrect&quot;)
+        else:
+            flash(f&quot;Password OK for {user.name} (we don't remember you yet - see step 7)&quot;)
+            return redirect(url_for(&quot;home&quot;))
+    return render_template(&quot;login.html&quot;, form=form)
+
+
+@app.route(&quot;/register&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if User.getUser(form.email.data):
+            form.email.errors.append(&quot;Email already registered&quot;)
+        else:
+            User.createUser(form.email.data, form.name.data, form.password.data)
+            flash(&quot;Account created - please log in&quot;)
+            return redirect(url_for(&quot;login&quot;))
+    return render_template(&quot;register.html&quot;, form=form)
+
+</code></pre>
+<p>What changed:</p>
+<ul>
+<li><code>home()</code> no longer has a hard-coded list; it asks the database: <code>Product.getAllProducts()</code>.</li>
+<li><code>register()</code> first checks that the email isn't taken, then calls <code>User.createUser(...)</code>. It really saves now.</li>
+<li><code>login()</code> looks the user up in MongoDB and verifies the hash. (It doesn't <em>remember</em> the user yet – that's Step 7.)</li>
+</ul>
+<p>The template used <code>product.desc</code> for the description; the model calls the field <code>description</code>. Update <strong>one line</strong> in <code>templates/shopping.html</code>:</p>
+<pre><code class="language-html">          &lt;p class=&quot;text-muted small mb-3&quot;&gt;{{ product.description }}&lt;/p&gt;
+</code></pre>
+<h3 id="checkpoint-6">✅ Checkpoint 6</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-6.webm" controls muted playsinline preload="metadata"></video></div>
+
+<ol>
+<li><code>bash start.sh</code>, open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> → <strong>eight</strong> products, loaded from MongoDB.</li>
+<li>Register a new account. You are sent to the login page.</li>
+<li>Register the <strong>same email</strong> again → "Email already registered".</li>
+<li>Log in with a wrong password → "Password incorrect". Log in with the right one → "Password OK for …".</li>
+<li>Look inside the database:</li>
+</ol>
+<pre><code class="language-bash">$ docker exec -it shop-mongo mongosh
+test&gt; use shop
+shop&gt; db.users.find()
+shop&gt; db.products.find()
+</code></pre>
+<p>You will see your user with a long <code>password</code> hash (not the plain text!) and the products with their <code>_id</code>s.</p>
+<pre><code class="language-text">app/
+├── __init__.py          ← MongoEngine(app) + db added
+├── app.py               ← uses models
+├── models.py            ← new (User, Product)
+├── forms.py
+├── start.sh
+├── assets/css/custom.css
+└── templates/  (as before)
+</code></pre>
+<hr />
+<h2 id="step-7-flask-login">Step 7 – Flask-Login</h2>
+<p>Step 6 checks the password but forgets who you are the moment the redirect happens (HTTP is <strong>stateless</strong> – every request is independent). <strong>Flask-Login</strong> solves this: after a successful login it stores the user's id in the signed session cookie, and on each later request it turns that id back into a user object.</p>
+<h3 id="71-the-package-for-this-step">7.1 The package for this step</h3>
+<p>Nothing to install – <strong>Flask-Login</strong> came with <code>requirements.txt</code> in Step 1.</p>
+<h3 id="72-the-four-ingredients">7.2 The four ingredients</h3>
+<ol>
+<li>A <strong><code>LoginManager</code></strong> attached to the app (<code>__init__.py</code>).</li>
+<li>A <strong>user model</strong> that includes <code>UserMixin</code> (gives it <code>is_authenticated</code>, <code>get_id()</code>, …).</li>
+<li>A <strong><code>user_loader</code></strong> function: "given an id from the cookie, return the <code>User</code>".</li>
+<li>The view helpers <strong><code>login_user</code></strong>, <strong><code>logout_user</code></strong>, <strong><code>current_user</code></strong> and the decorator <strong><code>@login_required</code></strong>.</li>
+</ol>
+<h3 id="73-app__init__py">7.3 <code>app/__init__.py</code></h3>
+<p><strong><code>app/__init__.py</code></strong></p>
+<pre><code class="language-py">from flask import Flask
+from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
+from flask_mongoengine import MongoEngine
+
+
+def create_app():
+    app = Flask(__name__)
+    app.static_folder = &quot;assets&quot;
+    app.secret_key = &quot;change-me-later&quot;
+    app.config[&quot;MONGODB_SETTINGS&quot;] = [
+        {
+            &quot;db&quot;: &quot;shop&quot;,
+            &quot;host&quot;: &quot;localhost&quot;,
+            &quot;port&quot;: 27017,
+        }
+    ]
+    db = MongoEngine(app)
+
+    CSRFProtect(app)  # every POST must carry a valid CSRF token
+
+    login_manager = LoginManager(app)
+    login_manager.login_view = &quot;login&quot;  # where to send visitors who hit a @login_required page
+    login_manager.login_message = &quot;Please log in to continue.&quot;
+    return app, db, login_manager
+
+
+app, db, login_manager = create_app()
+</code></pre>
+<ul>
+<li><code>login_manager.login_view = "login"</code> – if a not-logged-in visitor opens a <code>@login_required</code> page, Flask-Login redirects them to the route named <code>login</code> and appends <code>?next=&lt;where they were going&gt;</code>.</li>
+<li><code>CSRFProtect(app)</code> – Flask-WTF forms (login/register) already have CSRF tokens. The cart's "Add" button will be a <em>plain</em> form, so we switch on CSRF checking for <strong>all</strong> POST requests. Any POST without a valid token now gets <strong>400 Bad Request</strong>.</li>
+<li>The function now returns three things, so the last line unpacks them: <code>app, db, login_manager = create_app()</code>.</li>
+</ul>
+<h3 id="74-appmodelspy">7.4 <code>app/models.py</code></h3>
+<p><strong><code>app/models.py</code></strong></p>
+<pre><code class="language-py">from flask_login import UserMixin
+from mongoengine.errors import ValidationError
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import db, login_manager
+
+
+class User(UserMixin, db.Document):  # UserMixin adds is_authenticated, get_id() etc.
+    meta = {&quot;collection&quot;: &quot;users&quot;}
+    email = db.StringField(required=True, unique=True)
+    name = db.StringField(required=True)
+    password = db.StringField(required=True)  # stores the HASH, never the plain password
+
+    @staticmethod
+    def getUser(email):
+        return User.objects(email=email).first()  # None if not found
+
+    @staticmethod
+    def getUserById(user_id):
+        try:
+            return User.objects(pk=user_id).first()
+        except ValidationError:  # user_id is not a valid ObjectId
+            return None
+
+    @staticmethod
+    def createUser(email, name, password):
+        user = User.getUser(email)
+        if not user:
+            user = User(email=email, name=name, password=generate_password_hash(password))
+            user.save()
+        return user
+
+    def checkPassword(self, password):
+        return check_password_hash(self.password, password)  # True / False
+
+
+class Product(db.Document):
+    meta = {&quot;collection&quot;: &quot;products&quot;}
+    name = db.StringField(required=True, max_length=60)
+    description = db.StringField(max_length=300)
+    price = db.FloatField(required=True, min_value=0)
+
+    @staticmethod
+    def getProduct(product_id):
+        try:
+            return Product.objects(pk=product_id).first()
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def getAllProducts():
+        return Product.objects()
+
+    @staticmethod
+    def createProduct(name, description, price):
+        return Product(name=name, description=description, price=price).save()
+
+
+class CartItem(db.Document):
+    meta = {&quot;collection&quot;: &quot;cart_items&quot;}
+    user = db.ReferenceField(User, required=True)        # whose cart this line belongs to
+    product = db.ReferenceField(Product, required=True)  # which product
+    quantity = db.IntField(default=1, min_value=1)
+
+    @property
+    def subtotal(self):
+        return self.product.price * self.quantity
+
+    @staticmethod
+    def getCartItems(user):
+        return CartItem.objects(user=user)
+
+    @staticmethod
+    def getCartItem(user, product):
+        return CartItem.objects(user=user, product=product).first()  # None if not in the cart
+
+    @staticmethod
+    def countItems(user):
+        return CartItem.objects(user=user).sum(&quot;quantity&quot;)  # total number of units in the cart
+
+    @staticmethod
+    def addToCart(user, product):
+        item = CartItem.getCartItem(user, product)
+        if item:
+            item.quantity += 1  # already in the cart: one more
+        else:
+            item = CartItem(user=user, product=product)
+        return item.save()
+
+    @staticmethod
+    def removeFromCart(user, product):
+        item = CartItem.getCartItem(user, product)
+        if item:
+            item.delete()
+        return item
+
+    @staticmethod
+    def clearCart(user):
+        CartItem.objects(user=user).delete()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # Flask-Login calls this on every request, with the id it stored in the session cookie.
+    return User.getUserById(user_id)
+</code></pre>
+<h4 id="the-cart-lives-in-mongodb-the-cartitem-model">The cart lives in MongoDB: the <code>CartItem</code> model</h4>
+<p>Instead of keeping the cart in the browser's cookie, every line of every cart is a <strong>document in its own collection</strong>, <code>cart_items</code>. One document = one product in one user's cart:</p>
+<pre><code class="language-json">{ &quot;_id&quot;: &quot;…&quot;, &quot;user&quot;: &quot;&lt;id of Ann&gt;&quot;, &quot;product&quot;: &quot;&lt;id of Linen Shirt&gt;&quot;, &quot;quantity&quot;: 2 }
+</code></pre>
+<ul>
+<li><code>db.ReferenceField(User)</code> / <code>db.ReferenceField(Product)</code> store the <strong><code>_id</code> of another document</strong> – MongoDB's version of a foreign key. When you write <code>item.product.name</code> MongoEngine automatically fetches the referenced product for you. (Seminar 3's <code>Itinerary</code> and <code>Booking</code> models do the same.)</li>
+<li><code>db.IntField(default=1, min_value=1)</code> – a whole number, at least 1.</li>
+<li>A cart is not a separate object: <strong>Ann's cart is simply "all <code>CartItem</code> documents whose <code>user</code> is Ann"</strong>: <code>CartItem.objects(user=ann)</code>.</li>
+<li><code>@property subtotal</code> – a computed value (price × quantity) that you use like a field: <code>item.subtotal</code>. It is not stored in the database.</li>
+</ul>
+<p>The helper methods are the four database operations, <strong>CRUD</strong>, applied to the cart:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Method</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>C</strong>reate / <strong>U</strong>pdate</td>
+<td><code>addToCart(user, product)</code></td>
+<td>Looks for an existing line for this user + product. If there is one, <code>quantity += 1</code> and <code>save()</code> (update); if not, creates a new <code>CartItem</code> (create).</td>
+</tr>
+<tr>
+<td><strong>R</strong>ead</td>
+<td><code>getCartItems(user)</code>, <code>getCartItem(user, product)</code>, <code>countItems(user)</code></td>
+<td>List the user's lines, find one line (or <code>None</code>), and add up the quantities with <code>.sum("quantity")</code>.</td>
+</tr>
+<tr>
+<td><strong>D</strong>elete</td>
+<td><code>removeFromCart(user, product)</code>, <code>clearCart(user)</code></td>
+<td>Delete one line / every line of that user.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Because the data is in the database, the cart is <strong>still there after you log out, close the browser, or restart the server</strong>, and each user only ever sees their own lines.</p>
+<h3 id="75-appapppy">7.5 <code>app/app.py</code></h3>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from urllib.parse import urlsplit
+from flask import render_template, request, redirect, url_for, flash
+from flask_login import login_user, logout_user, current_user, login_required
+from forms import LoginForm, RegisterForm
+from models import User, Product, CartItem
+
+
+@app.route(&quot;/&quot;)
+def home():
+    &quot;&quot;&quot;Insert the sample catalogue the first time the shop is opened, then list the products.&quot;&quot;&quot;
+    if Product.objects.count() == 0:  # only when the collection is empty - carts point at these products
+        samples = [
+            (&quot;Linen Shirt&quot;, &quot;Breathable, relaxed fit.&quot;, 79.0),
+            (&quot;Canvas Tote&quot;, &quot;Sturdy everyday bag.&quot;, 35.5),
+            (&quot;Ceramic Mug&quot;, &quot;Hand-glazed, 350 ml.&quot;, 18.0),
+            (&quot;Wool Beanie&quot;, &quot;Soft merino blend.&quot;, 24.9),
+            (&quot;Leather Wallet&quot;, &quot;Slim, full-grain leather.&quot;, 55.0),
+            (&quot;Cotton Socks (3 pack)&quot;, &quot;Everyday crew socks.&quot;, 15.0),
+            (&quot;Desk Lamp&quot;, &quot;Warm light, adjustable arm.&quot;, 48.0),
+            (&quot;Notebook&quot;, &quot;A5, 120 pages, dotted.&quot;, 9.5),
+        ]
+        for name, description, price in samples:
+            Product.createProduct(name, description, price)
+    products = Product.getAllProducts()
+    return render_template(&quot;shopping.html&quot;, products=products)
+
+
+# ---- Playground routes (from lab 2) -------------------------------------------------
+@app.route(&quot;/greet/&lt;name&gt;&quot;)
+def greet(name):
+    return f&quot;Hello, {name}!&quot;
+
+
+@app.route(&quot;/add/&lt;int:a&gt;/&lt;int:b&gt;&quot;)
+def add(a, b):
+    return str(a + b)
+
+
+@app.route(&quot;/greetWithArgs&quot;)
+def greetWithArgs():
+    name = request.args.get(&quot;friend&quot;, &quot;stranger&quot;).title()
+    return redirect(url_for(&quot;greet&quot;, name=name))
+
+
+# ---- Login / Register / Logout ------------------------------------------------------
+@app.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    if current_user.is_authenticated:  # already logged in? nothing to do here
+        return redirect(url_for(&quot;home&quot;))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.getUser(form.email.data)
+        if not user:
+            form.email.errors.append(&quot;Email not found&quot;)
+        elif not user.checkPassword(form.password.data):
+            form.password.errors.append(&quot;Password incorrect&quot;)
+        else:
+            login_user(user, remember=form.remember_me.data)
+            flash(f&quot;Welcome back, {user.name}!&quot;)
+            # Flask-Login adds ?next=/cart when it bounces you here from a protected page
+            next_page = request.args.get(&quot;next&quot;)
+            if not next_page or urlsplit(next_page).netloc:  # reject absolute URLs
+                next_page = url_for(&quot;home&quot;)
+            return redirect(next_page)
+    return render_template(&quot;login.html&quot;, form=form)
+
+
+@app.route(&quot;/register&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if User.getUser(form.email.data):
+            form.email.errors.append(&quot;Email already registered&quot;)
+        else:
+            User.createUser(form.email.data, form.name.data, form.password.data)
+            flash(&quot;Account created - please log in&quot;)
+            return redirect(url_for(&quot;login&quot;))
+    return render_template(&quot;register.html&quot;, form=form)
+
+
+@app.route(&quot;/logout&quot;)
+def logout():
+    logout_user()
+    flash(&quot;You have been logged out&quot;)
+    return redirect(url_for(&quot;home&quot;))
+
+
+# ---- Cart (login required) ----------------------------------------------------------
+@app.context_processor
+def inject_cart_count():
+    # Runs before every template is rendered. The dict it returns becomes template variables,
+    # so base.html can show {{ cart_count }} without every route passing it in.
+    if current_user.is_authenticated:
+        return {&quot;cart_count&quot;: CartItem.countItems(current_user)}
+    return {&quot;cart_count&quot;: 0}
+
+
+@app.route(&quot;/cart&quot;)
+@login_required
+def cart():
+    items = CartItem.getCartItems(current_user)
+    total = sum(item.subtotal for item in items)
+    return render_template(&quot;cart.html&quot;, items=items, total=total)
+
+
+@app.route(&quot;/cart/add/&lt;product_id&gt;&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartAdd(product_id):
+    product = Product.getProduct(product_id)
+    if not product:
+        flash(&quot;Sorry, that product does not exist&quot;)
+        return redirect(url_for(&quot;home&quot;))
+    CartItem.addToCart(current_user, product)
+    flash(f&quot;Added {product.name} to your cart&quot;)
+    return redirect(url_for(&quot;home&quot;))
+
+
+@app.route(&quot;/cart/remove/&lt;product_id&gt;&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartRemove(product_id):
+    product = Product.getProduct(product_id)
+    if product:
+        CartItem.removeFromCart(current_user, product)
+    return redirect(url_for(&quot;cart&quot;))
+
+
+@app.route(&quot;/cart/clear&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartClear():
+    CartItem.clearCart(current_user)
+    return redirect(url_for(&quot;cart&quot;))
+</code></pre>
+<p>The new ideas:</p>
+<ul>
+<li><strong><code>login_user(user, remember=...)</code></strong> – log this user in. <code>remember=True</code> (the "Remember me" checkbox) also sets a long-lived cookie so they stay logged in after closing the browser.</li>
+<li><strong><code>logout_user()</code></strong> – forget the user.</li>
+<li><strong><code>current_user</code></strong> – the logged-in <code>User</code>, or an "anonymous" object whose <code>is_authenticated</code> is <code>False</code>. Available in Python <em>and</em> in templates.</li>
+<li><strong><code>@login_required</code></strong> – put it <em>under</em> <code>@app.route(...)</code>. Anonymous visitors are redirected to the login page.</li>
+<li><strong><code>?next=</code></strong> – after logging in, we send the user to where they were originally headed (e.g. <code>/cart</code>). We only accept <strong>relative</strong> URLs (<code>urlsplit(next).netloc</code> is empty); otherwise an attacker could craft <code>…/login?next=http://evil.com</code> and bounce your users to a fake site (an <em>open redirect</em>).</li>
+<li><strong>The cart is stored in the database</strong>, through the <code>CartItem</code> model. The routes stay very short because the model does the work: <code>CartItem.addToCart(current_user, product)</code>, <code>CartItem.getCartItems(current_user)</code>, <code>CartItem.removeFromCart(...)</code>, <code>CartItem.clearCart(...)</code>. (<code>current_user</code> can be passed straight to a query as "this user".)</li>
+<li><strong><code>@app.context_processor</code></strong> – a function whose returned dictionary is added to <strong>every</strong> template automatically. We use it to give <code>base.html</code> a <code>cart_count</code> variable (the number on the Cart badge) without having to pass it from every route.</li>
+<li><strong>Only the logged-in user's own lines are touched</strong>: every cart method filters by <code>user</code>, so a user cannot add to, view or remove somebody else's cart even by editing the URL.</li>
+<li><strong><code>home()</code> changed slightly.</strong> In Step 6 it wiped and re-inserted the sample products on <em>every</em> visit. That would now break carts: each <code>CartItem</code> points at a product's <code>_id</code>, and re-inserting creates products with <strong>new</strong> ids, leaving every cart pointing at products that no longer exist. So now the samples are inserted <strong>only if the <code>products</code> collection is empty</strong> (<code>if Product.objects.count() == 0</code>), i.e. the first time somebody opens the shop.</li>
+<li>Adding to the cart <strong>changes data</strong>, so it is a <code>POST</code> route, never a plain link (a link can be triggered by anything, e.g. a search-engine crawler).</li>
+</ul>
+<h3 id="76-apptemplatesbasehtml-show-who-is-logged-in">7.6 <code>app/templates/base.html</code> – show who is logged in</h3>
+<p>This is now the complete, final version of the base template. Replace the file with:</p>
+<p><strong><code>app/templates/base.html</code></strong></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;{% block title %}Essentials{% endblock %}&lt;/title&gt;
+  &lt;!-- Bootstrap 5 CSS + Bootstrap Icons via CDN --&gt;
+  &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;
+        integrity=&quot;sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC&quot; crossorigin=&quot;anonymous&quot;&gt;
+  &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;!-- our own CSS, served from the &quot;assets&quot; folder --&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;{{ url_for('static', filename='css/custom.css') }}&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;!-- Header / navbar --&gt;
+  &lt;nav class=&quot;navbar navbar-expand-lg navbar-light bg-white sticky-top py-3&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;a class=&quot;navbar-brand fw-bold text-dark&quot; href=&quot;{{ url_for('home') }}&quot;&gt;ESSENTIALS&lt;/a&gt;
+
+      &lt;button class=&quot;navbar-toggler border-0&quot; type=&quot;button&quot; data-bs-toggle=&quot;collapse&quot; data-bs-target=&quot;#navbarNav&quot;&gt;
+        &lt;span class=&quot;navbar-toggler-icon&quot;&gt;&lt;/span&gt;
+      &lt;/button&gt;
+
+      &lt;div class=&quot;collapse navbar-collapse justify-content-end&quot; id=&quot;navbarNav&quot;&gt;
+        &lt;ul class=&quot;navbar-nav align-items-center&quot;&gt;
+          &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-dark text-decoration-none&quot; href=&quot;{{ url_for('home') }}&quot;&gt;Shop All&lt;/a&gt;&lt;/li&gt;
+
+          {% if current_user.is_authenticated %}
+            &lt;li class=&quot;nav-item px-2 text-secondary&quot;&gt;Hi, {{ current_user.name }}&lt;/li&gt;
+            &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-secondary text-decoration-none&quot; href=&quot;{{ url_for('logout') }}&quot;&gt;Logout&lt;/a&gt;&lt;/li&gt;
+          {% else %}
+            &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-secondary text-decoration-none&quot; href=&quot;{{ url_for('login') }}&quot;&gt;Login&lt;/a&gt;&lt;/li&gt;
+            &lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-secondary text-decoration-none&quot; href=&quot;{{ url_for('register') }}&quot;&gt;Register&lt;/a&gt;&lt;/li&gt;
+          {% endif %}
+
+          &lt;li class=&quot;nav-item ps-3&quot;&gt;
+            &lt;a class=&quot;btn btn-outline-dark btn-sm rounded-pill px-3 position-relative&quot; href=&quot;{{ url_for('cart') }}&quot;&gt;
+              &lt;i class=&quot;bi bi-bag me-1&quot;&gt;&lt;/i&gt; Cart
+              &lt;span class=&quot;position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark&quot;&gt;
+                {{ cart_count }}
+              &lt;/span&gt;
+            &lt;/a&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/nav&gt;
+
+  &lt;!-- Flash messages: one-time notes stored in the session --&gt;
+  &lt;div class=&quot;container mt-3&quot;&gt;
+    {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+        &lt;div class=&quot;alert alert-dark alert-dismissible fade show&quot; role=&quot;alert&quot;&gt;
+          {{ message }}
+          &lt;button type=&quot;button&quot; class=&quot;btn-close&quot; data-bs-dismiss=&quot;alert&quot;&gt;&lt;/button&gt;
+        &lt;/div&gt;
+      {% endfor %}
+    {% endwith %}
+  &lt;/div&gt;
+
+  &lt;!-- Each child page fills in this block --&gt;
+  {% block content %}{% endblock %}
+
+  &lt;!-- Footer --&gt;
+  &lt;footer class=&quot;text-center text-muted py-4 mt-5&quot;&gt;
+    &lt;div class=&quot;container&quot;&gt;
+      &lt;p class=&quot;small mb-1&quot;&gt;&amp;copy; 2026 Essentials Studio. All rights reserved.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/footer&gt;
+
+  &lt;!-- Bootstrap JS (needed for the collapsing navbar on phones) --&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Highlights:</p>
+<ul>
+<li><code>{% if current_user.is_authenticated %}…{% else %}…{% endif %}</code> – show <em>"Hi, Ann / Logout"</em> to logged-in users and <em>Login / Register</em> to everyone else. This is how Seminar 3's <code>base.html</code> behaves.</li>
+<li>The cart badge: <code>{{ cart_count }}</code> – the total number of items in the logged-in user's cart, provided by the context processor in <code>app.py</code> (it is <code>0</code> for visitors who aren't logged in).</li>
+</ul>
+<h3 id="77-apptemplatesshoppinghtml-a-working-add-button">7.7 <code>app/templates/shopping.html</code> – a working "Add" button</h3>
+<p>The button becomes a tiny form that POSTs to the cart route, with a CSRF token:</p>
+<p><strong><code>app/templates/shopping.html</code></strong></p>
+<pre><code class="language-html">{% extends &quot;base.html&quot; %}
+
+{% block title %}Shop All{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5 py-4&quot;&gt;
+  &lt;div class=&quot;row g-4 row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4&quot;&gt;
+
+    {% for product in products %}
+    &lt;div class=&quot;col&quot;&gt;
+      &lt;div class=&quot;card h-100 product-card rounded-0&quot;&gt;
+        &lt;div class=&quot;product-img-placeholder&quot;&gt;
+          &lt;i class=&quot;bi bi-image fs-3&quot;&gt;&lt;/i&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;card-body d-flex flex-column p-4&quot;&gt;
+          &lt;h5 class=&quot;card-title fs-6 fw-bold mb-1&quot;&gt;{{ product.name }}&lt;/h5&gt;
+          &lt;p class=&quot;text-muted small mb-3&quot;&gt;{{ product.description }}&lt;/p&gt;
+          &lt;div class=&quot;d-flex justify-content-between align-items-center mt-auto&quot;&gt;
+            &lt;span class=&quot;fw-semibold&quot;&gt;${{ &quot;%.2f&quot;|format(product.price) }}&lt;/span&gt;
+            &lt;form method=&quot;POST&quot; action=&quot;{{ url_for('cartAdd', product_id=product.id) }}&quot;&gt;
+              &lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;{{ csrf_token() }}&quot;&gt;
+              &lt;button type=&quot;submit&quot; class=&quot;btn btn-dark btn-sm rounded-0 px-3&quot;&gt;Add&lt;/button&gt;
+            &lt;/form&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    {% else %}
+    &lt;p class=&quot;text-muted&quot;&gt;No products yet.&lt;/p&gt;
+    {% endfor %}
+
+  &lt;/div&gt;
+&lt;/main&gt;
+{% endblock %}
+</code></pre>
+<p><code>product.id</code> is the MongoDB <code>_id</code>. <code>url_for('cartAdd', product_id=product.id)</code> fills the <code>&lt;product_id&gt;</code> slot in the route: <code>/cart/add/64f1a…</code>.</p>
+<h3 id="78-apptemplatescarthtml-new-page">7.8 <code>app/templates/cart.html</code> – new page</h3>
+<p><strong><code>app/templates/cart.html</code></strong></p>
+<pre><code class="language-html">{% extends &quot;base.html&quot; %}
+
+{% block title %}Your Cart{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5&quot;&gt;
+  &lt;h1 class=&quot;h3 mb-4&quot;&gt;Your cart&lt;/h1&gt;
+
+  {% if items %}
+  &lt;table class=&quot;table align-middle&quot;&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Product&lt;/th&gt;
+        &lt;th class=&quot;text-end&quot;&gt;Price&lt;/th&gt;
+        &lt;th class=&quot;text-end&quot;&gt;Qty&lt;/th&gt;
+        &lt;th class=&quot;text-end&quot;&gt;Subtotal&lt;/th&gt;
+        &lt;th&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      {% for item in items %}
+      &lt;tr&gt;
+        &lt;td&gt;{{ item.product.name }}&lt;/td&gt;
+        &lt;td class=&quot;text-end&quot;&gt;${{ &quot;%.2f&quot;|format(item.product.price) }}&lt;/td&gt;
+        &lt;td class=&quot;text-end&quot;&gt;{{ item.quantity }}&lt;/td&gt;
+        &lt;td class=&quot;text-end&quot;&gt;${{ &quot;%.2f&quot;|format(item.subtotal) }}&lt;/td&gt;
+        &lt;td class=&quot;text-end&quot;&gt;
+          &lt;form method=&quot;POST&quot; action=&quot;{{ url_for('cartRemove', product_id=item.product.id) }}&quot;&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;{{ csrf_token() }}&quot;&gt;
+            &lt;button class=&quot;btn btn-outline-dark btn-sm rounded-0&quot;&gt;Remove&lt;/button&gt;
+          &lt;/form&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      {% endfor %}
+    &lt;/tbody&gt;
+    &lt;tfoot&gt;
+      &lt;tr&gt;&lt;th colspan=&quot;3&quot; class=&quot;text-end&quot;&gt;Total&lt;/th&gt;&lt;th class=&quot;text-end&quot;&gt;${{ &quot;%.2f&quot;|format(total) }}&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;/tr&gt;
+    &lt;/tfoot&gt;
+  &lt;/table&gt;
+
+  &lt;form method=&quot;POST&quot; action=&quot;{{ url_for('cartClear') }}&quot;&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;csrf_token&quot; value=&quot;{{ csrf_token() }}&quot;&gt;
+    &lt;button class=&quot;btn btn-outline-dark btn-sm rounded-0&quot;&gt;Empty cart&lt;/button&gt;
+  &lt;/form&gt;
+  {% else %}
+    &lt;p class=&quot;text-muted&quot;&gt;Your cart is empty. &lt;a href=&quot;{{ url_for('home') }}&quot;&gt;Keep shopping&lt;/a&gt;&lt;/p&gt;
+  {% endif %}
+&lt;/main&gt;
+{% endblock %}
+</code></pre>
+<p>Each row's <strong>Remove</strong> button and the <strong>Empty cart</strong> button are small POST forms with a CSRF token, just like <strong>Add</strong>. <code>item.product.id</code> is the id of the referenced product, which <code>cartRemove</code> uses to find the right line.</p>
+<p>The two other forms need no changes: <code>login.html</code> has no <code>action</code>, so after Flask-Login bounces you to <code>/login?next=%2Fcart</code> the form posts back to that same URL and the <code>next</code> value is preserved. <em>(Seminar 3's login form used <code>action="/login"</code>, which would have dropped it.)</em></p>
+<h3 id="checkpoint-7">✅ Checkpoint 7</h3>
+<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-7.webm" controls muted playsinline preload="metadata"></video></div>
+
+<ol>
+<li>Logged out, click <strong>Cart</strong> → you're taken to the login page, and the address bar shows <code>/login?next=%2Fcart</code>. A banner says "Please log in to continue."</li>
+<li>Log in → you land on <strong>/cart</strong> (that's <code>next</code> working), which says "Your cart is empty".</li>
+<li>Go to <strong>Shop All</strong> and click <strong>Add</strong> on two products (one twice). The badge on the Cart button counts up and each click shows "Added … to your cart". Refresh the shop page a few times: the products and your badge stay the same (the products are only inserted once).</li>
+<li>Open <strong>Cart</strong> → a table with quantities, subtotals and a total. Click <strong>Remove</strong> on one row (that line disappears), or <strong>Empty cart</strong> to clear everything.</li>
+<li>The navbar says <strong>Hi, \&lt;your name&gt;</strong>. Add something again, then click <strong>Logout</strong> ("You have been logged out") and <strong>log back in</strong> → your cart is <strong>still there</strong>, because it is stored in MongoDB, not in the cookie.</li>
+<li>Register a second user in a private/incognito window and add a different product: the two carts stay separate.</li>
+<li>Look at the data:</li>
+</ol>
+<pre><code class="language-bash">shop&gt; db.cart_items.find()
+</code></pre>
+<p>You will see one document per cart line, with <code>user</code> and <code>product</code> ids and a <code>quantity</code>.
+8. While logged in, visit <a href="http://127.0.0.1:5000/login">http://127.0.0.1:5000/login</a> → you're bounced straight back to the shop (<code>current_user.is_authenticated</code>).
+9. (Optional) In your browser's dev-tools → Application → Cookies, you'll see a <code>session</code> cookie: the signed data. Change one character and reload: you're logged out, because the signature no longer matches.</p>
+<hr />
+<h2 id="step-8-blueprints-and-a-proper-folder-structure">Step 8 – Blueprints and a proper folder structure</h2>
+<p><code>app.py</code> now contains routes for authentication, the shop, the cart and the demo playground, and <code>models.py</code> contains unrelated models. With a real project this becomes unmanageable. We reorganise into the <strong>model / controller / view</strong> layout of the <code>staycation</code> project:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>MVC name</th>
+<th>Folder</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Model</strong></td>
+<td><code>models/</code></td>
+<td>database classes and forms</td>
+</tr>
+<tr>
+<td><strong>View</strong></td>
+<td><code>templates/</code></td>
+<td>HTML</td>
+</tr>
+<tr>
+<td><strong>Controller</strong></td>
+<td><code>controllers/</code></td>
+<td>the route functions</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="81-what-is-a-blueprint">8.1 What is a Blueprint?</h3>
+<p>A <strong>Blueprint</strong> is a <em>named bundle of routes</em> defined in its own file. You create it, attach routes to it (<code>@shop.route(...)</code> instead of <code>@app.route(...)</code>), then <strong>register</strong> it with the app in one line. Think of blueprints as chapters of a book and <code>app.register_blueprint(...)</code> as adding the chapter to the table of contents.</p>
+<p>We will create three:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Blueprint</th>
+<th>File</th>
+<th>Routes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth</code></td>
+<td><code>controllers/auth.py</code></td>
+<td>login, register, logout</td>
+</tr>
+<tr>
+<td><code>shop</code></td>
+<td><code>controllers/shop.py</code></td>
+<td>home, cart, add to cart, remove from cart, empty cart</td>
+</tr>
+<tr>
+<td><code>demo</code></td>
+<td><code>controllers/demo.py</code></td>
+<td>the Seminar 2 playground (greet, add, greetWithArgs), mounted under <code>/demo</code></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="82-do-the-reorganisation">8.2 Do the reorganisation</h3>
+<p>Inside <code>app/</code>:</p>
+<pre><code class="language-bash">(venv) $ mkdir controllers models
+(venv) $ mv forms.py models/forms.py        # forms.py moves unchanged
+</code></pre>
+<p>Now <strong>split <code>models.py</code></strong> into three files – <code>users.py</code>, <code>product.py</code> and <code>cart.py</code> – then delete the old one (<code>rm models.py</code>).</p>
+<p><strong><code>app/models/users.py</code></strong></p>
+<pre><code class="language-py">from flask_login import UserMixin
+from mongoengine.errors import ValidationError
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import db, login_manager
+
+
+class User(UserMixin, db.Document):  # UserMixin adds is_authenticated, get_id() etc.
+    meta = {&quot;collection&quot;: &quot;users&quot;}
+    email = db.StringField(required=True, unique=True)
+    name = db.StringField(required=True)
+    password = db.StringField(required=True)  # stores the HASH, never the plain password
+
+    @staticmethod
+    def getUser(email):
+        return User.objects(email=email).first()  # None if not found
+
+    @staticmethod
+    def getUserById(user_id):
+        try:
+            return User.objects(pk=user_id).first()
+        except ValidationError:  # user_id is not a valid ObjectId
+            return None
+
+    @staticmethod
+    def createUser(email, name, password):
+        user = User.getUser(email)
+        if not user:
+            user = User(email=email, name=name, password=generate_password_hash(password))
+            user.save()
+        return user
+
+    def checkPassword(self, password):
+        return check_password_hash(self.password, password)  # True / False
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # Flask-Login calls this on every request, with the id it stored in the session cookie.
+    return User.getUserById(user_id)
+</code></pre>
+<p><strong><code>app/models/product.py</code></strong></p>
+<pre><code class="language-py">from mongoengine.errors import ValidationError
+from app import db
+
+
+class Product(db.Document):
+    meta = {&quot;collection&quot;: &quot;products&quot;}
+    name = db.StringField(required=True, max_length=60)
+    description = db.StringField(max_length=300)
+    price = db.FloatField(required=True, min_value=0)
+
+    @staticmethod
+    def getProduct(product_id):
+        try:
+            return Product.objects(pk=product_id).first()
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def getAllProducts():
+        return Product.objects()
+
+    @staticmethod
+    def createProduct(name, description, price):
+        return Product(name=name, description=description, price=price).save()
+</code></pre>
+<p><strong><code>app/models/cart.py</code></strong></p>
+<pre><code class="language-py">from app import db
+from models.users import User
+from models.product import Product
+
+
+class CartItem(db.Document):
+    meta = {&quot;collection&quot;: &quot;cart_items&quot;}
+    user = db.ReferenceField(User, required=True)        # whose cart this line belongs to
+    product = db.ReferenceField(Product, required=True)  # which product
+    quantity = db.IntField(default=1, min_value=1)
+
+    @property
+    def subtotal(self):
+        return self.product.price * self.quantity
+
+    @staticmethod
+    def getCartItems(user):
+        return CartItem.objects(user=user)
+
+    @staticmethod
+    def getCartItem(user, product):
+        return CartItem.objects(user=user, product=product).first()  # None if not in the cart
+
+    @staticmethod
+    def countItems(user):
+        return CartItem.objects(user=user).sum(&quot;quantity&quot;)  # total number of units in the cart
+
+    @staticmethod
+    def addToCart(user, product):
+        item = CartItem.getCartItem(user, product)
+        if item:
+            item.quantity += 1  # already in the cart: one more
+        else:
+            item = CartItem(user=user, product=product)
+        return item.save()
+
+    @staticmethod
+    def removeFromCart(user, product):
+        item = CartItem.getCartItem(user, product)
+        if item:
+            item.delete()
+        return item
+
+    @staticmethod
+    def clearCart(user):
+        CartItem.objects(user=user).delete()
+</code></pre>
+<p><code>cart.py</code> imports <code>User</code> and <code>Product</code> because it refers to them. <code>users.py</code> and <code>product.py</code> import neither each other nor <code>cart.py</code>, so there are no circular imports.</p>
+<p>(<code>models/forms.py</code> is exactly the <code>forms.py</code> from Step 4.)</p>
+<h3 id="83-the-controllers">8.3 The controllers</h3>
+<p><strong><code>app/controllers/auth.py</code></strong></p>
+<pre><code class="language-py">from urllib.parse import urlsplit
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_user, logout_user, current_user
+
+from models.forms import LoginForm, RegisterForm
+from models.users import User
+
+auth = Blueprint(&quot;auth&quot;, __name__)  # endpoints become auth.login, auth.register, auth.logout
+
+
+@auth.route(&quot;/login&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for(&quot;shop.home&quot;))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.getUser(form.email.data)
+        if not user:
+            form.email.errors.append(&quot;Email not found&quot;)
+        elif not user.checkPassword(form.password.data):
+            form.password.errors.append(&quot;Password incorrect&quot;)
+        else:
+            login_user(user, remember=form.remember_me.data)
+            flash(f&quot;Welcome back, {user.name}!&quot;)
+            next_page = request.args.get(&quot;next&quot;)
+            if not next_page or urlsplit(next_page).netloc:  # reject absolute URLs
+                next_page = url_for(&quot;shop.home&quot;)
+            return redirect(next_page)
+    return render_template(&quot;login.html&quot;, form=form)
+
+
+@auth.route(&quot;/register&quot;, methods=[&quot;GET&quot;, &quot;POST&quot;])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if User.getUser(form.email.data):
+            form.email.errors.append(&quot;Email already registered&quot;)
+        else:
+            User.createUser(form.email.data, form.name.data, form.password.data)
+            flash(&quot;Account created - please log in&quot;)
+            return redirect(url_for(&quot;auth.login&quot;))
+    return render_template(&quot;register.html&quot;, form=form)
+
+
+@auth.route(&quot;/logout&quot;)
+def logout():
+    logout_user()
+    flash(&quot;You have been logged out&quot;)
+    return redirect(url_for(&quot;shop.home&quot;))
+</code></pre>
+<p><strong><code>app/controllers/shop.py</code></strong></p>
+<pre><code class="language-py">from flask import Blueprint, render_template, redirect, url_for, flash
+from flask_login import login_required, current_user
+
+from models.product import Product
+from models.cart import CartItem
+
+shop = Blueprint(&quot;shop&quot;, __name__)  # endpoints: shop.home, shop.cart, shop.cartAdd, shop.cartRemove, shop.cartClear
+
+
+@shop.route(&quot;/&quot;)
+def home():
+    &quot;&quot;&quot;Insert the sample catalogue the first time the shop is opened, then list the products.&quot;&quot;&quot;
+    if Product.objects.count() == 0:  # only when the collection is empty - carts point at these products
+        samples = [
+            (&quot;Linen Shirt&quot;, &quot;Breathable, relaxed fit.&quot;, 79.0),
+            (&quot;Canvas Tote&quot;, &quot;Sturdy everyday bag.&quot;, 35.5),
+            (&quot;Ceramic Mug&quot;, &quot;Hand-glazed, 350 ml.&quot;, 18.0),
+            (&quot;Wool Beanie&quot;, &quot;Soft merino blend.&quot;, 24.9),
+            (&quot;Leather Wallet&quot;, &quot;Slim, full-grain leather.&quot;, 55.0),
+            (&quot;Cotton Socks (3 pack)&quot;, &quot;Everyday crew socks.&quot;, 15.0),
+            (&quot;Desk Lamp&quot;, &quot;Warm light, adjustable arm.&quot;, 48.0),
+            (&quot;Notebook&quot;, &quot;A5, 120 pages, dotted.&quot;, 9.5),
+        ]
+        for name, description, price in samples:
+            Product.createProduct(name, description, price)
+    products = Product.getAllProducts()
+    return render_template(&quot;shopping.html&quot;, products=products)
+
+
+@shop.route(&quot;/cart&quot;)
+@login_required
+def cart():
+    items = CartItem.getCartItems(current_user)
+    total = sum(item.subtotal for item in items)
+    return render_template(&quot;cart.html&quot;, items=items, total=total)
+
+
+@shop.route(&quot;/cart/add/&lt;product_id&gt;&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartAdd(product_id):
+    product = Product.getProduct(product_id)
+    if not product:
+        flash(&quot;Sorry, that product does not exist&quot;)
+        return redirect(url_for(&quot;shop.home&quot;))
+    CartItem.addToCart(current_user, product)
+    flash(f&quot;Added {product.name} to your cart&quot;)
+    return redirect(url_for(&quot;shop.home&quot;))
+
+
+@shop.route(&quot;/cart/remove/&lt;product_id&gt;&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartRemove(product_id):
+    product = Product.getProduct(product_id)
+    if product:
+        CartItem.removeFromCart(current_user, product)
+    return redirect(url_for(&quot;shop.cart&quot;))
+
+
+@shop.route(&quot;/cart/clear&quot;, methods=[&quot;POST&quot;])
+@login_required
+def cartClear():
+    CartItem.clearCart(current_user)
+    return redirect(url_for(&quot;shop.cart&quot;))
+</code></pre>
+<p><strong><code>app/controllers/demo.py</code></strong></p>
+<pre><code class="language-py">from flask import Blueprint, request, redirect, url_for
+
+demo = Blueprint(&quot;demo&quot;, __name__)  # registered with url_prefix=&quot;/demo&quot; in app.py
+
+
+@demo.route(&quot;/greet/&lt;name&gt;&quot;)
+def greet(name):
+    return f&quot;Hello, {name}!&quot;
+
+
+@demo.route(&quot;/add/&lt;int:a&gt;/&lt;int:b&gt;&quot;)
+def add(a, b):
+    return str(a + b)
+
+
+@demo.route(&quot;/greetWithArgs&quot;)
+def greetWithArgs():
+    name = request.args.get(&quot;friend&quot;, &quot;stranger&quot;).title()
+    return redirect(url_for(&quot;demo.greet&quot;, name=name))
+</code></pre>
+<p>The <strong>important new rule</strong>: a blueprint's endpoint name is <code>blueprintname.functionname</code>. So <code>login()</code> inside the <code>auth</code> blueprint is now <code>auth.login</code>, and every <code>url_for</code> must use the new name: <code>url_for("auth.login")</code>, <code>url_for("shop.home")</code>. (Inside a blueprint you may also write the shorthand <code>url_for(".home")</code>.)</p>
+<h3 id="84-the-new-appapppy">8.4 The new <code>app/app.py</code></h3>
+<p><code>app.py</code> shrinks to "assemble the pieces", plus the context processor that supplies <code>cart_count</code> (it needs <code>app</code>, so it stays here). Loading the sample products moved into <code>home()</code> in <code>controllers/shop.py</code>, so nothing has to be run from the command line:</p>
+<p><strong><code>app/app.py</code></strong></p>
+<pre><code class="language-py">from app import app
+from flask_login import current_user
+from models.cart import CartItem
+from controllers.auth import auth
+from controllers.shop import shop
+from controllers.demo import demo
+
+# Register the blueprints so Flask knows about their routes
+app.register_blueprint(auth)
+app.register_blueprint(shop)
+app.register_blueprint(demo, url_prefix=&quot;/demo&quot;)  # /demo/greet/&lt;name&gt;, /demo/add/2/3, ...
+
+
+@app.context_processor
+def inject_cart_count():
+    # Runs before every template is rendered. The dict it returns becomes template variables,
+    # so base.html can show {{ cart_count }} without every route passing it in.
+    if current_user.is_authenticated:
+        return {&quot;cart_count&quot;: CartItem.countItems(current_user)}
+    return {&quot;cart_count&quot;: 0}
+</code></pre>
+<p><code>url_prefix="/demo"</code> adds <code>/demo</code> in front of every route in that blueprint (<code>/demo/greet/&lt;name&gt;</code>) – handy for grouping. <code>auth</code> and <code>shop</code> have no prefix, so their URLs are unchanged (<code>/login</code>, <code>/</code>, <code>/cart</code>).</p>
+<h3 id="85-update-the-endpoint-names">8.5 Update the endpoint names</h3>
+<p><strong><code>app/__init__.py</code></strong> – one line:</p>
+<pre><code class="language-python">    login_manager.login_view = &quot;auth.login&quot;      # was &quot;login&quot;
+</code></pre>
+<p><strong>Templates</strong> – every <code>url_for(...)</code> needs the blueprint prefix. Use your editor's <em>find &amp; replace</em> across the <code>templates/</code> folder:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Find</th>
+<th>Replace with</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url_for('home')</code></td>
+<td><code>url_for('shop.home')</code></td>
+</tr>
+<tr>
+<td><code>url_for('cart')</code></td>
+<td><code>url_for('shop.cart')</code></td>
+</tr>
+<tr>
+<td><code>url_for('cartAdd'</code></td>
+<td><code>url_for('shop.cartAdd'</code></td>
+</tr>
+<tr>
+<td><code>url_for('cartRemove'</code></td>
+<td><code>url_for('shop.cartRemove'</code></td>
+</tr>
+<tr>
+<td><code>url_for('cartClear')</code></td>
+<td><code>url_for('shop.cartClear')</code></td>
+</tr>
+<tr>
+<td><code>url_for('login')</code></td>
+<td><code>url_for('auth.login')</code></td>
+</tr>
+<tr>
+<td><code>url_for('register')</code></td>
+<td><code>url_for('auth.register')</code></td>
+</tr>
+<tr>
+<td><code>url_for('logout')</code></td>
+<td><code>url_for('auth.logout')</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>(Leave <code>url_for('static', …)</code> alone – <code>static</code> belongs to the app itself.)</p>
+<p>To double-check that nothing was missed, list what's left:</p>
+<pre><code class="language-bash">$ grep -rn &quot;url_for&quot; templates | grep -v &quot;static\|auth\.\|shop\.&quot;
+</code></pre>
+<p>It should print nothing.</p>
+<h3 id="86-how-the-imports-fit-together">8.6 How the imports fit together</h3>
+<p>Imports look odd at first, so here is how they resolve when you run <code>flask run</code> inside <code>app/</code>:</p>
+<pre><code class="language-text">flask loads  app.py  (as module &quot;app.app&quot;)
+ ├─ from app import app                 → package &quot;app&quot; (__init__.py): creates app + db (MongoEngine) + login_manager
+ ├─ from models.product import Product  → app/models/product.py   (found because PYTHONPATH=. = the app/ folder)
+ ├─ from controllers.auth import auth   → app/controllers/auth.py
+ │     ├─ from models.forms import ...
+ │     └─ from models.users import User → ... from app import db, login_manager   (already created above)
+ └─ app.register_blueprint(...)         → routes now exist
+</code></pre>
+<p>The order matters to avoid <strong>circular imports</strong>: <code>__init__.py</code> must <em>never</em> import from <code>models/</code> or <code>controllers/</code> (it only creates things), while models and controllers may import <em>from</em> <code>app</code>.</p>
+<h3 id="checkpoint-8-final-test">✅ Checkpoint 8 (final test)</h3>
+<pre><code class="language-bash">(venv) $ export FLASK_APP=app.py PYTHONPATH=.
+(venv) $ flask routes
+</code></pre>
+<p>should list exactly:</p>
+<pre><code class="language-text">Endpoint            Methods    Rule
+------------------  ---------  -------------------------
+auth.login          GET, POST  /login
+auth.logout         GET        /logout
+auth.register       GET, POST  /register
+demo.add            GET        /demo/add/&lt;int:a&gt;/&lt;int:b&gt;
+demo.greet          GET        /demo/greet/&lt;name&gt;
+demo.greetWithArgs  GET        /demo/greetWithArgs
+shop.cart           GET        /cart
+shop.cartAdd        POST       /cart/add/&lt;product_id&gt;
+shop.cartClear      POST       /cart/clear
+shop.cartRemove     POST       /cart/remove/&lt;product_id&gt;
+shop.home           GET        /
+static              GET        /static/&lt;path:filename&gt;
+</code></pre>
+<p>Then repeat <strong>Checkpoint 7</strong> in full – <em>everything should behave exactly as before</em>. That is the definition of a successful refactor: the code moved, the behaviour did not. Also try <a href="http://127.0.0.1:5000/demo/add/2/3">http://127.0.0.1:5000/demo/add/2/3</a> (<code>5</code>), and note that the old <code>/greet/Ann</code> is now a 404 because the demo routes live under <code>/demo</code>.</p>
+<hr />
+<h2 id="the-finished-project">The finished project</h2>
+<h3 id="final-folder-structure">Final folder structure</h3>
+<pre><code class="language-text">shop-site/
+├── venv/                        ← private packages (never edit / never commit)
+├── requirements.txt             ← from pip freeze
+└── app/
+    ├── __init__.py              ← creates app, connects to MongoDB, sets up CSRF + Flask-Login
+    ├── app.py                   ← registers blueprints + the cart-count context processor
+    ├── start.sh                 ← run the dev server
+    ├── assets/
+    │   └── css/custom.css       ← static files
+    ├── controllers/             ← ROUTES (blueprints)
+    │   ├── auth.py
+    │   ├── shop.py
+    │   └── demo.py
+    ├── models/                  ← DATA
+    │   ├── forms.py
+    │   ├── cart.py
+    │   ├── product.py
+    │   └── users.py
+    └── templates/               ← HTML (Jinja)
+        ├── _render_field.html
+        ├── base.html
+        ├── cart.html
+        ├── login.html
+        ├── register.html
+        └── shopping.html
+</code></pre>
+<h3 id="requirementstxt-final"><code>requirements.txt</code> (final)</h3>
+<p>The file never changed after Step 1 – you needed every package from the beginning:</p>
+<pre><code class="language-text">blinker==1.7.0
+click==8.1.7
+dnspython==2.6.1
+email-validator==2.1.0.post1
+Flask==2.2.5
+Flask-Login==0.6.3
+flask-mongoengine==1.0.0
+Flask-WTF==1.2.1
+idna==3.6
+itsdangerous==2.1.2
+Jinja2==3.1.3
+MarkupSafe==2.1.5
+mongoengine==0.27.0
+pymongo==4.6.1
+Werkzeug==3.0.1
+WTForms==3.1.2
+</code></pre>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause and fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'flask'</code> (or <code>wtforms</code>, <code>mongoengine</code>, …)</td>
+<td>The venv isn't activated. Run <code>source venv/bin/activate</code>, or you forgot <code>pip install …</code> / <code>pip install -r requirements.txt</code>.</td>
+</tr>
+<tr>
+<td><code>Error: Could not locate a Flask application</code></td>
+<td>You're not inside <code>app/</code>, or <code>FLASK_APP</code> isn't set. Use <code>cd app &amp;&amp; bash start.sh</code>.</td>
+</tr>
+<tr>
+<td><code>ImportError: cannot import name 'app' from 'app'</code> / circular-import errors</td>
+<td>You ran <code>python app.py</code>, or <code>__init__.py</code> imports something from <code>models/</code> or <code>controllers/</code>. Use <code>flask run</code>; keep <code>__init__.py</code> free of those imports.</td>
+</tr>
+<tr>
+<td><code>ModuleNotFoundError: No module named 'forms'</code> / <code>'models'</code> / <code>'controllers'</code></td>
+<td><code>PYTHONPATH=.</code> missing, or you're not inside <code>app/</code>.</td>
+</tr>
+<tr>
+<td><code>ImportError: email-validator is not installed</code></td>
+<td><code>pip install -r requirements.txt</code> (venv activated)</td>
+</tr>
+<tr>
+<td><code>ServerSelectionTimeoutError: localhost:27017: [Errno 111] Connection refused</code></td>
+<td>MongoDB isn't running. Start it (<code>docker start shop-mongo</code>).</td>
+</tr>
+<tr>
+<td>Homepage says "No products yet."</td>
+<td>The sample products are inserted by <code>home()</code> the first time the page loads. If it is still empty, look at the terminal for an error (usually MongoDB not running).</td>
+</tr>
+<tr>
+<td>Form submit just redisplays the form with no error text</td>
+<td>Missing <code>{{ form.hidden_tag() }}</code> (CSRF token) in the template, or no <code>secret_key</code>.</td>
+</tr>
+<tr>
+<td><code>400 Bad Request – The CSRF token is missing.</code></td>
+<td>A plain <code>&lt;form method="POST"&gt;</code> without <code>&lt;input type="hidden" name="csrf_token" value="{{ csrf_token() }}"&gt;</code> (Step 7).</td>
+</tr>
+<tr>
+<td><code>werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'login'</code></td>
+<td>After Step 8 the endpoint is <code>auth.login</code>. Update the <code>url_for(...)</code> call.</td>
+</tr>
+<tr>
+<td><code>TemplateNotFound: xyz.html</code></td>
+<td>File isn't in <code>app/templates/</code>, or the name is misspelled.</td>
+</tr>
+<tr>
+<td><code>Method Not Allowed (405)</code></td>
+<td>The route lacks <code>methods=["GET","POST"]</code> (or the form posts to a GET-only route).</td>
+</tr>
+<tr>
+<td>Changes don't appear</td>
+<td>Debug mode (<code>FLASK_DEBUG=1</code>) reloads Python files automatically; also hard-refresh the browser (Ctrl+Shift+R) for CSS.</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="urls-to-try">URLs to try</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Needs login?</th>
+<th>What it shows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td>no</td>
+<td>Product grid from MongoDB</td>
+</tr>
+<tr>
+<td><code>/register</code>, <code>/login</code></td>
+<td>no</td>
+<td>Forms</td>
+</tr>
+<tr>
+<td><code>/logout</code></td>
+<td>no</td>
+<td>Logs you out, back to <code>/</code></td>
+</tr>
+<tr>
+<td><code>/cart</code></td>
+<td><strong>yes</strong></td>
+<td>Your cart (stored in MongoDB)</td>
+</tr>
+<tr>
+<td><code>/demo/greet/Ann</code>, <code>/demo/add/2/3</code>, <code>/demo/greetWithArgs?friend=bob</code></td>
+<td>no</td>
+<td>Seminar 2 playground</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="where-to-go-next-exercises">Where to go next (exercises)</h3>
+<ol>
+<li><strong>Product detail page</strong> – a route <code>/product/&lt;product_id&gt;</code> in <code>controllers/shop.py</code> plus a <code>product.html</code> template. (Compare <code>viewPackageDetail</code> in <code>staycation</code>.)</li>
+<li><strong>Images</strong> – add an <code>image_url</code> field to <code>Product</code>, put pictures in <code>assets/img/</code>, and show them in the card instead of the grey placeholder.</li>
+<li><strong>Change quantities</strong> in the cart (add "+" and "−" buttons that update <code>CartItem.quantity</code>, and delete the line when it reaches 0).</li>
+<li><strong>Orders</strong> – a new <code>Order</code> model with a <code>ReferenceField(User)</code> and a list of products, saved when the user "checks out" (see <code>Itinerary</code>/<code>Booking</code> in Seminar 3).</li>
+<li><strong>Admin-only page</strong> – only <code>current_user.email == "admin@abc.com"</code> may add products (see how Seminar 3's <code>base.html</code> checks this).</li>
+<li><strong>Configuration</strong> – move the secret key and database host into environment variables.</li>
+</ol>
+    </article>
+</div>
+
+<a href="#doc-hero" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grandee Lee. All Rights Reserved.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+(function () {
+    hljs.highlightAll();
+
+    // TOC drawer toggle (mobile)
+    const toc = document.getElementById('toc');
+    const toggle = document.getElementById('toc-toggle');
+    toggle.addEventListener('click', () => toc.classList.toggle('open'));
+    toc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => toc.classList.remove('open')));
+
+    // back to top
+    const backToTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+        backToTop.classList.toggle('show', window.scrollY > 800);
+    });
+
+    // active TOC link on scroll
+    const sections = Array.from(document.querySelectorAll('article.doc-content > h2[id]'));
+    const links = Array.from(document.querySelectorAll('#toc a'));
+    function setActive() {
+        let current = null;
+        const y = window.scrollY + 110;
+        for (const sec of sections) {
+            if (sec.offsetTop <= y) current = sec;
+        }
+        links.forEach(l => l.classList.toggle('active', current && l.getAttribute('href') === '#' + current.id));
+    }
+    window.addEventListener('scroll', setActive, { passive: true });
+    setActive();
+})();
+</script>
+</body>
+</html>
