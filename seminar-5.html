@@ -252,6 +252,30 @@ footer{margin-top:70px;color:var(--muted);font-size:14px}
     &lt;script src="custom.js"&gt;&lt;/script&gt;                 &lt;!-- JavaScript, last, so the elements above exist --&gt;
   &lt;/body&gt;
 &lt;/html&gt;</pre>
+  <p>The two files the skeleton points to are short. <b>custom.css</b> styles the paragraph, and <b>custom.js</b> adds the behaviour. The warm-up below uses exactly this CSS and JavaScript.</p>
+  <pre class="code" data-lang="css">/* custom.css */
+#player {
+  display: inline-block;
+  padding: 3px 12px;
+  border: 2px solid rgba(0, 0, 200, .6);
+  background: rgba(0, 0, 200, .12);
+  border-radius: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: #33c;
+}</pre>
+  <pre class="code" data-lang="js">// custom.js
+const para = document.querySelector("#player");
+const names = ["Chris", "Ana", "Raj", "Mei"];
+let i = 0;
+
+para.addEventListener("click", updateName);
+
+function updateName() {
+  i = (i + 1) % names.length;
+  para.textContent = "Player 1: " + names[i];
+}</pre>
 
   <h4>Warm-up: click the name</h4>
   <p>This is the demo from the seminar slides. JavaScript finds the paragraph, listens for a click, and rewrites its text. Run it, click the pill, then change the code.</p>
@@ -763,8 +787,18 @@ return /5 items/.test(document.getElementById('title').textContent) || 'The head
 
   <h4>Step 1 · the board</h4>
   <p>Nine holes, made by a loop. In Python you would append nine objects to a list; here you append nine <code>&lt;div&gt;</code>s to the page.</p>
-  <div class="pg" data-id="s2-board" data-title="Step 1 · build the board" data-css="game" data-h="290">
+  <div class="pg" data-id="s2-board" data-title="Step 1 · build the board" data-h="290">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <div id="board"></div>
     </script>
     <script type="text/plain" data-pane="js">
@@ -793,8 +827,18 @@ return document.querySelectorAll('#board .hole').length === 9 || 'Expected 9 ele
 
   <h4>Step 2 · a mole you can hit</h4>
   <p>Two TODOs: choose a random hole, and react to a click on the right one. <code>Math.random()</code> gives 0 up to (not including) 1, so <code>Math.floor(Math.random() * 9)</code> is Python's <code>random.randrange(9)</code>.</p>
-  <div class="pg" data-id="s2-click" data-title="Step 2 · mole + click" data-css="game" data-h="270">
+  <div class="pg" data-id="s2-click" data-title="Step 2 · mole + click" data-h="270">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <div class="hud">Score: <b id="score">0</b></div>
 <div id="board"></div>
     </script>
@@ -873,8 +917,18 @@ return document.getElementById('score').textContent === '1' || 'Clicking the mol
 
   <h4>Step 3 · timers: the full game <span class="tag" style="margin-left:0">playable</span></h4>
   <p><code>setInterval</code> moves the mole every 800 ms and counts the clock down every second. Notice how the code is organised: <b>state</b> (<code>game</code>), <b>helpers</b> (<code>showMole</code>, <code>render</code>), <b>flow</b> (<code>startGame</code>, <code>tick</code>, <code>endGame</code>), then <b>events</b>. Play a round, then read the code.</p>
-  <div class="pg" data-id="s2-game" data-title="Whack-a-Mole · vanilla JavaScript" data-css="game" data-h="400" data-auto="1" data-nocheck="1">
+  <div class="pg" data-id="s2-game" data-title="Whack-a-Mole · vanilla JavaScript" data-h="400" data-auto="1" data-nocheck="1">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <div class="hud">
   <span>Score: <b id="score">0</b></span>
   <span>Time: <b id="time">30</b>s</span>
@@ -1176,8 +1230,18 @@ holes[game.moleAt].classList.add("mole");</code></td><td><code data-hl="js">$(".
     <li><code>showMole()</code>: remove <code>mole</code> from all holes, pick <code>game.moleAt</code> randomly, add <code>mole</code> to <code>.eq(game.moleAt)</code>.</li>
     <li>Delegated click handler on <code>#board</code> for <code>.hole</code>: if the game is running and <code>$(this).index() === game.moleAt</code>, score a point, clear the mole, <code>render()</code>.</li></ol>
     <small style="color:var(--muted)">The check presses Start for you, then clicks the mole.</small></div>
-  <div class="pg" data-id="s3-game" data-title="Exercise 3.4 · Whack-a-Mole with jQuery" data-libs="jquery" data-css="game" data-h="400">
+  <div class="pg" data-id="s3-game" data-title="Exercise 3.4 · Whack-a-Mole with jQuery" data-libs="jquery" data-h="400">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <div class="hud">
   <span>Score: <b id="score">0</b></span>
   <span>Time: <b id="time">30</b>s</span>
@@ -1628,8 +1692,18 @@ $.getJSON("https://jsonplaceholder.typicode.com/users")
 
   <h3>4.4 The game gets a memory</h3>
   <p>Now combine everything. When the round ends the game <b>POSTs the score as JSON</b> (<code>JSON.stringify</code> + <code>contentType</code>) and then <b>GETs the leaderboard</b> to redraw it. Type a name, play a round, and watch the blue network lines in the console.</p>
-  <div class="pg" data-id="s4-game" data-title="Whack-a-Mole · jQuery + AJAX leaderboard" data-libs="jquery" data-css="game" data-h="440" data-auto="1" data-nocheck="1">
+  <div class="pg" data-id="s4-game" data-title="Whack-a-Mole · jQuery + AJAX leaderboard" data-libs="jquery" data-h="440" data-auto="1" data-nocheck="1">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <style>.wrap{display:flex;gap:28px;flex-wrap:wrap}#lb{margin:0;padding-left:22px;min-width:150px}</style>
 <div class="hud">
   <span>Score: <b id="score">0</b></span>
@@ -1937,8 +2011,18 @@ return new Promise(function (resolve) {
     <div class="col"><h4>Run it for real with Flask</h4>
       <p style="font-size:14.5px;margin:0">Put this HTML in <code>templates/arcade.html</code> and the JavaScript in <code>static/arcade.js</code>. Add the three routes (<code>/api/scores</code>, <code>/api/summary</code>, <code>/api/history</code>) using <code>jsonify</code>, as in Section 4. The JavaScript does not change at all.</p></div>
   </div>
-  <div class="pg" data-id="s6-capstone" data-title="Mole Arcade · jQuery + AJAX + Chart.js" data-libs="jquery chart" data-css="game" data-h="860" data-auto="1" data-nocheck="1">
+  <div class="pg" data-id="s6-capstone" data-title="Mole Arcade · jQuery + AJAX + Chart.js" data-libs="jquery chart" data-h="860" data-auto="1" data-nocheck="1">
     <script type="text/plain" data-pane="html">
+<style>
+.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.hud b{font-variant-numeric:tabular-nums}
+#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}
+.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);
+display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}
+.hole.mole::after{content:"🐹";animation:pop .15s ease-out}
+@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}
+#msg{min-height:1.4em;font-weight:600}
+</style>
 <style>
 .row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
 .grow{flex:1 1 200px;min-width:200px}
@@ -2389,11 +2473,6 @@ const CDN = {
 const BASE_CSS = '*{box-sizing:border-box}body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1f2430;background:#fff;margin:0;padding:12px}' +
   'button{font:inherit;padding:.35em .85em;border:1px solid #b9c0d0;border-radius:6px;background:#f3f5fa;cursor:pointer}button:hover{background:#e7ebf5}' +
   'input,select{font:inherit;padding:.35em .5em;border:1px solid #b9c0d0;border-radius:6px}';
-const GAME_CSS = '.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.hud b{font-variant-numeric:tabular-nums}' +
-  '#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}' +
-  '.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}' +
-  '.hole.mole::after{content:"🐹";animation:pop .15s ease-out}@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}#msg{min-height:1.4em;font-weight:600}';
-
 /* ================= editor with syntax highlighting ================= */
 function insertText(ta, text) {
   ta.focus();
@@ -2528,17 +2607,10 @@ class Playground {
     const cfgBase = { id: this.id, run: this.runN, check: this.src.check || '', libs: { jquery: this.libs.includes('jquery'), chart: this.libs.includes('chart') } };
     const make = offset => {
       const cfg = Object.assign({ offset: offset }, cfgBase);
-      const head = '<!doctype html><html><head><meta charset="utf-8"><meta name="run" content="' + this.runN + '"><style>' + BASE_CSS + (this.css === 'game' ? GAME_CSS : '') + '</style>' +
+      const head = '<!doctype html><html><head><meta charset="utf-8"><meta name="run" content="' + this.runN + '"><style>' + BASE_CSS + '</style>' +
         this.libs.filter(l => CDN[l]).map(l => '<script src="' + CDN[l] + '"><\/script>').join('') +
         '<script>(' + preludeFn.toString() + ')(' + JSON.stringify(cfg).replace(/</g, '\\u003c') + ');<\/script></head><body>\n' + html + '\n<script>';
-      return { head: head, tail: js + '\n<\/script><button id="to-top" type="button" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
-<script>
-(function(){var b=document.getElementById('to-top');
-function t(){b.classList.toggle('show',window.scrollY>400)}
-window.addEventListener('scroll',t,{passive:true});t();
-b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});})();
-</script>
-</body></html>' };
+      return { head: head, tail: js + '\n<\/script></body></html>' };
     };
     const first = make(0);
     const offset = first.head.split('\n').length - 1;
@@ -2829,6 +2901,13 @@ function boot() {
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
+</script>
+<button id="to-top" type="button" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+<script>
+(function(){var b=document.getElementById('to-top');
+function t(){b.classList.toggle('show',window.scrollY>400)}
+window.addEventListener('scroll',t,{passive:true});t();
+b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});})();
 </script>
 </body>
 </html>
