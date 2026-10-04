@@ -236,7 +236,6 @@ footer{margin-top:70px;color:var(--muted);font-size:14px}
     <li>Every code box is a live editor. Press <b>Run ▶</b> or <code>Ctrl</code>/<code>⌘</code> + <code>Enter</code> to execute it.</li>
     <li>Boxes with a <span style="color:var(--teal);font-weight:600">✓ check</span> test your code automatically. <b>Hint</b> nudges you; <b>Solution</b> shows one answer (and you can switch back to your own code).</li>
     <li>Code runs in a sandboxed frame, so you cannot break the page. Break things on purpose, read the red error, fix it. That is the fastest way to learn.</li>
-    <li>Every exercise also exists as a <b>standalone HTML file</b> in the <code>seminar-5-exercises</code> folder (use the <b>Standalone ↗</b> button), ready to open in your own editor. Solutions are in <code>seminar-5-exercises/solutions</code>.</li>
     <li>You need an internet connection once: jQuery and Chart.js load from a CDN, exactly like in your own projects.</li>
   </ul>
 
@@ -283,7 +282,7 @@ function updateName() {
     <li>Add a click counter, so the text becomes <code>Player 1: Ana (clicked 2 times)</code>.</li>
     <li>Open DevTools (<code>F12</code>) on any website and type <code>document.title</code> in the Console tab.</li>
   </ul></div>
-  <div class="pg" data-id="s0-hello" data-title="Warm-up · click the name" data-h="90">
+  <div class="pg" data-id="s0-hello" data-title="Warm-up · click the name" data-h="90" data-hidecode="1" data-auto="1">
     <script type="text/plain" data-pane="html">
 <style>
 #player{display:inline-block;padding:3px 12px;border:2px solid rgba(0,0,200,.6);background:rgba(0,0,200,.12);
@@ -2549,10 +2548,6 @@ class Playground {
     if (this.src.hint) this.hintBtn = mk('', 'Hint', () => this.hintBox.classList.toggle('show'));
     if (this.src.solution) this.solBtn = mk('', 'Solution', () => this.toggleSolution());
     mk('', 'Copy', e => this.copy(e.currentTarget));
-    const sa = document.createElement('a'); sa.className = 'btn'; sa.textContent = 'Standalone ↗';
-    sa.href = 'seminar-5-exercises/' + this.id + '.html'; sa.target = '_blank'; sa.rel = 'noopener';
-    sa.title = 'Open this exercise as its own HTML file (from the seminar-5-exercises folder)'; sa.style.textDecoration = 'none';
-    head.appendChild(sa);
     el.appendChild(head);
 
     if (this.src.hint) {
@@ -2585,6 +2580,10 @@ class Playground {
     const editors = [this.ed.html && this.ed.html.el, this.ed.js.el].filter(Boolean);
     if (this.frameH > 0) el.append(out, this.status, ...editors);
     else el.append(...editors, out, this.status);
+    if (el.dataset.hidecode) {            // demo only: the code is already shown in the lesson text above
+      editors.forEach(e => { e.style.display = 'none'; });
+      head.querySelectorAll('.btn:not(.run)').forEach(b => { b.style.display = 'none'; });
+    }
     this.clearConsole();
     this.setStatus('', this.hasCheck ? 'Run your code to check it.' : '');
   }
