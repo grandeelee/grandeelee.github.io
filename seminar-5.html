@@ -1676,16 +1676,20 @@ console.log("this prints FIRST: requests are asynchronous");
 <ul id="users"><li>Loading…</li></ul>
     </script>
     <script type="text/plain" data-pane="js">
-$.getJSON("https://jsonplaceholder.typicode.com/users")
-  .done(function (users) {
+$.ajax({
+  url: "https://jsonplaceholder.typicode.com/users",
+  method: "GET",
+  dataType: "json",
+  success: function (users) {
     $("#users").empty();
     users.slice(0, 5).forEach(function (u) {
       $("<li>").text(u.name + " — " + u.email).appendTo("#users");
     });
-  })
-  .fail(function () {
+  },
+  error: function () {
     $("#users").text("Request failed (offline, or blocked by the server's CORS policy)");
-  });
+  }
+});
     </script>
   </div>
 
