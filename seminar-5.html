@@ -1,0 +1,2834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seminar 5 · From Python to JavaScript</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+:root{
+  --c1:#e2c6b5;--c2:#c8a48a;--c3:#a77b5b;--c4:#7b4a3a;--c5:#4e2b1e;
+  --cream:#f5ede5;--cream-dark:#ede2d5;--text-dark:#3b1f14;--text-mid:#5a3a2c;--text-light:#7a6558;
+  --bg:var(--cream);--panel:#fbf6f0;--ink:var(--text-dark);--muted:var(--text-light);--line:rgba(200,164,138,.38);
+  --accent:var(--c3);--accent-soft:rgba(167,123,91,.14);--teal:#3f7d52;--teal-soft:#e4efe6;--amber:#9a6a1f;--amber-soft:#f6ead0;--bad:#a9432f;
+  --code-bg:var(--cream-dark);--console:#282c34;--console-ink:#abb2bf;
+  --tk-c:#8a7a6c;--tk-s:#3f7d52;--tk-n:#a8651b;--tk-k:#8a3f7a;--tk-t:#a9432f;
+  --serif:'Playfair Display',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+#topnav{position:sticky;top:0;z-index:1000;background:rgba(245,237,229,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 1px 0 rgba(167,123,91,.15);padding:0 clamp(1.2rem,4vw,3rem)}
+.topnav-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:1rem}
+.nav-back{display:flex;align-items:center;gap:.5rem;font-family:var(--serif);font-weight:700;font-size:1rem;color:var(--c5);text-decoration:none}
+.nav-back i{font-size:.85rem;color:var(--c3);transition:transform .25s ease}
+.nav-back:hover i{transform:translateX(-3px)}
+.nav-title{font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);display:none}
+@media(min-width:700px){.nav-title{display:block}}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1320px;margin:0 auto;padding:0 clamp(16px,3vw,40px);gap:clamp(8px,2vw,32px)}
+nav.menu{position:sticky;top:64px;align-self:start;max-height:calc(100vh - 64px);overflow:auto;padding:36px 0 24px}
+nav.menu ol{list-style:none;margin:0;padding:0}
+nav.menu li{margin:0}
+nav.menu a{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;margin:2px 0;border-radius:8px;color:var(--text-mid);text-decoration:none;font-size:14.5px;border-left:2px solid transparent}
+nav.menu a:hover{color:var(--c5);background:var(--accent-soft)}
+nav.menu a.on{color:var(--c5);font-weight:600;border-left-color:var(--c3);background:var(--accent-soft)}
+nav.menu a small{color:var(--muted);font-family:var(--mono);font-size:12px;align-self:center}
+nav.menu a.full small{color:var(--teal)}
+.progress{margin:18px 4px 0;font-size:13px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--c3),var(--c2));transition:width .3s}
+.progress button{all:unset;cursor:pointer;color:var(--muted);text-decoration:underline;font-size:12px}
+main{padding:36px 0 140px;min-width:0;max-width:1040px;width:100%;margin:0 auto}
+@media(max-width:900px){.layout{display:block}nav.menu{position:static;max-height:none;padding:20px 0 0}}
+#to-top{position:fixed;right:clamp(14px,3vw,32px);bottom:clamp(14px,3vw,32px);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--c4);color:var(--c1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 4px 20px rgba(59,31,20,.25);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .25s,visibility .25s;z-index:900}
+#to-top.show{opacity:1;visibility:visible;transform:none}
+#to-top:hover{background:var(--c5)}
+
+.hero{position:relative;overflow:hidden;padding:clamp(2.6rem,7vw,4.5rem) clamp(1.5rem,6vw,4rem);background:linear-gradient(155deg,var(--c5) 0%,var(--c4) 45%,var(--c3) 100%)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 12% 90%,rgba(226,198,181,.10) 0%,transparent 55%),radial-gradient(ellipse 55% 70% at 88% 10%,rgba(226,198,181,.08) 0%,transparent 50%);pointer-events:none}
+.hero-inner{position:relative;max-width:820px;margin:0 auto;text-align:center}
+.hero p.lead{margin-left:auto;margin-right:auto}
+.chips{justify-content:center}
+.hero .kicker{font:600 13px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--c2)}
+.hero h1{font:900 clamp(34px,5vw,54px)/1.08 var(--serif);color:var(--c1);margin:8px 0 14px;letter-spacing:-.01em}
+.hero p.lead{font-size:19px;color:rgba(226,198,181,.88);max-width:46em;margin:0 auto}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+.chips span{padding:4px 12px;border:1px solid rgba(226,198,181,.3);background:rgba(226,198,181,.1);color:var(--c1);border-radius:99px;font-size:13.5px}
+.chips b{color:#fff}
+
+section{margin-top:56px;padding-top:36px;border-top:2px solid var(--line)}
+section>h2{font:900 clamp(27px,3.4vw,36px)/1.15 var(--serif);color:var(--c5);margin:0 0 6px}
+section>h2 .num{display:inline-block;min-width:1.6em;margin-right:.35em;color:var(--accent);font-family:var(--mono);font-size:.8em}
+section>.sub{color:var(--muted);margin:0 0 22px;font-size:17px}
+h3{font:700 22px/1.25 var(--serif);color:var(--c4);margin:42px 0 8px}
+h3 .tag{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;vertical-align:middle;margin-left:8px;padding:2px 8px;border-radius:99px;background:var(--teal-soft);color:var(--teal)}
+h4{margin:22px 0 4px;font-size:16px;color:var(--text-mid)}
+p{margin:.6em 0}
+a{color:var(--accent);text-decoration-color:rgba(167,123,91,.4);text-underline-offset:3px}
+a:hover{color:var(--c4)}
+code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);border:1px solid var(--line);padding:.05em .35em;border-radius:5px}
+pre code{border:0;padding:0;background:none;font-size:inherit}
+ul,ol{padding-left:1.3em}
+li{margin:.25em 0}
+.tasks{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 18px 10px 22px;margin:14px 0}
+.tasks>b{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-top:4px}
+.tasks ol,.tasks ul{margin:.3em 0}
+.callout{border-radius:10px;padding:10px 16px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.tip{background:var(--teal-soft);border-color:transparent}
+.callout.warn{background:var(--amber-soft);border-color:transparent}
+.callout>b:first-child{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}
+.callout.tip>b:first-child{color:var(--teal)}
+.callout.warn>b:first-child{color:var(--amber)}
+
+pre.code,.pyblock{margin:12px 0;padding:12px 16px;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;overflow:auto;font:13.5px/1.55 var(--mono);tab-size:2}
+.tk-c{color:var(--tk-c);font-style:italic}.tk-s{color:var(--tk-s)}.tk-n{color:var(--tk-n)}.tk-k{color:var(--tk-k);font-weight:600}.tk-t{color:var(--tk-t)}
+
+table.xl{width:100%;border-collapse:separate;border-spacing:0;margin:14px 0;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14.5px}
+table.xl th{background:var(--code-bg);text-align:left;padding:8px 12px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+table.xl td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.xl tr:last-child td{border-bottom:0}
+table.xl td code{white-space:pre-wrap}
+table.xl th:first-child,table.xl td:first-child{border-right:1px solid var(--line)}
+.scroll{overflow-x:auto}
+
+/* ---------- playground ---------- */
+.pg{margin:20px 0 28px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 0 rgba(59,31,20,.03),0 8px 24px -16px rgba(59,31,20,.3)}
+.pg.done{border-color:var(--teal)}
+.pg-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 12px;background:var(--code-bg);border-bottom:1px solid var(--line)}
+.pg-title{font:600 13px var(--mono);margin-right:auto}
+.pg-badge{font:600 12px var(--mono);color:var(--teal);display:none}
+.pg.done .pg-badge{display:inline}
+.btn{font:600 13px var(--mono);padding:5px 11px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.run{background:var(--c4);border-color:var(--c4);color:#fff}
+.btn.run:hover{filter:brightness(1.08)}
+.pg-hint{display:none;padding:10px 16px;background:var(--amber-soft);font-size:14.5px;border-bottom:1px solid var(--line)}
+.pg-hint.show{display:block}
+.pg-py{border-bottom:1px solid var(--line)}
+.pg-py summary{cursor:pointer;padding:7px 14px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pg-py pre{margin:0;padding:4px 16px 12px;font:13.5px/1.55 var(--mono);overflow:auto}
+.pane-label{padding:6px 14px 0;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ed{border-bottom:1px solid var(--line)}
+.ed-in{position:relative}
+.ed pre,.ed textarea{margin:0;padding:10px 14px;font:13.5px/1.55 var(--mono);tab-size:2;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;letter-spacing:0}
+.ed pre{min-height:3em;pointer-events:none;color:var(--ink)}
+.ed textarea{position:absolute;inset:0;width:100%;height:100%;border:0;outline:0;resize:none;overflow:hidden;background:transparent;color:transparent;caret-color:var(--ink)}
+.ed textarea::selection{background:rgba(167,123,91,.3);color:transparent}
+.ed:focus-within{box-shadow:inset 3px 0 0 var(--accent)}
+.pg-out iframe{display:block;width:100%;border:0;background:#fff;border-top:0}
+.pg-out.noframe iframe{display:none}
+.pg-console{margin:0;padding:8px 14px;background:var(--console);color:var(--console-ink);font:13px/1.5 var(--mono);min-height:44px;max-height:260px;overflow:auto;white-space:pre-wrap}
+.pg-console .ln{padding:1px 0}
+.pg-console .warn{color:#f0b44c}.pg-console .error{color:#ff7b6b}.pg-console .net{color:#7dd3fc}.pg-console .empty{color:#6b7488}
+.pg-status{padding:8px 14px;font:600 13px var(--mono);min-height:2.3em;border-top:1px solid var(--line);color:var(--muted)}
+.pg-status.ok{color:var(--teal);background:var(--teal-soft)}
+.pg-status.no{color:var(--amber);background:var(--amber-soft)}
+.pg-src{display:none}
+
+/* quiz */
+.quiz{display:grid;gap:14px;margin:16px 0}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.q h5{margin:0 0 4px;font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.q pre{margin:6px 0 10px}
+.q .opts{display:flex;flex-wrap:wrap;gap:8px}
+.q .opts button{font:600 13.5px var(--mono);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--code-bg);color:var(--ink);cursor:pointer}
+.q .opts button:hover:not(:disabled){border-color:var(--accent)}
+.q .opts button.right{background:var(--teal-soft);border-color:var(--teal);color:var(--teal)}
+.q .opts button.wrong{background:#f7e7e2;border-color:var(--bad);color:var(--bad)}
+.q .why{display:none;margin-top:10px;font-size:14.5px}
+.q.answered .why{display:block}
+
+/* selector lab */
+.lab{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:18px 0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px}
+@media(max-width:820px){.lab{grid-template-columns:1fr}}
+.lab h4{margin:0 0 6px;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#lab-sample{border:1px dashed var(--line);border-radius:10px;padding:10px 16px;background:#fff;color:#222;font-size:15px}
+#lab-sample h2{margin:0 0 4px;font:700 20px/1.2 system-ui}
+#lab-sample ul{margin:6px 0}
+#lab-sample a{color:#2457d6}
+#lab-sample .hl{outline:3px solid #ff6b35;outline-offset:2px;background:rgba(255,107,53,.16)}
+.lab-q{display:flex;gap:8px;align-items:center;font-family:var(--mono)}
+.lab-q input{flex:1;font:14px var(--mono);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--code-bg);color:var(--ink);min-width:0}
+.lab-res{font:13px var(--mono);margin:8px 0;min-height:1.5em;color:var(--muted)}
+.lab-res.ok{color:var(--teal)}.lab-res.bad{color:var(--bad)}
+.lab ol.ch{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.lab ol.ch li{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:14.5px;margin:0}
+.lab ol.ch li.cur{border-color:var(--accent);background:var(--accent-soft)}
+.lab ol.ch li.done{border-color:var(--teal)}
+.lab ol.ch li i{font-style:normal;font-family:var(--mono);color:var(--muted);min-width:1.3em}
+.lab ol.ch li.done i{color:var(--teal)}
+.lab ol.ch li button{all:unset;margin-left:auto;cursor:pointer;color:var(--muted);font:12px var(--mono);text-decoration:underline}
+
+/* diagrams */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:16px 0}
+.flow .col{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.flow .col h4{margin:0 0 6px}
+.flow ol{margin:.2em 0;font-size:14.5px}
+.road{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.road a{padding:8px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:14.5px}
+.road a b{color:var(--accent);font-family:var(--mono);margin-right:6px}
+.road a:hover{border-color:var(--accent)}
+footer{margin-top:70px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<nav id="topnav">
+  <div class="topnav-inner">
+    <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+    <span class="nav-title">ICT239 &middot; Seminar 5</span>
+  </div>
+</nav>
+<header class="hero" id="start">
+<div class="hero-inner">
+  <div class="kicker">ICT239 Web Programming · Front-end development</div>
+  <h1>From Python to JavaScript</h1>
+  <p class="lead">One small game, four upgrades. You will write a Whack-a-Mole game in plain JavaScript, rebuild it with jQuery, make it talk to a server with AJAX, and finish with a Chart.js dashboard of the scores. Everything on this page runs, and everything on this page is editable.</p>
+  <div class="chips">
+    <span><b>≈ 2½ h</b> of hands-on work</span>
+    <span><b>20+</b> runnable exercises</span>
+    <span><b>0</b> installs needed, only a browser</span>
+  </div>
+</div>
+</header>
+<div class="layout">
+
+
+<nav class="menu" aria-label="Seminar outline">
+  <ol id="nav">
+    <li><a href="#start" data-sec="start">Start here</a></li>
+    <li><a href="#s1" data-sec="s1">1 · From Python to JavaScript <small></small></a></li>
+    <li><a href="#s2" data-sec="s2">2 · Whack-a-Mole &amp; the DOM <small></small></a></li>
+    <li><a href="#s3" data-sec="s3">3 · jQuery <small></small></a></li>
+    <li><a href="#s4" data-sec="s4">4 · AJAX &amp; JSON <small></small></a></li>
+    <li><a href="#s5" data-sec="s5">5 · Chart.js <small></small></a></li>
+    <li><a href="#s6" data-sec="s6">6 · Putting it together <small></small></a></li>
+    <li><a href="#s7" data-sec="s7">7 · Cheat sheet &amp; lab</a></li>
+  </ol>
+  <div class="progress">
+    <div><span id="prog-n">0</span> / <span id="prog-t">0</span> checked exercises</div>
+    <div class="bar"><i id="prog-bar"></i></div>
+    <button id="prog-reset" type="button">reset my progress</button>
+  </div>
+</nav>
+<main>
+
+
+
+<section id="s0" style="margin-top:36px;border-top:0;padding-top:0">
+  <h3 style="margin-top:20px">The route</h3>
+  <div class="road">
+    <a href="#s1"><b>1</b>JS ↔ Python</a>
+    <a href="#s2"><b>2</b>Game with the DOM</a>
+    <a href="#s3"><b>3</b>jQuery rewrite</a>
+    <a href="#s4"><b>4</b>AJAX &amp; leaderboard</a>
+    <a href="#s5"><b>5</b>Chart.js</a>
+    <a href="#s6"><b>6</b>Putting it together</a>
+  </div>
+
+  <h3>How to use this page</h3>
+  <ul>
+    <li>Every code box is a live editor. Press <b>Run ▶</b> or <code>Ctrl</code>/<code>⌘</code> + <code>Enter</code> to execute it.</li>
+    <li>Boxes with a <span style="color:var(--teal);font-weight:600">✓ check</span> test your code automatically. <b>Hint</b> nudges you; <b>Solution</b> shows one answer (and you can switch back to your own code).</li>
+    <li>Code runs in a sandboxed frame, so you cannot break the page. Break things on purpose, read the red error, fix it. That is the fastest way to learn.</li>
+    <li>Every exercise also exists as a <b>standalone HTML file</b> in the <code>seminar-5-exercises</code> folder (use the <b>Standalone ↗</b> button), ready to open in your own editor. Solutions are in <code>seminar-5-exercises/solutions</code>.</li>
+    <li>You need an internet connection once: jQuery and Chart.js load from a CDN, exactly like in your own projects.</li>
+  </ul>
+
+  <h3>Why JavaScript?</h3>
+  <p>A web page has three layers. HTML gives it <b>structure</b>, CSS gives it <b>style</b>, and JavaScript gives it <b>behaviour</b>. It runs in the user's browser, so it can react instantly, with no round trip to your Flask server.</p>
+  <pre class="code" data-lang="html">&lt;!-- the skeleton of every page in this seminar --&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;link rel="stylesheet" href="custom.css"&gt;        &lt;!-- CSS --&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p id="player"&gt;Player 1: Chris&lt;/p&gt;              &lt;!-- HTML --&gt;
+    &lt;script src="custom.js"&gt;&lt;/script&gt;                 &lt;!-- JavaScript, last, so the elements above exist --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+
+  <h4>Warm-up: click the name</h4>
+  <p>This is the demo from the seminar slides. JavaScript finds the paragraph, listens for a click, and rewrites its text. Run it, click the pill, then change the code.</p>
+  <div class="tasks"><b>Try</b><ul>
+    <li>Add a click counter, so the text becomes <code>Player 1: Ana (clicked 2 times)</code>.</li>
+    <li>Open DevTools (<code>F12</code>) on any website and type <code>document.title</code> in the Console tab.</li>
+  </ul></div>
+  <div class="pg" data-id="s0-hello" data-title="Warm-up · click the name" data-h="90">
+    <script type="text/plain" data-pane="html">
+<style>
+#player{display:inline-block;padding:3px 12px;border:2px solid rgba(0,0,200,.6);background:rgba(0,0,200,.12);
+border-radius:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:#33c}
+</style>
+<p id="player">Player 1: Chris</p>
+    </script>
+    <script type="text/plain" data-pane="js">
+const para = document.querySelector("#player");
+const names = ["Chris", "Ana", "Raj", "Mei"];
+let i = 0;
+
+para.addEventListener("click", updateName);
+
+function updateName() {
+  i = (i + 1) % names.length;
+  para.textContent = "Player 1: " + names[i];
+}
+    </script>
+  </div>
+</section>
+
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1">
+  <h2><span class="num">1</span>From Python to JavaScript</h2>
+  <p class="sub">You already know variables, lists, dicts, loops and functions. JavaScript has all of them, only the spelling changes. In this section you translate Python you know into JavaScript you will use.</p>
+
+  <div class="callout tip"><b>Rule of thumb</b>Same ideas, different punctuation: <code>{ }</code> instead of indentation, <code>;</code> at the end of statements, <code>( )</code> around conditions, and <code>let</code>/<code>const</code> when you create a variable.</div>
+
+  <h4>Scratchpad</h4>
+  <p>A free console, no tests. Use it any time you want to try something.</p>
+  <div class="pg" data-id="s1-scratch" data-title="Scratchpad">
+    <script type="text/plain" data-pane="js">
+// Try anything! Ctrl+Enter runs it.
+let x = 7;
+console.log(x * 2, typeof x);
+console.log("5" + 3);
+    </script>
+  </div>
+
+  <!-- 1.1 -->
+  <h3>1.1 Variables &amp; types</h3>
+  <table class="xl scroll">
+    <tr><th>Python</th><th>JavaScript</th></tr>
+    <tr><td><code data-hl="py">x = 10</code></td><td><code data-hl="js">let x = 10;</code>  <span style="color:var(--muted)">changeable</span></td></tr>
+    <tr><td><code data-hl="py">PI = 3.14   # by convention</code></td><td><code data-hl="js">const PI = 3.14;</code>  <span style="color:var(--muted)">cannot be reassigned</span></td></tr>
+    <tr><td><code data-hl="py">type(x)</code></td><td><code data-hl="js">typeof x</code></td></tr>
+    <tr><td><code data-hl="py">int, float</code></td><td><code data-hl="js">number</code> (just one kind)</td></tr>
+    <tr><td><code data-hl="py">str / list / dict</code></td><td><code data-hl="js">string / array / object</code></td></tr>
+    <tr><td><code data-hl="py">True  False  None</code></td><td><code data-hl="js">true  false  null</code> (plus <code data-hl="js">undefined</code>: "never given a value")</td></tr>
+    <tr><td><code data-hl="py">and  or  not</code></td><td><code data-hl="js">&amp;&amp;  ||  !</code></td></tr>
+    <tr><td><code data-hl="py">==</code> compares values</td><td><code data-hl="js">===</code> strict equality. Prefer it over <code data-hl="js">==</code>, which converts types first.</td></tr>
+    <tr><td><code data-hl="py">print(x)</code></td><td><code data-hl="js">console.log(x)</code></td></tr>
+    <tr><td><code data-hl="py"># comment</code></td><td><code data-hl="js">// comment</code></td></tr>
+  </table>
+
+  <div class="tasks"><b>Exercise 1.1</b>
+    Translate the Python on the right: create three variables with <code>const</code> and print the <code>typeof</code> of each, one per line.</div>
+  <div class="pg" data-id="s1-types" data-title="Exercise 1.1 · typeof">
+    <script type="text/plain" data-pane="py">
+name = "Ada"
+age = 21
+is_student = True
+print(type(name))
+print(type(age))
+print(type(is_student))
+    </script>
+    <script type="text/plain" data-pane="js">
+// TODO 1: declare name ("Ada"), age (21) and isStudent (true) with const
+// TODO 2: console.log(typeof ...) for each of them
+    </script>
+    <script type="text/plain" data-pane="solution">
+const name = "Ada";
+const age = 21;
+const isStudent = true;
+console.log(typeof name);
+console.log(typeof age);
+console.log(typeof isStudent);
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['string', 'number', 'boolean']);
+    </script>
+    <script type="text/plain" data-pane="hint">JavaScript names its types <code>string</code>, <code>number</code> and <code>boolean</code>. Booleans are lowercase: <code>true</code>.</script>
+  </div>
+
+  <h4>Python habits that break in JavaScript</h4>
+  <p>Predict first, then click. Each answer teaches a difference between Python and JavaScript.</p>
+  <div class="quiz" data-quiz="gotchas"></div>
+
+  <!-- 1.2 -->
+  <h3>1.2 Strings &amp; template literals</h3>
+  <p>An f-string becomes a <b>template literal</b>: backticks, and <code>${ }</code> instead of <code>{ }</code>. String methods are camelCase and called on the string, just like Python.</p>
+  <table class="xl scroll">
+    <tr><th>Python</th><th>JavaScript</th></tr>
+    <tr><td><code data-hl="py">f"{name} scored {score}"</code></td><td><code data-hl="js">`${name} scored ${score}`</code></td></tr>
+    <tr><td><code data-hl="py">name.upper()  /  .lower()</code></td><td><code data-hl="js">name.toUpperCase()  /  .toLowerCase()</code></td></tr>
+    <tr><td><code data-hl="py">len(name)</code></td><td><code data-hl="js">name.length</code> <span style="color:var(--muted)">(a property, no brackets)</span></td></tr>
+    <tr><td><code data-hl="py">name[0]    name[-1]</code></td><td><code data-hl="js">name[0]    name.at(-1)</code></td></tr>
+    <tr><td><code data-hl="py">"a,b".split(",")</code></td><td><code data-hl="js">"a,b".split(",")</code></td></tr>
+    <tr><td><code data-hl="py">" hi ".strip()</code></td><td><code data-hl="js">" hi ".trim()</code></td></tr>
+    <tr><td><code data-hl="py">"x" in text</code></td><td><code data-hl="js">text.includes("x")</code></td></tr>
+  </table>
+  <div class="tasks"><b>Exercise 1.2</b>
+    <ol><li>Print <code>Ada scored 42</code> using a template literal.</li><li>Print the name in upper case.</li><li>Print its length.</li><li>Print its first character.</li><li>Split <code>"a,b,c"</code> on commas and print the array.</li><li>Print <code>"  hi  "</code> with the spaces removed.</li></ol></div>
+  <div class="pg" data-id="s1-strings" data-title="Exercise 1.2 · strings">
+    <script type="text/plain" data-pane="py">
+name = "Ada"
+score = 42
+print(f"{name} scored {score}")
+print(name.upper())
+print(len(name))
+print(name[0])
+print("a,b,c".split(","))
+print("  hi  ".strip())
+    </script>
+    <script type="text/plain" data-pane="js">
+const name = "Ada";
+const score = 42;
+
+// 1. Ada scored 42   (backticks and ${...})
+// 2. upper case
+// 3. length
+// 4. first character
+// 5. split "a,b,c"
+// 6. trim "  hi  "
+    </script>
+    <script type="text/plain" data-pane="solution">
+const name = "Ada";
+const score = 42;
+
+console.log(`${name} scored ${score}`);
+console.log(name.toUpperCase());
+console.log(name.length);
+console.log(name[0]);
+console.log("a,b,c".split(","));
+console.log("  hi  ".trim());
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['Ada scored 42', 'ADA', '3', 'A', "['a', 'b', 'c']", 'hi']);
+    </script>
+    <script type="text/plain" data-pane="hint">Template literal: <code>`${name} scored ${score}`</code>. Notice the backticks, not quotes.</script>
+  </div>
+
+  <!-- 1.3 -->
+  <h3>1.3 Arrays are lists</h3>
+  <table class="xl scroll">
+    <tr><th>Python list</th><th>JavaScript array</th></tr>
+    <tr><td><code data-hl="py">a = [1, 2, 3]</code></td><td><code data-hl="js">const a = [1, 2, 3];</code></td></tr>
+    <tr><td><code data-hl="py">a.append(4)   a.pop()</code></td><td><code data-hl="js">a.push(4)   a.pop()</code></td></tr>
+    <tr><td><code data-hl="py">len(a)</code></td><td><code data-hl="js">a.length</code></td></tr>
+    <tr><td><code data-hl="py">a[1:3]</code></td><td><code data-hl="js">a.slice(1, 3)</code></td></tr>
+    <tr><td><code data-hl="py">2 in a</code></td><td><code data-hl="js">a.includes(2)</code></td></tr>
+    <tr><td><code data-hl="py">[x * 2 for x in a]</code></td><td><code data-hl="js">a.map(x =&gt; x * 2)</code></td></tr>
+    <tr><td><code data-hl="py">[x for x in a if x &gt; 1]</code></td><td><code data-hl="js">a.filter(x =&gt; x &gt; 1)</code></td></tr>
+    <tr><td><code data-hl="py">sum(a)</code></td><td><code data-hl="js">a.reduce((total, x) =&gt; total + x, 0)</code></td></tr>
+    <tr><td><code data-hl="py">sorted(a, reverse=True)</code></td><td><code data-hl="js">[...a].sort((p, q) =&gt; q - p)</code></td></tr>
+    <tr><td><code data-hl="py">for x in a:</code></td><td><code data-hl="js">for (const x of a) { ... }</code></td></tr>
+    <tr><td><code data-hl="py">for i, x in enumerate(a):</code></td><td><code data-hl="js">a.forEach((x, i) =&gt; { ... })</code></td></tr>
+  </table>
+  <div class="callout warn"><b>Careful</b><code>.sort()</code> with no argument sorts as <i>text</i> and changes the array in place. Always give numbers a compare function. <code>[...a]</code> makes a copy first.</div>
+  <div class="tasks"><b>Exercise 1.3</b> Work through the six comments. Each one prints one line except step 1.</div>
+  <div class="pg" data-id="s1-arrays" data-title="Exercise 1.3 · arrays">
+    <script type="text/plain" data-pane="py">
+scores = [12, 7, 25, 3, 18]
+scores.append(30)
+print(len(scores))
+print([s * 2 for s in scores])
+print([s for s in scores if s > 10])
+print(sum(scores))
+print(sorted(scores, reverse=True))
+    </script>
+    <script type="text/plain" data-pane="js">
+const scores = [12, 7, 25, 3, 18];
+
+// 1. add 30 to the end              (append  -> push)
+// 2. print how many scores there are (len     -> .length)
+// 3. print every score doubled       (list comprehension -> map)
+// 4. print only scores above 10      (comprehension with if -> filter)
+// 5. print the total                 (sum     -> reduce)
+// 6. print them sorted high to low   (sorted  -> sort with a compare function)
+    </script>
+    <script type="text/plain" data-pane="solution">
+const scores = [12, 7, 25, 3, 18];
+
+scores.push(30);
+console.log(scores.length);
+console.log(scores.map(s => s * 2));
+console.log(scores.filter(s => s > 10));
+console.log(scores.reduce((sum, s) => sum + s, 0));
+console.log([...scores].sort((a, b) => b - a));
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['6', '[24, 14, 50, 6, 36, 60]', '[12, 25, 18, 30]', '95', '[30, 25, 18, 12, 7, 3]']);
+    </script>
+    <script type="text/plain" data-pane="hint"><code>s =&gt; s * 2</code> is a tiny function. <code>map</code> calls it on every element and returns a new array. For the total: <code>reduce((sum, s) =&gt; sum + s, 0)</code>.</script>
+  </div>
+
+  <!-- 1.4 -->
+  <h3>1.4 Objects are dicts <span class="tag">JSON lives here</span></h3>
+  <p>A JavaScript object is a dict whose keys are (usually) plain words. A <b>list of dicts</b> in Python is an <b>array of objects</b> in JavaScript, and that is exactly the shape of the JSON a server sends back.</p>
+  <table class="xl scroll">
+    <tr><th>Python dict</th><th>JavaScript object</th></tr>
+    <tr><td><code data-hl="py">s = {"name": "Ada", "age": 21}</code></td><td><code data-hl="js">const s = { name: "Ada", age: 21 };</code></td></tr>
+    <tr><td><code data-hl="py">s["name"]</code></td><td><code data-hl="js">s.name</code>  or  <code data-hl="js">s["name"]</code></td></tr>
+    <tr><td><code data-hl="py">s.get("city", "n/a")</code></td><td><code data-hl="js">s.city ?? "n/a"</code></td></tr>
+    <tr><td><code data-hl="py">"name" in s</code></td><td><code data-hl="js">"name" in s</code></td></tr>
+    <tr><td><code data-hl="py">s["city"] = "SG"</code></td><td><code data-hl="js">s.city = "SG";</code></td></tr>
+    <tr><td><code data-hl="py">del s["age"]</code></td><td><code data-hl="js">delete s.age;</code></td></tr>
+    <tr><td><code data-hl="py">for k, v in s.items():</code></td><td><code data-hl="js">for (const [k, v] of Object.entries(s)) { ... }</code></td></tr>
+    <tr><td><code data-hl="py">list(s.keys())</code></td><td><code data-hl="js">Object.keys(s)</code></td></tr>
+  </table>
+  <div class="tasks"><b>Exercise 1.4</b>
+    For each student print <code>Name: average</code> with one decimal place, then print the name of the student with the highest average.</div>
+  <div class="pg" data-id="s1-objects" data-title="Exercise 1.4 · array of objects">
+    <script type="text/plain" data-pane="py">
+students = [
+    {"name": "Ada",  "scores": [90, 85]},
+    {"name": "Ben",  "scores": [70, 65, 80]},
+    {"name": "Cara", "scores": [100]},
+]
+def average(nums): return sum(nums) / len(nums)
+
+for s in students:
+    print(f"{s['name']}: {average(s['scores']):.1f}")
+
+best = max(students, key=lambda s: average(s["scores"]))
+print(best["name"])
+    </script>
+    <script type="text/plain" data-pane="js">
+const students = [
+  { name: "Ada",  scores: [90, 85] },
+  { name: "Ben",  scores: [70, 65, 80] },
+  { name: "Cara", scores: [100] },
+];
+
+// TODO 1: write an average(list) function (reduce, then divide by list.length)
+// TODO 2: for...of loop: print "Ada: 87.5"  (hint: number.toFixed(1))
+// TODO 3: find and print the name of the student with the best average
+    </script>
+    <script type="text/plain" data-pane="solution">
+const students = [
+  { name: "Ada",  scores: [90, 85] },
+  { name: "Ben",  scores: [70, 65, 80] },
+  { name: "Cara", scores: [100] },
+];
+
+const average = (list) => list.reduce((a, b) => a + b, 0) / list.length;
+
+for (const s of students) {
+  console.log(`${s.name}: ${average(s.scores).toFixed(1)}`);
+}
+
+let best = students[0];
+for (const s of students) {
+  if (average(s.scores) > average(best.scores)) best = s;
+}
+console.log(best.name);
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['Ada: 87.5', 'Ben: 71.7', 'Cara: 100.0', 'Cara']);
+    </script>
+    <script type="text/plain" data-pane="hint">Python's f-string format <code>:.1f</code> is <code>.toFixed(1)</code> in JavaScript. To find the best, keep a variable <code>best</code> and replace it whenever you meet a higher average.</script>
+  </div>
+
+  <!-- 1.5 -->
+  <h3>1.5 Control flow</h3>
+  <table class="xl scroll">
+    <tr><th>Python</th><th>JavaScript</th></tr>
+    <tr><td><code data-hl="py">if x &gt; 0:
+    ...
+elif x == 0:
+    ...
+else:
+    ...</code></td><td><code data-hl="js">if (x > 0) {
+  ...
+} else if (x === 0) {
+  ...
+} else {
+  ...
+}</code></td></tr>
+    <tr><td><code data-hl="py">for i in range(5):</code></td><td><code data-hl="js">for (let i = 0; i &lt; 5; i++) { ... }</code></td></tr>
+    <tr><td><code data-hl="py">while n &gt; 0:</code></td><td><code data-hl="js">while (n &gt; 0) { ... }</code></td></tr>
+    <tr><td><code data-hl="py">"big" if n &gt; 9 else "small"</code></td><td><code data-hl="js">n &gt; 9 ? "big" : "small"</code></td></tr>
+    <tr><td><code data-hl="py">match day:  # 3.10+
+    case "Sat": ...</code></td><td><code data-hl="js">switch (day) {
+  case "Sat": ...; break;
+  default: ...
+}</code></td></tr>
+    <tr><td><code data-hl="py">break   continue</code></td><td><code data-hl="js">break;   continue;</code></td></tr>
+  </table>
+  <div class="tasks"><b>Exercise 1.5a · translate</b> Rewrite this Python as JavaScript.</div>
+  <div class="pg" data-id="s1-flow1" data-title="Exercise 1.5a · translate">
+    <script type="text/plain" data-pane="py">
+total = 0
+for n in range(1, 11):
+    if n % 2 == 0:
+        total += n
+print("Sum of evens:", total)
+    </script>
+    <script type="text/plain" data-pane="js">
+// Translate the Python above. Expected output:  Sum of evens: 30
+    </script>
+    <script type="text/plain" data-pane="solution">
+let total = 0;
+for (let n = 1; n <= 10; n++) {
+  if (n % 2 === 0) {
+    total += n;
+  }
+}
+console.log("Sum of evens:", total);
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['Sum of evens: 30']);
+    </script>
+    <script type="text/plain" data-pane="hint"><code>range(1, 11)</code> means 1 up to <i>and including</i> 10, so the loop test is <code>n &lt;= 10</code>. You need <code>let</code> for <code>total</code> because it changes.</script>
+  </div>
+  <div class="tasks"><b>Exercise 1.5b · FizzBuzz</b> Print 1 to 15, one per line: <code>Fizz</code> for multiples of 3, <code>Buzz</code> for multiples of 5, <code>FizzBuzz</code> for both.</div>
+  <div class="pg" data-id="s1-fizz" data-title="Exercise 1.5b · FizzBuzz">
+    <script type="text/plain" data-pane="js">
+// for loop + if / else if / else
+    </script>
+    <script type="text/plain" data-pane="solution">
+for (let i = 1; i <= 15; i++) {
+  if (i % 15 === 0) console.log("FizzBuzz");
+  else if (i % 3 === 0) console.log("Fizz");
+  else if (i % 5 === 0) console.log("Buzz");
+  else console.log(i);
+}
+    </script>
+    <script type="text/plain" data-pane="check">
+const want = [];
+for (let i = 1; i <= 15; i++) want.push(i % 15 === 0 ? 'FizzBuzz' : i % 3 === 0 ? 'Fizz' : i % 5 === 0 ? 'Buzz' : String(i));
+return expectLines(logs, want);
+    </script>
+    <script type="text/plain" data-pane="hint">Test for 15 (both) <i>first</i>, otherwise 15 would stop at the "multiple of 3" branch.</script>
+  </div>
+
+  <!-- 1.6 -->
+  <h3>1.6 Functions, and functions as values</h3>
+  <table class="xl scroll">
+    <tr><th>Python</th><th>JavaScript</th></tr>
+    <tr><td><code data-hl="py">def add(a, b=1):
+    return a + b</code></td><td><code data-hl="js">function add(a, b = 1) {
+  return a + b;
+}</code></td></tr>
+    <tr><td><code data-hl="py">double = lambda x: x * 2</code></td><td><code data-hl="js">const double = x =&gt; x * 2;</code>  <span style="color:var(--muted)">arrow function</span></td></tr>
+    <tr><td><code data-hl="py">sorted(a, key=len)</code></td><td><code data-hl="js">a.sort((p, q) =&gt; p.length - q.length)</code></td></tr>
+  </table>
+  <p>JavaScript passes functions around constantly. A function you hand to something else to be called <i>later</i> is a <b>callback</b>: <code>map(x =&gt; x * 2)</code> already used one, and every click handler and every AJAX <code>success</code> is one too.</p>
+  <div class="tasks"><b>Exercise 1.6</b>
+    <ol><li>Write <code>grade(score)</code> returning <code>"A"</code> for 80+, <code>"B"</code> for 60–79, otherwise <code>"C"</code>.</li><li>Write an <i>arrow function</i> <code>isPass(score)</code> that is true when the score is at least 50.</li></ol></div>
+  <div class="pg" data-id="s1-funcs" data-title="Exercise 1.6 · functions">
+    <script type="text/plain" data-pane="py">
+def grade(score):
+    if score >= 80:
+        return "A"
+    elif score >= 60:
+        return "B"
+    return "C"
+
+is_pass = lambda s: s >= 50
+    </script>
+    <script type="text/plain" data-pane="js">
+// 1. function grade(score) { ... }
+// 2. const isPass = ...
+    </script>
+    <script type="text/plain" data-pane="solution">
+function grade(score) {
+  if (score >= 80) return "A";
+  if (score >= 60) return "B";
+  return "C";
+}
+
+const isPass = (score) => score >= 50;
+
+console.log(grade(85), grade(70), grade(10), isPass(50));
+    </script>
+    <script type="text/plain" data-pane="check">
+if (typeof grade !== 'function') return 'Define a function called grade';
+if (grade(85) !== 'A' || grade(80) !== 'A' || grade(60) !== 'B' || grade(79) !== 'B' || grade(10) !== 'C') return 'grade() gives the wrong letter for some score (try 80, 79, 60, 59)';
+if (typeof isPass !== 'function') return 'Define an arrow function called isPass';
+return (isPass(50) === true && isPass(49) === false) || 'isPass(50) should be true and isPass(49) false';
+    </script>
+    <script type="text/plain" data-pane="hint">Arrow function: <code>const isPass = (score) =&gt; score &gt;= 50;</code>. The comparison already produces a boolean.</script>
+  </div>
+
+  <h4>One big difference: JavaScript does not wait</h4>
+  <p>Python runs line by line and <code>input()</code> blocks until the user types. JavaScript in the browser must never freeze the page, so slow things (timers, network requests) are handed off with a callback and the script <b>keeps going</b>. Read the output order carefully; it is the key to AJAX later.</p>
+  <div class="pg" data-id="s1-async" data-title="Order of execution">
+    <script type="text/plain" data-pane="js">
+console.log("1. start");
+
+setTimeout(function () {
+  console.log("3. inside the timer: runs later");
+}, 1000);
+
+console.log("2. end of script");
+
+// Change 1000 to 0. Does the order change? (Try the quiz below.)
+    </script>
+  </div>
+  <div class="quiz" data-quiz="async"></div>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2">
+  <h2><span class="num">2</span>Whack-a-Mole: JavaScript meets the DOM</h2>
+  <p class="sub">The browser turns your HTML into a tree of objects called the <b>Document Object Model</b>. JavaScript can find any node, change it, add to it or remove it, and react to the user's clicks. That is all a web game is.</p>
+
+  <h3>2.1 The DOM in five moves</h3>
+<pre class="code" data-lang="html">&lt;body&gt;                          document
+  &lt;h2 id="title"&gt;Shopping&lt;/h2&gt;     └─ body
+  &lt;ul id="list"&gt;                       ├─ h2#title  "Shopping"
+    &lt;li&gt;Milk&lt;/li&gt;                      └─ ul#list
+    &lt;li&gt;Eggs&lt;/li&gt;                           ├─ li  "Milk"
+  &lt;/ul&gt;                                      └─ li  "Eggs"
+&lt;/body&gt;</pre>
+  <div class="flow">
+    <div class="col"><h4>① Find</h4>
+<pre class="code" data-lang="js">document.getElementById("title")
+document.querySelector(".hole")     // first match
+document.querySelectorAll("li")     // all (like a list)</pre></div>
+    <div class="col"><h4>② Change</h4>
+<pre class="code" data-lang="js">el.textContent = "Hi";      // plain text
+el.innerHTML = "&lt;b&gt;Hi&lt;/b&gt;";   // HTML
+el.classList.add("mole");
+el.style.color = "red";
+el.setAttribute("href", "/x");</pre></div>
+    <div class="col"><h4>③ Create &amp; add</h4>
+<pre class="code" data-lang="js">const li = document.createElement("li");
+li.textContent = "Bread";
+list.appendChild(li);
+li.remove();</pre></div>
+    <div class="col"><h4>④ Listen</h4>
+<pre class="code" data-lang="js">btn.addEventListener("click", function (event) {
+  // runs every time btn is clicked
+});</pre></div>
+    <div class="col"><h4>⑤ Time</h4>
+<pre class="code" data-lang="js">setTimeout(fn, 500);     // once, later
+const id = setInterval(fn, 1000);  // repeat
+clearInterval(id);       // stop</pre></div>
+  </div>
+
+  <div class="tasks"><b>Exercise 2.1 · a shopping list</b>
+    <ol><li>Make the heading say <code>Shopping list (3 items)</code>, computed from the list, not typed by hand.</li>
+    <li>When <b>Add item</b> is clicked, create a new <code>&lt;li&gt;</code> (<code>Item 4</code>, <code>Item 5</code>, …) and append it.</li>
+    <li>Keep the heading's count correct after every click.</li></ol>
+    <small style="color:var(--muted)">The automatic check clicks the button twice for you.</small></div>
+  <div class="pg" data-id="s2-dom" data-title="Exercise 2.1 · DOM basics" data-h="230">
+    <script type="text/plain" data-pane="html">
+<h2 id="title">My shopping list</h2>
+<ul id="list">
+  <li>Milk</li>
+  <li>Eggs</li>
+  <li>Bread</li>
+</ul>
+<button id="add">Add item</button>
+    </script>
+    <script type="text/plain" data-pane="js">
+const title = document.querySelector("#title");
+const list = document.querySelector("#list");
+const addBtn = document.querySelector("#add");
+
+// 1. a refresh() function that sets title.textContent to "Shopping list (N items)"
+//    N = list.querySelectorAll("li").length
+// 2. addBtn.addEventListener("click", ...) -> createElement("li"), textContent, appendChild
+// 3. call refresh() at the start and after each add
+    </script>
+    <script type="text/plain" data-pane="solution">
+const title = document.querySelector("#title");
+const list = document.querySelector("#list");
+const addBtn = document.querySelector("#add");
+
+function refresh() {
+  const n = list.querySelectorAll("li").length;
+  title.textContent = `Shopping list (${n} items)`;
+}
+
+addBtn.addEventListener("click", () => {
+  const li = document.createElement("li");
+  li.textContent = "Item " + (list.children.length + 1);
+  list.appendChild(li);
+  refresh();
+});
+
+refresh();
+    </script>
+    <script type="text/plain" data-pane="check">
+if (document.querySelectorAll('#list li').length !== 3) return 'The list should start with 3 items';
+if (!/3 items/.test(document.getElementById('title').textContent)) return 'The heading should read "Shopping list (3 items)"';
+document.getElementById('add').click();
+document.getElementById('add').click();
+if (document.querySelectorAll('#list li').length !== 5) return 'Each click should append exactly one <li>';
+return /5 items/.test(document.getElementById('title').textContent) || 'The heading should update to 5 items';
+    </script>
+    <script type="text/plain" data-pane="hint">Inside the click handler: <code>const li = document.createElement("li"); li.textContent = "Item 4"; list.appendChild(li);</code> then call <code>refresh()</code>.</script>
+  </div>
+
+  <h3>2.2 Build the game, step by step</h3>
+  <p>The game keeps all its <b>state in one object</b> (a Python dict) and draws that state into the page. Every later version in this seminar reuses the same HTML ids, so you only learn the new tool, not a new game.</p>
+
+  <h4>Step 1 · the board</h4>
+  <p>Nine holes, made by a loop. In Python you would append nine objects to a list; here you append nine <code>&lt;div&gt;</code>s to the page.</p>
+  <div class="pg" data-id="s2-board" data-title="Step 1 · build the board" data-css="game" data-h="290">
+    <script type="text/plain" data-pane="html">
+<div id="board"></div>
+    </script>
+    <script type="text/plain" data-pane="js">
+const board = document.getElementById("board");
+const HOLES = 9;
+
+// TODO: use a for loop to create 9 <div class="hole"> elements
+//       and append every one of them to board.
+    </script>
+    <script type="text/plain" data-pane="solution">
+const board = document.getElementById("board");
+const HOLES = 9;
+
+for (let i = 0; i < HOLES; i++) {
+  const hole = document.createElement("div");
+  hole.className = "hole";
+  hole.dataset.index = i;      // becomes data-index="3" in the HTML
+  board.appendChild(hole);
+}
+    </script>
+    <script type="text/plain" data-pane="check">
+return document.querySelectorAll('#board .hole').length === 9 || 'Expected 9 elements with class "hole" inside #board';
+    </script>
+    <script type="text/plain" data-pane="hint"><code>document.createElement("div")</code>, then <code>hole.className = "hole"</code>, then <code>board.appendChild(hole)</code>. All three go inside the loop.</script>
+  </div>
+
+  <h4>Step 2 · a mole you can hit</h4>
+  <p>Two TODOs: choose a random hole, and react to a click on the right one. <code>Math.random()</code> gives 0 up to (not including) 1, so <code>Math.floor(Math.random() * 9)</code> is Python's <code>random.randrange(9)</code>.</p>
+  <div class="pg" data-id="s2-click" data-title="Step 2 · mole + click" data-css="game" data-h="270">
+    <script type="text/plain" data-pane="html">
+<div class="hud">Score: <b id="score">0</b></div>
+<div id="board"></div>
+    </script>
+    <script type="text/plain" data-pane="js">
+const board = document.getElementById("board");
+const scoreEl = document.getElementById("score");
+const HOLES = 9;
+
+const game = { score: 0, moleAt: -1 };   // the state: a dict
+
+for (let i = 0; i < HOLES; i++) {        // the board from step 1
+  const hole = document.createElement("div");
+  hole.className = "hole";
+  hole.dataset.index = i;
+  board.appendChild(hole);
+}
+const holes = board.querySelectorAll(".hole");
+
+function showMole() {
+  holes.forEach((h) => h.classList.remove("mole"));
+  // TODO 1: set game.moleAt to a random whole number from 0 to 8
+  holes[game.moleAt].classList.add("mole");
+}
+
+board.addEventListener("click", (event) => {
+  const hole = event.target.closest(".hole");   // which hole was clicked?
+  if (!hole) return;
+  // TODO 2: if Number(hole.dataset.index) === game.moleAt
+  //           add 1 to game.score, show it in scoreEl, call showMole() again
+});
+
+showMole();
+    </script>
+    <script type="text/plain" data-pane="solution">
+const board = document.getElementById("board");
+const scoreEl = document.getElementById("score");
+const HOLES = 9;
+
+const game = { score: 0, moleAt: -1 };
+
+for (let i = 0; i < HOLES; i++) {
+  const hole = document.createElement("div");
+  hole.className = "hole";
+  hole.dataset.index = i;
+  board.appendChild(hole);
+}
+const holes = board.querySelectorAll(".hole");
+
+function showMole() {
+  holes.forEach((h) => h.classList.remove("mole"));
+  game.moleAt = Math.floor(Math.random() * HOLES);
+  holes[game.moleAt].classList.add("mole");
+}
+
+board.addEventListener("click", (event) => {
+  const hole = event.target.closest(".hole");
+  if (!hole) return;
+  if (Number(hole.dataset.index) === game.moleAt) {
+    game.score++;
+    scoreEl.textContent = game.score;
+    showMole();
+  }
+});
+
+showMole();
+    </script>
+    <script type="text/plain" data-pane="check">
+showMole();
+const m = document.querySelectorAll('.hole.mole');
+if (m.length !== 1) return 'showMole() must leave exactly one .mole on the board';
+m[0].click();
+return document.getElementById('score').textContent === '1' || 'Clicking the mole should make the score 1';
+    </script>
+    <script type="text/plain" data-pane="hint"><code>dataset.index</code> is text, so compare with <code>Number(hole.dataset.index)</code>. Inside the <code>if</code>: <code>game.score++; scoreEl.textContent = game.score; showMole();</code></script>
+  </div>
+
+  <h4>Step 3 · timers: the full game <span class="tag" style="margin-left:0">playable</span></h4>
+  <p><code>setInterval</code> moves the mole every 800 ms and counts the clock down every second. Notice how the code is organised: <b>state</b> (<code>game</code>), <b>helpers</b> (<code>showMole</code>, <code>render</code>), <b>flow</b> (<code>startGame</code>, <code>tick</code>, <code>endGame</code>), then <b>events</b>. Play a round, then read the code.</p>
+  <div class="pg" data-id="s2-game" data-title="Whack-a-Mole · vanilla JavaScript" data-css="game" data-h="400" data-auto="1" data-nocheck="1">
+    <script type="text/plain" data-pane="html">
+<div class="hud">
+  <span>Score: <b id="score">0</b></span>
+  <span>Time: <b id="time">30</b>s</span>
+  <button id="start">Start</button>
+</div>
+<div id="board"></div>
+<p id="msg">Press Start, then whack the 🐹!</p>
+    </script>
+    <script type="text/plain" data-pane="js">
+const board = document.getElementById("board");
+const scoreEl = document.getElementById("score");
+const timeEl = document.getElementById("time");
+const msgEl = document.getElementById("msg");
+const startBtn = document.getElementById("start");
+
+const HOLES = 9;
+const ROUND_SECONDS = 30;
+const MOLE_MS = 800;           // how long a mole stays before it moves
+
+const game = { score: 0, timeLeft: ROUND_SECONDS, moleAt: -1, running: false };
+let moleTimer = null;          // ids from setInterval, so we can stop them
+let clockTimer = null;
+
+// ---- build the board ---------------------------------------------
+for (let i = 0; i < HOLES; i++) {
+  const hole = document.createElement("div");
+  hole.className = "hole";
+  hole.dataset.index = i;
+  board.appendChild(hole);
+}
+const holes = board.querySelectorAll(".hole");
+
+// ---- helpers -----------------------------------------------------
+function clearMoles() {
+  holes.forEach((h) => h.classList.remove("mole"));
+}
+
+function showMole() {
+  clearMoles();
+  game.moleAt = Math.floor(Math.random() * HOLES);
+  holes[game.moleAt].classList.add("mole");
+}
+
+function render() {
+  scoreEl.textContent = game.score;
+  timeEl.textContent = game.timeLeft;
+}
+
+// ---- game flow ---------------------------------------------------
+function startGame() {
+  clearInterval(moleTimer);
+  clearInterval(clockTimer);
+  game.score = 0;
+  game.timeLeft = ROUND_SECONDS;
+  game.running = true;
+  msgEl.textContent = "Go go go!";
+  render();
+  showMole();
+  moleTimer = setInterval(showMole, MOLE_MS);
+  clockTimer = setInterval(tick, 1000);
+}
+
+function tick() {
+  game.timeLeft--;
+  render();
+  if (game.timeLeft <= 0) endGame();
+}
+
+function endGame() {
+  clearInterval(moleTimer);
+  clearInterval(clockTimer);
+  game.running = false;
+  game.moleAt = -1;
+  clearMoles();
+  msgEl.textContent = `Time's up! You whacked ${game.score} moles.`;
+}
+
+// ---- events ------------------------------------------------------
+board.addEventListener("click", (event) => {
+  const hole = event.target.closest(".hole");
+  if (!hole || !game.running) return;
+  if (Number(hole.dataset.index) === game.moleAt) {
+    game.score++;
+    game.moleAt = -1;
+    clearMoles();
+    render();
+  }
+});
+
+startBtn.addEventListener("click", startGame);
+    </script>
+  </div>
+  <div class="tasks"><b>Challenges</b> (edit the box above and press Run)
+    <ul><li>Make a round 15 seconds long, and the mole faster (<code>MOLE_MS</code>).</li>
+    <li>Lose a point for clicking an empty hole (but never go below 0). Hint: <code>else { ... }</code> and <code>Math.max</code>.</li>
+    <li>Call <code>showMole()</code> right after a hit so a new mole pops up immediately.</li>
+    <li>Harder: a golden mole worth 5 points that appears one time in ten.</li></ul></div>
+
+  <div class="callout tip"><b>Python parallel</b>Your Python programs ask for input and wait. This game never waits: it registers <i>event listeners</i> and <i>timers</i>, then the browser calls your functions when something happens. That "register a callback" pattern is the whole of front-end programming.</div>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section id="s3">
+  <h2><span class="num">3</span>jQuery: say more with less</h2>
+  <p class="sub">The DOM API is powerful but wordy. jQuery is a small library that wraps it in short, chainable commands, and it is what the seminar and lab use. One line of jQuery often replaces four lines of plain JavaScript.</p>
+
+  <h3>3.1 The idea</h3>
+  <ol>
+    <li>Load the library: <code>&lt;script src="https://code.jquery.com/jquery-3.7.1.min.js"&gt;&lt;/script&gt;</code> (before your own script).</li>
+    <li>Use <code>$</code> to <b>select</b> elements with a CSS selector, then call a method to <b>act</b> on them: <code>$("selector").action()</code></li>
+    <li>Wrap your code in <code>$(function () { ... })</code> so it runs once the page is ready.</li>
+  </ol>
+<pre class="code" data-lang="js">$(function () {                          // run when the DOM is ready
+  $("#greet").on("click", function () {  // find, then listen
+    $("#card").text("Hello!").addClass("highlight");   // find, then chain two actions
+  });
+});</pre>
+
+  <div class="scroll"><table class="xl">
+    <tr><th>Plain JavaScript</th><th>jQuery</th></tr>
+    <tr><td><code data-hl="js">document.getElementById("a")</code></td><td><code data-hl="js">$("#a")</code></td></tr>
+    <tr><td><code data-hl="js">document.querySelectorAll(".hole")</code></td><td><code data-hl="js">$(".hole")</code></td></tr>
+    <tr><td><code data-hl="js">el.textContent = "Hi"</code></td><td><code data-hl="js">$(el).text("Hi")</code></td></tr>
+    <tr><td><code data-hl="js">el.innerHTML = "&lt;b&gt;Hi&lt;/b&gt;"</code></td><td><code data-hl="js">$(el).html("&lt;b&gt;Hi&lt;/b&gt;")</code></td></tr>
+    <tr><td><code data-hl="js">input.value</code></td><td><code data-hl="js">$("#in").val()</code></td></tr>
+    <tr><td><code data-hl="js">el.classList.add("on")</code></td><td><code data-hl="js">$(el).addClass("on")</code></td></tr>
+    <tr><td><code data-hl="js">els.forEach(e =&gt; e.classList.remove("on"))</code></td><td><code data-hl="js">$(".x").removeClass("on")</code>  <span style="color:var(--muted)">(loops for you)</span></td></tr>
+    <tr><td><code data-hl="js">el.style.color = "red"</code></td><td><code data-hl="js">$(el).css("color", "red")</code></td></tr>
+    <tr><td><code data-hl="js">const li = document.createElement("li");
+li.textContent = "x"; ul.appendChild(li);</code></td><td><code data-hl="js">$("&lt;li&gt;").text("x").appendTo("#ul")</code></td></tr>
+    <tr><td><code data-hl="js">el.remove()</code></td><td><code data-hl="js">$(el).remove()   $(el).empty()</code></td></tr>
+    <tr><td><code data-hl="js">el.addEventListener("click", fn)</code></td><td><code data-hl="js">$(el).on("click", fn)</code></td></tr>
+  </table></div>
+
+  <h4>Selectors you will use all the time</h4>
+  <table class="xl scroll">
+    <tr><th>Selector</th><th>Selects</th></tr>
+    <tr><td><code data-hl="js">$("#id")</code></td><td>the element with that id</td></tr>
+    <tr><td><code data-hl="js">$(".class")</code></td><td>every element with that class</td></tr>
+    <tr><td><code data-hl="js">$("p")  $("p.intro")  $("ul &gt; li")</code></td><td>by tag; tag + class; direct children</td></tr>
+    <tr><td><code data-hl="js">$("li:first")  $("li:even")</code></td><td>first match; every other one</td></tr>
+    <tr><td><code data-hl="js">$("a[href^='https']")</code></td><td>attribute starts with…</td></tr>
+    <tr><td><code data-hl="js">$(this)</code></td><td>the element that triggered the current event</td></tr>
+    <tr><td><code data-hl="js">.parent()  .children()  .siblings()  .find("x")  .eq(2)</code></td><td><b>traversing</b>: move up, down and sideways in the DOM tree from what you have selected</td></tr>
+  </table>
+
+  <h3>3.2 Selector lab <span class="tag">interactive</span></h3>
+  <p>Type a jQuery expression, see which elements light up. Then try the eight challenges: when your selection matches the target exactly, it ticks.</p>
+  <div class="lab" id="lab">
+    <div>
+      <h4>The page (live DOM)</h4>
+      <div id="lab-sample">
+        <h2 id="title">Menu</h2>
+        <p class="intro">Choose your <span>favourite</span> drink.</p>
+        <ul id="drinks">
+          <li class="item hot">Coffee</li>
+          <li class="item hot special">Tea</li>
+          <li class="item cold">Milo</li>
+          <li class="item cold special">Lemonade</li>
+        </ul>
+        <p>More at <a href="https://example.com">our site</a> or <a href="/contact">contact us</a>.</p>
+      </div>
+    </div>
+    <div>
+      <h4>Your selector</h4>
+      <div class="lab-q"><input id="lab-in" placeholder='$(".item")' spellcheck="false" autocomplete="off" aria-label="jQuery expression"></div>
+      <div class="lab-res" id="lab-res">Type a jQuery expression. You can chain: <code>$("li").first().siblings()</code></div>
+      <h4>Challenges</h4>
+      <ol class="ch" id="lab-ch"></ol>
+    </div>
+  </div>
+
+  <h3>3.3 Read, change, react</h3>
+  <p><code>.val()</code> reads a text box, <code>.text()</code> and <code>.html()</code> read or set content, <code>.on("click", fn)</code> listens, and the class methods switch styles on and off. Most methods <b>return the jQuery object</b>, so you can chain them.</p>
+  <div class="callout warn"><b>Security</b><code>.html()</code> treats its argument as HTML. If you put something a user typed into it, they can inject a <code>&lt;script&gt;</code>. For user-supplied text, always use <code>.text()</code>.</div>
+
+  <div class="tasks"><b>Exercise 3.3a · greeting card</b>
+    <ol><li>On click of <b>Greet me</b>, read the name from the text box with <code>.val()</code>.</li>
+    <li>Put <code>Hello, NAME!</code> (NAME in bold) in <code>#card</code> using <code>.html()</code>.</li>
+    <li>Toggle the class <code>highlight</code> on <code>#card</code> every click.</li></ol></div>
+  <div class="pg" data-id="s3-card" data-title="Exercise 3.3a · greet" data-libs="jquery" data-h="170">
+    <script type="text/plain" data-pane="html">
+<style>
+.highlight{background:#fff3b0;border-color:#e0a800!important}
+#card{margin-top:10px;padding:10px 14px;border:2px dashed #aab;border-radius:8px;min-height:2.4em}
+</style>
+<input id="nameInput" placeholder="Your name">
+<button id="greet">Greet me</button>
+<div id="card">(nothing yet)</div>
+    </script>
+    <script type="text/plain" data-pane="js">
+$(function () {
+  // TODO: $("#greet").on("click", function () { ... });
+  //   1. const name = $("#nameInput").val();
+  //   2. $("#card").html(...)
+  //   3. .toggleClass("highlight")   (you can chain it onto step 2)
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$(function () {
+  $("#greet").on("click", function () {
+    const name = $("#nameInput").val();
+    $("#card")
+      .html("<b>Hello, " + name + "!</b>")
+      .toggleClass("highlight");
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+$('#nameInput').val('Zed');
+$('#greet').trigger('click');
+if (!$('#card').text().includes('Hello, Zed')) return 'After clicking, #card should say Hello, Zed!';
+return $('#card').hasClass('highlight') || 'Toggle the "highlight" class on #card';
+    </script>
+    <script type="text/plain" data-pane="hint"><code>.html("&lt;b&gt;Hello, " + name + "!&lt;/b&gt;")</code> returns the jQuery object, so <code>.toggleClass("highlight")</code> can follow directly.</script>
+  </div>
+
+  <div class="tasks"><b>Exercise 3.3b · to-do list</b>
+    <ol><li>Add button: append a <code>&lt;li&gt;</code> with the typed text, then clear the box with <code>.val("")</code>.</li>
+    <li>Clicking any item toggles <code>done</code>. Items are created <i>later</i>, so use <b>event delegation</b>: <code>$("#todo").on("click", "li", fn)</code>.</li>
+    <li><code>updateCount()</code> shows how many items are <i>not</i> done. Call it at start and after every change.</li></ol></div>
+  <div class="pg" data-id="s3-todo" data-title="Exercise 3.3b · to-do list" data-libs="jquery" data-h="230">
+    <script type="text/plain" data-pane="html">
+<style>
+#todo{padding-left:20px}
+#todo li{cursor:pointer;padding:2px 0}
+#todo li.done{text-decoration:line-through;color:#888}
+</style>
+<input id="newTask" placeholder="New task">
+<button id="addTask">Add</button>
+<ul id="todo"><li>Buy milk</li><li>Study jQuery</li></ul>
+<p><b id="count">?</b> tasks left</p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$(function () {
+  function updateCount() {
+    // TODO 3: $("#count").text( number of #todo li that do NOT have class "done" )
+    //         hint: $("#todo li").not(".done").length
+  }
+
+  // TODO 1: $("#addTask").on("click", ...)  -> $("<li>").text(...).appendTo("#todo")
+  // TODO 2: $("#todo").on("click", "li", function () { $(this).toggleClass("done"); ... });
+
+  updateCount();
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$(function () {
+  function updateCount() {
+    $("#count").text($("#todo li").not(".done").length);
+  }
+
+  $("#addTask").on("click", function () {
+    const text = $("#newTask").val().trim();
+    if (!text) return;
+    $("<li>").text(text).appendTo("#todo");
+    $("#newTask").val("");
+    updateCount();
+  });
+
+  $("#todo").on("click", "li", function () {
+    $(this).toggleClass("done");
+    updateCount();
+  });
+
+  updateCount();
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+if ($('#count').text() !== '2') return 'The counter should start at 2';
+$('#newTask').val('Test');
+$('#addTask').click();
+if ($('#todo li').length !== 3) return 'The Add button should append an <li>';
+if ($('#newTask').val() !== '') return 'Clear the text box after adding';
+$('#todo li').first().click();
+if (!$('#todo li').first().hasClass('done')) return 'Clicking an item should toggle the class "done"';
+return $('#count').text() === '2' || 'The counter should show how many items are not done (2 now)';
+    </script>
+    <script type="text/plain" data-pane="hint">Why delegation? <code>$("#todo li").on(...)</code> only attaches to the items that exist <i>right now</i>. <code>$("#todo").on("click", "li", fn)</code> listens on the list and checks which <code>li</code> was hit, so future items work too.</script>
+  </div>
+
+  <h3>3.4 The game, rewritten with jQuery</h3>
+  <p>Same game, same HTML, same state object. Compare it with the vanilla version: the board loop, the "clear all moles" helper and the click handler all shrink. Fill in the three TODOs.</p>
+  <table class="xl scroll">
+    <tr><th>Vanilla version</th><th>jQuery version</th></tr>
+    <tr><td><code data-hl="js">const hole = document.createElement("div");
+hole.className = "hole";
+board.appendChild(hole);</code></td><td><code data-hl="js">$("&lt;div&gt;").addClass("hole").appendTo("#board");</code></td></tr>
+    <tr><td><code data-hl="js">holes.forEach(h =&gt; h.classList.remove("mole"));
+holes[game.moleAt].classList.add("mole");</code></td><td><code data-hl="js">$(".hole").removeClass("mole")
+  .eq(game.moleAt).addClass("mole");</code></td></tr>
+    <tr><td><code data-hl="js">board.addEventListener("click", e =&gt; {
+  const hole = e.target.closest(".hole"); ...</code></td><td><code data-hl="js">$("#board").on("click", ".hole", function () {
+  // $(this) is the clicked hole</code></td></tr>
+    <tr><td><code data-hl="js">scoreEl.textContent = game.score;</code></td><td><code data-hl="js">$("#score").text(game.score);</code></td></tr>
+  </table>
+  <div class="tasks"><b>Exercise 3.4</b>
+    <ol><li>Build the 9 holes with one jQuery chain.</li>
+    <li><code>showMole()</code>: remove <code>mole</code> from all holes, pick <code>game.moleAt</code> randomly, add <code>mole</code> to <code>.eq(game.moleAt)</code>.</li>
+    <li>Delegated click handler on <code>#board</code> for <code>.hole</code>: if the game is running and <code>$(this).index() === game.moleAt</code>, score a point, clear the mole, <code>render()</code>.</li></ol>
+    <small style="color:var(--muted)">The check presses Start for you, then clicks the mole.</small></div>
+  <div class="pg" data-id="s3-game" data-title="Exercise 3.4 · Whack-a-Mole with jQuery" data-libs="jquery" data-css="game" data-h="400">
+    <script type="text/plain" data-pane="html">
+<div class="hud">
+  <span>Score: <b id="score">0</b></span>
+  <span>Time: <b id="time">30</b>s</span>
+  <button id="start">Start</button>
+</div>
+<div id="board"></div>
+<p id="msg">Press Start, then whack the 🐹!</p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$(function () {
+  const HOLES = 9;
+  const ROUND_SECONDS = 30;
+  const MOLE_MS = 800;
+  const game = { score: 0, timeLeft: ROUND_SECONDS, moleAt: -1, running: false };
+  let moleTimer, clockTimer;
+
+  // TODO 1: build the board: 9 x  $("<div>").addClass("hole").appendTo("#board")
+
+
+  function showMole() {
+    // TODO 2: remove "mole" from every .hole, choose game.moleAt, add "mole" to $(".hole").eq(game.moleAt)
+  }
+
+  // TODO 3: $("#board").on("click", ".hole", function () { ... });
+  //   $(this).index()  is the position of the clicked hole among its siblings
+
+
+  // ---- given: game flow -------------------------------------------
+  function render() {
+    $("#score").text(game.score);
+    $("#time").text(game.timeLeft);
+  }
+
+  function startGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.score = 0;
+    game.timeLeft = ROUND_SECONDS;
+    game.running = true;
+    $("#msg").text("Go go go!");
+    render();
+    showMole();
+    moleTimer = setInterval(showMole, MOLE_MS);
+    clockTimer = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    game.timeLeft--;
+    render();
+    if (game.timeLeft <= 0) endGame();
+  }
+
+  function endGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.running = false;
+    game.moleAt = -1;
+    $(".hole").removeClass("mole");
+    $("#msg").text("Time's up! You whacked " + game.score + " moles.");
+  }
+
+  $("#start").on("click", startGame);
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$(function () {
+  const HOLES = 9;
+  const ROUND_SECONDS = 30;
+  const MOLE_MS = 800;
+  const game = { score: 0, timeLeft: ROUND_SECONDS, moleAt: -1, running: false };
+  let moleTimer, clockTimer;
+
+  for (let i = 0; i < HOLES; i++) {
+    $("<div>").addClass("hole").appendTo("#board");
+  }
+
+  function showMole() {
+    $(".hole").removeClass("mole");
+    game.moleAt = Math.floor(Math.random() * HOLES);
+    $(".hole").eq(game.moleAt).addClass("mole");
+  }
+
+  $("#board").on("click", ".hole", function () {
+    if (!game.running) return;
+    if ($(this).index() === game.moleAt) {
+      game.score++;
+      game.moleAt = -1;
+      $(".hole").removeClass("mole");
+      render();
+    }
+  });
+
+  // ---- given: game flow -------------------------------------------
+  function render() {
+    $("#score").text(game.score);
+    $("#time").text(game.timeLeft);
+  }
+
+  function startGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.score = 0;
+    game.timeLeft = ROUND_SECONDS;
+    game.running = true;
+    $("#msg").text("Go go go!");
+    render();
+    showMole();
+    moleTimer = setInterval(showMole, MOLE_MS);
+    clockTimer = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    game.timeLeft--;
+    render();
+    if (game.timeLeft <= 0) endGame();
+  }
+
+  function endGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.running = false;
+    game.moleAt = -1;
+    $(".hole").removeClass("mole");
+    $("#msg").text("Time's up! You whacked " + game.score + " moles.");
+  }
+
+  $("#start").on("click", startGame);
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+if ($('#board .hole').length !== 9) return 'TODO 1: the board needs 9 .hole elements';
+$('#start').click();
+if ($('.hole.mole').length !== 1) return 'TODO 2: showMole() should leave exactly one .mole';
+$('.hole.mole').click();
+return $('#score').text() === '1' || 'TODO 3: clicking the mole should raise the score to 1';
+    </script>
+    <script type="text/plain" data-pane="hint">TODO 1 is a <code>for</code> loop with one jQuery line inside. TODO 2: <code>$(".hole").removeClass("mole");</code> then pick the random index and <code>$(".hole").eq(game.moleAt).addClass("mole");</code></script>
+  </div>
+
+  <h4>Quick check</h4>
+  <div class="quiz" data-quiz="jquery"></div>
+</section>
+
+<!-- ===================== SECTION 4 ===================== -->
+<section id="s4">
+  <h2><span class="num">4</span>AJAX &amp; JSON: talking to the server</h2>
+  <p class="sub">So far every score vanishes when you refresh. To keep scores, the page must talk to the server <i>without reloading</i>. That technique is AJAX, and it is what turns a collection of pages into a single-page application.</p>
+
+  <h3>4.1 Two ways to build a page</h3>
+  <div class="flow">
+    <div class="col"><h4>Server-side rendering <small>(your Flask templates so far)</small></h4>
+      <ol><li>Browser asks for <code>/blog</code></li><li>Flask runs <code>render_template(...)</code></li><li>Server sends <b>finished HTML</b></li><li>Browser replaces the whole page</li></ol></div>
+    <div class="col"><h4>Client-side rendering <small>(AJAX)</small></h4>
+      <ol><li>Page is already loaded</li><li>JavaScript asks for <code>/api/scores</code> in the background</li><li>Flask runs <code>jsonify(...)</code>, sends <b>JSON data</b></li><li>JavaScript builds only the HTML it needs and updates that part of the page</li></ol></div>
+  </div>
+  <p><b>AJAX</b> = <i>Asynchronous JavaScript And XML</i> (today it carries JSON, not XML). Asynchronous means the page stays usable while the request is in flight, and your code runs later in a <b>callback</b>, exactly like the <code>setTimeout</code> in Section 1.</p>
+
+  <h3>4.2 JSON is the dict you already know</h3>
+  <table class="xl scroll">
+    <tr><th>Python</th><th>JavaScript</th></tr>
+    <tr><td><code data-hl="py">json.loads(text)</code>  → dict/list</td><td><code data-hl="js">JSON.parse(text)</code>  → object/array</td></tr>
+    <tr><td><code data-hl="py">json.dumps(obj)</code>  → str</td><td><code data-hl="js">JSON.stringify(obj)</code>  → string</td></tr>
+    <tr><td><code data-hl="py">return jsonify({"bmi": 22.1})</code> <span style="color:var(--muted)">(Flask)</span></td><td>arrives in <code data-hl="js">success: function (data)</code> already parsed</td></tr>
+  </table>
+  <div class="tasks"><b>Exercise 4.2</b> Parse, read, modify, and serialise a JSON string.</div>
+  <div class="pg" data-id="s4-json" data-title="Exercise 4.2 · JSON round trip">
+    <script type="text/plain" data-pane="py">
+import json
+text = '{"players": [{"name": "Ann", "score": 23}, {"name": "Ben", "score": 16}]}'
+data = json.loads(text)
+print(data["players"][1]["name"])
+data["players"].append({"name": "Cara", "score": 22})
+print(json.dumps(data))
+    </script>
+    <script type="text/plain" data-pane="js">
+const text = '{"players": [{"name": "Ann", "score": 23}, {"name": "Ben", "score": 16}]}';
+
+// 1. parse text into a JavaScript object        (json.loads  -> JSON.parse)
+// 2. print the name of the second player
+// 3. add { name: "Cara", score: 22 } to the players array
+// 4. print the whole object back as a JSON string (json.dumps -> JSON.stringify)
+    </script>
+    <script type="text/plain" data-pane="solution">
+const text = '{"players": [{"name": "Ann", "score": 23}, {"name": "Ben", "score": 16}]}';
+
+const data = JSON.parse(text);
+console.log(data.players[1].name);
+data.players.push({ name: "Cara", score: 22 });
+console.log(JSON.stringify(data));
+    </script>
+    <script type="text/plain" data-pane="check">
+return expectLines(logs, ['Ben', '{"players":[{"name":"Ann","score":23},{"name":"Ben","score":16},{"name":"Cara","score":22}]}']);
+    </script>
+    <script type="text/plain" data-pane="hint"><code>const data = JSON.parse(text);</code> gives you a normal object. <code>players</code> is an array, so use <code>.push(...)</code>.</script>
+  </div>
+
+  <h3>4.3 <code>$.ajax()</code></h3>
+<pre class="code" data-lang="js">$.ajax({
+  url: "/api/scores",          // the Flask route
+  type: "GET",                 // or "POST"
+  data: { limit: 5 },          // GET: becomes ?limit=5      POST: sent in the body
+  dataType: "json",            // parse the reply as JSON
+  success: function (data, status, xhr) { /* use data HERE */ },
+  error:   function (xhr, status, err)  { /* 4xx / 5xx / network failure */ }
+});
+// Shortcuts:  $.get(url, data, fn)   $.post(url, data, fn)   $.getJSON(url, data, fn)</pre>
+  <div class="callout warn"><b>The #1 AJAX mistake</b>You cannot write <code>let r; $.ajax({... success: d =&gt; r = d}); console.log(r);</code>. The request has not come back yet when <code>console.log</code> runs, so <code>r</code> is still <code>undefined</code>. Everything that needs the data goes <i>inside</i> the callback.</div>
+
+  <h4>The server</h4>
+  <p>There is no Flask here, so <b>this page contains a tiny pretend server</b> that answers the URLs below after a short random delay (watch the blue lines in each console, they work like the Network tab). It follows the same contract a Flask app would, so the JavaScript you write is exactly what you would write against the real thing. Scores you save are remembered by your browser and shared by every exercise on this page.</p>
+  <div class="scroll"><table class="xl">
+    <tr><th>Request</th><th>Reply (JSON)</th></tr>
+    <tr><td><code data-hl="js">GET /api/scores?limit=5</code></td><td><code data-hl="js">{ scores: [{ id, name, score, date }, ...], count }</code> best first</td></tr>
+    <tr><td><code data-hl="js">POST /api/scores</code>  <code>name, score</code></td><td><code data-hl="js">{ ok: true, rank: 3, saved: {...} }</code>   or status 400 <code data-hl="js">{ error: "..." }</code></td></tr>
+    <tr><td><code data-hl="js">GET /api/summary</code></td><td><code data-hl="js">{ labels: [names], best: [...], average: [...], games: [...] }</code></td></tr>
+    <tr><td><code data-hl="js">GET /api/history</code></td><td><code data-hl="js">{ labels: ["#1", ...], scores: [...] }</code> oldest first</td></tr>
+    <tr><td><code data-hl="js">GET /api/broken</code></td><td>status 500 <code data-hl="js">{ error: "Server exploded" }</code></td></tr>
+  </table></div>
+<pre class="code" data-lang="py"># What the matching Flask route looks like (you wrote routes like this in seminars 2-4)
+@app.route("/api/scores", methods=["GET"])
+def get_scores():
+    limit = request.args.get("limit", 5, type=int)
+    rows = Score.objects.order_by("-score")[:limit]
+    return jsonify({"scores": [r.to_dict() for r in rows], "count": Score.objects.count()})
+
+@app.route("/api/scores", methods=["POST"])
+def add_score():
+    payload = request.get_json(silent=True) or request.form    # JSON body or form body
+    name, score = payload.get("name", "").strip(), payload.get("score")
+    if not name:
+        return jsonify({"error": "Name is required"}), 400
+    Score(name=name, score=int(score)).save()
+    rank = Score.objects(score__gt=int(score)).count() + 1
+    return jsonify({"ok": True, "rank": rank})</pre>
+
+  <div class="tasks"><b>Exercise 4.3a · GET and render</b> <i>Client-side rendering</i>: the server sends data, you build the HTML. In <code>success</code>, append one <code>&lt;li&gt;</code> per score to <code>#lb</code> as <code>Ann – 23</code>.</div>
+  <div class="pg" data-id="s4-get" data-title="Exercise 4.3a · GET /api/scores" data-libs="jquery" data-h="230" data-wait="1400">
+    <script type="text/plain" data-pane="html">
+<h3 style="margin:0 0 4px">Top 5</h3>
+<ol id="lb"></ol>
+<p id="status"></p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$("#status").text("Loading…");
+
+$.ajax({
+  url: "/api/scores",
+  type: "GET",
+  data: { limit: 5 },            // becomes ?limit=5
+  dataType: "json",
+  success: function (data, status, xhr) {
+    $("#status").text("");
+    console.log("first row:", data.scores[0]);
+    // TODO: for each item in data.scores append <li>NAME – SCORE</li> to #lb
+  },
+  error: function () {
+    $("#status").text("Could not load scores");
+  }
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$("#status").text("Loading…");
+
+$.ajax({
+  url: "/api/scores",
+  type: "GET",
+  data: { limit: 5 },
+  dataType: "json",
+  success: function (data, status, xhr) {
+    $("#status").text("");
+    console.log("first row:", data.scores[0]);
+    data.scores.forEach(function (s) {
+      $("<li>").text(s.name + " – " + s.score).appendTo("#lb");
+    });
+  },
+  error: function () {
+    $("#status").text("Could not load scores");
+  }
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+return new Promise(function (resolve) {
+  setTimeout(function () {
+    resolve($('#lb li').length === 5 || 'Render exactly 5 <li> items into #lb, inside the success callback');
+  }, 600);
+});
+    </script>
+    <script type="text/plain" data-pane="hint"><code>data.scores.forEach(function (s) { $("&lt;li&gt;").text(s.name + " – " + s.score).appendTo("#lb"); });</code></script>
+  </div>
+
+  <div class="tasks"><b>Exercise 4.3b · POST</b> Send a new score. On <b>success</b> show <code>Saved! You are rank N</code> in <code>#result</code>; on <b>error</b> show the server's message (try an empty name).
+    <small style="display:block;color:var(--muted)">Form-encoded POST (<code>name=Ann&amp;score=23</code>) is jQuery's default when you pass an object to <code>data</code>.</small></div>
+  <div class="pg" data-id="s4-post" data-title="Exercise 4.3b · POST /api/scores" data-libs="jquery" data-h="170" data-wait="800">
+    <script type="text/plain" data-pane="html">
+<style>input{width:110px}</style>
+<input id="pname" placeholder="name">
+<input id="pscore" type="number" placeholder="score">
+<button id="save">Save score</button>
+<p id="result"></p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$("#save").on("click", function () {
+  const name = $("#pname").val();
+  const score = $("#pscore").val();
+
+  $.ajax({
+    url: "/api/scores",
+    type: "POST",
+    data: { name: name, score: score },
+    success: function (data) {
+      // TODO: show "Saved! You are rank N" in #result   (data.rank)
+    },
+    error: function (xhr) {
+      // TODO: show the server's message in #result      (xhr.responseJSON.error)
+    }
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$("#save").on("click", function () {
+  const name = $("#pname").val();
+  const score = $("#pscore").val();
+
+  $.ajax({
+    url: "/api/scores",
+    type: "POST",
+    data: { name: name, score: score },
+    success: function (data) {
+      $("#result").text("Saved! You are rank " + data.rank);
+    },
+    error: function (xhr) {
+      const msg = xhr.responseJSON && xhr.responseJSON.error;
+      $("#result").text("Error " + xhr.status + ": " + (msg || "request failed"));
+    }
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+$('#pname').val('__test');
+$('#pscore').val(5);
+$('#save').click();
+return new Promise(function (resolve) {
+  setTimeout(function () {
+    if (!/rank/i.test($('#result').text())) return resolve('Success: show "Saved! You are rank N" in #result');
+    $('#pname').val('');
+    $('#save').click();
+    setTimeout(function () {
+      const t = $('#result').text();
+      resolve((t && !/rank/i.test(t)) || 'Error: show the server message in #result (try a blank name)');
+    }, 1300);
+  }, 1300);
+});
+    </script>
+    <script type="text/plain" data-pane="hint">Success: <code>$("#result").text("Saved! You are rank " + data.rank)</code>. In <code>error</code> the parsed JSON body is <code>xhr.responseJSON</code>, so the message is <code>xhr.responseJSON.error</code>.</script>
+  </div>
+
+  <div class="tasks"><b>Exercise 4.3c · when things go wrong</b> Networks fail. This endpoint returns HTTP 500. Add an <code>error</code> callback that shows <code>Error 500</code> in <code>#status</code>.</div>
+  <div class="pg" data-id="s4-error" data-title="Exercise 4.3c · error callback" data-libs="jquery" data-h="110" data-wait="400">
+    <script type="text/plain" data-pane="html">
+<button id="go">Load broken endpoint</button>
+<p id="status"></p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$("#go").on("click", function () {
+  $("#status").text("Loading…");
+  $.ajax({
+    url: "/api/broken",
+    type: "GET",
+    success: function (data) {
+      $("#status").text("Loaded!");
+    }
+    // TODO: add  error: function (xhr) { ... }  and show "Error 500: Server exploded"
+    //       xhr.status and xhr.responseJSON.error are handy
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$("#go").on("click", function () {
+  $("#status").text("Loading…");
+  $.ajax({
+    url: "/api/broken",
+    type: "GET",
+    success: function (data) {
+      $("#status").text("Loaded!");
+    },
+    error: function (xhr) {
+      $("#status").text("Error " + xhr.status + ": " + xhr.responseJSON.error);
+    }
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+$('#go').click();
+return new Promise(function (resolve) {
+  setTimeout(function () {
+    resolve(/500/.test($('#status').text()) || 'The #status text should mention the 500 status');
+  }, 1300);
+});
+    </script>
+    <script type="text/plain" data-pane="hint">Add a comma after the <code>success</code> function, then <code>error: function (xhr) { $("#status").text("Error " + xhr.status); }</code></script>
+  </div>
+
+  <h4>Same request, three styles</h4>
+  <p>Modern JavaScript also has <code>fetch</code> and <code>async/await</code>. They do the same job; you will meet all three in the wild. Run it and read the order of the output.</p>
+  <div class="pg" data-id="s4-fetch" data-title="jQuery vs fetch vs async/await" data-libs="jquery" data-h="0" data-wait="900">
+    <script type="text/plain" data-pane="js">
+// 1. jQuery
+$.getJSON("/api/scores", { limit: 3 }, function (data) {
+  console.log("jQuery :", data.scores.map((s) => s.name));
+});
+
+// 2. fetch + promises
+fetch("/api/scores?limit=3")
+  .then((res) => res.json())
+  .then((data) => console.log("fetch  :", data.scores.map((s) => s.name)));
+
+// 3. async / await: looks like normal top-to-bottom code
+async function main() {
+  const res = await fetch("/api/scores?limit=3");
+  const data = await res.json();
+  console.log("async  :", data.scores.map((s) => s.name));
+}
+main();
+
+console.log("this prints FIRST: requests are asynchronous");
+    </script>
+  </div>
+
+  <h4>A real public API</h4>
+  <p>This one leaves the page and calls a public server. It needs internet, and works only because that server explicitly allows other websites to read its answers (<b>CORS</b>). The <code>ajax_demo.html</code> from the seminar, which loads Wikipedia, fails for the opposite reason: the browser's same-origin policy blocks reading another site's response unless that site opts in. Your own Flask server is same-origin, so it just works.</p>
+  <div class="pg" data-id="s4-real" data-title="A real API (needs internet)" data-libs="jquery" data-h="190">
+    <script type="text/plain" data-pane="html">
+<ul id="users"><li>Loading…</li></ul>
+    </script>
+    <script type="text/plain" data-pane="js">
+$.getJSON("https://jsonplaceholder.typicode.com/users")
+  .done(function (users) {
+    $("#users").empty();
+    users.slice(0, 5).forEach(function (u) {
+      $("<li>").text(u.name + " — " + u.email).appendTo("#users");
+    });
+  })
+  .fail(function () {
+    $("#users").text("Request failed (offline, or blocked by the server's CORS policy)");
+  });
+    </script>
+  </div>
+
+  <h3>4.4 The game gets a memory</h3>
+  <p>Now combine everything. When the round ends the game <b>POSTs the score as JSON</b> (<code>JSON.stringify</code> + <code>contentType</code>) and then <b>GETs the leaderboard</b> to redraw it. Type a name, play a round, and watch the blue network lines in the console.</p>
+  <div class="pg" data-id="s4-game" data-title="Whack-a-Mole · jQuery + AJAX leaderboard" data-libs="jquery" data-css="game" data-h="440" data-auto="1" data-nocheck="1">
+    <script type="text/plain" data-pane="html">
+<style>.wrap{display:flex;gap:28px;flex-wrap:wrap}#lb{margin:0;padding-left:22px;min-width:150px}</style>
+<div class="hud">
+  <span>Score: <b id="score">0</b></span>
+  <span>Time: <b id="time">30</b>s</span>
+  <input id="player" value="Student" size="10" aria-label="Your name">
+  <button id="start">Start</button>
+</div>
+<div class="wrap">
+  <div id="board"></div>
+  <div><b>🏆 Top 5</b><ol id="lb"></ol></div>
+</div>
+<p id="msg">Enter your name, press Start.</p>
+    </script>
+    <script type="text/plain" data-pane="js">
+$(function () {
+  const HOLES = 9, ROUND_SECONDS = 30, MOLE_MS = 800;
+  const game = { score: 0, timeLeft: ROUND_SECONDS, moleAt: -1, running: false };
+  let moleTimer, clockTimer;
+
+  for (let i = 0; i < HOLES; i++) $("<div>").addClass("hole").appendTo("#board");
+
+  function showMole() {
+    $(".hole").removeClass("mole");
+    game.moleAt = Math.floor(Math.random() * HOLES);
+    $(".hole").eq(game.moleAt).addClass("mole");
+  }
+  function render() {
+    $("#score").text(game.score);
+    $("#time").text(game.timeLeft);
+  }
+
+  // ---- AJAX ---------------------------------------------------------
+  function loadLeaderboard() {                     // GET  -> draw the list
+    $.ajax({
+      url: "/api/scores",
+      type: "GET",
+      data: { limit: 5 },
+      dataType: "json",
+      success: function (data) {
+        $("#lb").empty();
+        data.scores.forEach(function (s) {
+          $("<li>").text(s.name + " – " + s.score).appendTo("#lb");
+        });
+      }
+    });
+  }
+
+  function saveScore() {                           // POST -> save, then refresh
+    $.ajax({
+      url: "/api/scores",
+      type: "POST",
+      contentType: "application/json",             // we are sending JSON, not a form
+      data: JSON.stringify({ name: $("#player").val(), score: game.score }),
+      success: function (data) {
+        $("#msg").text("Time's up! Score " + game.score + ". You are rank " + data.rank + "!");
+        loadLeaderboard();
+      },
+      error: function (xhr) {
+        const e = xhr.responseJSON && xhr.responseJSON.error;
+        $("#msg").text("Could not save: " + (e || "network error"));
+      }
+    });
+  }
+
+  // ---- game flow ----------------------------------------------------
+  function startGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.score = 0;
+    game.timeLeft = ROUND_SECONDS;
+    game.running = true;
+    $("#msg").text("Go go go!");
+    render();
+    showMole();
+    moleTimer = setInterval(showMole, MOLE_MS);
+    clockTimer = setInterval(tick, 1000);
+  }
+  function tick() {
+    game.timeLeft--;
+    render();
+    if (game.timeLeft <= 0) endGame();
+  }
+  function endGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.running = false;
+    game.moleAt = -1;
+    $(".hole").removeClass("mole");
+    saveScore();
+  }
+
+  $("#board").on("click", ".hole", function () {
+    if (!game.running) return;
+    if ($(this).index() === game.moleAt) {
+      game.score++;
+      game.moleAt = -1;
+      $(".hole").removeClass("mole");
+      render();
+    }
+  });
+  $("#start").on("click", startGame);
+
+  loadLeaderboard();
+});
+    </script>
+  </div>
+  <div class="tasks"><b>Challenges</b>
+    <ul><li>Skip saving when the score is 0.</li>
+    <li>Show a "🎉 New record!" message when <code>data.rank === 1</code>.</li>
+    <li>Add a <b>Reset leaderboard</b> button that sends <code>type: "DELETE"</code> to <code>/api/scores</code>, then reloads the list.</li></ul></div>
+
+  <h4>Quick check</h4>
+  <div class="quiz" data-quiz="ajax"></div>
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section id="s5">
+  <h2><span class="num">5</span>Chart.js: turn data into pictures</h2>
+  <p class="sub">Chart.js draws charts on an HTML <code>&lt;canvas&gt;</code>. You describe <i>what</i> to draw (type, labels, numbers) as a plain object, and it handles axes, colours, animation and responsiveness.</p>
+
+  <h3>5.1 Six steps to a chart</h3>
+  <ol>
+    <li>Put a <b>canvas</b> in your HTML: <code>&lt;canvas id="myChart"&gt;&lt;/canvas&gt;</code></li>
+    <li>Load the <b>library</b>: <code>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</code></li>
+    <li>Prepare <code>labels</code> (the x-axis, a list of strings), <code>datasets</code> (a list of objects, each with a <code>label</code> and a list of numbers in <code>data</code>) and <code>options</code>.</li>
+    <li>Get the canvas element.</li>
+    <li>Call <code>new Chart(canvas, { type, data: { labels, datasets }, options })</code>.</li>
+  </ol>
+  <p>Python parallel: this is a <code>plt.bar(labels, values)</code> in matplotlib, except the "figure" is described as a dict and drawn live in the page, so it is interactive (hover for tooltips) and you can feed it from AJAX.</p>
+  <table class="xl scroll">
+    <tr><th>type</th><th>Use it for</th><th>Extra you will want</th></tr>
+    <tr><td><code>"bar"</code></td><td>compare categories (best score per player)</td><td><code>options.scales.y.beginAtZero: true</code></td></tr>
+    <tr><td><code>"line"</code></td><td>change over time (score per game)</td><td><code>tension: 0.3</code> smooths the line, <code>fill: true</code> shades under it</td></tr>
+    <tr><td><code>"pie"</code>, <code>"doughnut"</code></td><td>parts of a whole</td><td>give <code>backgroundColor</code> as an <i>array</i>, one colour per slice</td></tr>
+    <tr><td><code>"scatter"</code>, <code>"radar"</code></td><td>x/y points; compare several measures</td><td>scatter data is <code>[{x, y}, ...]</code></td></tr>
+  </table>
+
+  <div class="tasks"><b>Exercise 5.1</b>
+    <ol><li>Run the bar chart. Hover over a bar.</li>
+    <li>Change <code>type</code> to <code>"line"</code>. Then try <code>"pie"</code> and <code>"doughnut"</code> and see what each does with the same data. End on <code>"line"</code>.</li>
+    <li>Add a second dataset: <code>label: "# of Spoiled Votes"</code>, <code>data: [2, 5, 0, 1, 0, 1]</code>.</li></ol></div>
+  <div class="pg" data-id="s5-bar" data-title="Exercise 5.1 · your first chart" data-libs="chart" data-h="360">
+    <script type="text/plain" data-pane="html">
+<div style="max-width:520px"><canvas id="myChart"></canvas></div>
+    </script>
+    <script type="text/plain" data-pane="js">
+const labels = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
+
+const datasets = [{
+  label: "# of Votes",
+  data: [12, 19, 3, 5, 2, 3],
+  borderWidth: 1
+}];
+
+const options = {
+  scales: { y: { beginAtZero: true } }
+};
+
+const ctx = document.getElementById("myChart");
+
+new Chart(ctx, {
+  type: "bar",
+  data: { labels: labels, datasets: datasets },
+  options: options
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+const labels = ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"];
+
+const datasets = [{
+  label: "# of Votes",
+  data: [12, 19, 3, 5, 2, 3],
+  borderWidth: 1
+}, {
+  label: "# of Spoiled Votes",
+  data: [2, 5, 0, 1, 0, 1],
+  borderWidth: 1
+}];
+
+const options = {
+  scales: { y: { beginAtZero: true } }
+};
+
+const ctx = document.getElementById("myChart");
+
+new Chart(ctx, {
+  type: "line",
+  data: { labels: labels, datasets: datasets },
+  options: options
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+const c = Chart.getChart('myChart');
+if (!c) return 'No chart found on #myChart. Did the script throw an error?';
+if (c.config.type !== 'line') return 'Change the chart type to "line"';
+return c.data.datasets.length === 2 || 'Add a second dataset: "# of Spoiled Votes" with [2, 5, 0, 1, 0, 1]';
+    </script>
+    <script type="text/plain" data-pane="hint">The <code>datasets</code> array holds <i>objects</i>. Add a comma after the first <code>{ ... }</code> and write a second one with its own <code>label</code> and <code>data</code>.</script>
+  </div>
+
+  <h3>5.2 Chart + AJAX = a live dashboard</h3>
+  <p>This is the pattern from the seminar's BMI dashboard: the server computes the numbers and replies with JSON (<code>jsonify({"chartDim": ..., "labels": ...})</code>), and the browser feeds them into Chart.js. Create the chart <b>inside</b> <code>success</code>, because that is the first moment the data exists.</p>
+  <div class="tasks"><b>Exercise 5.2a · bar chart from the server</b> Draw "Best" and "Average" score per player from <code>/api/summary</code>.</div>
+  <div class="pg" data-id="s5-ajax" data-title="Exercise 5.2a · chart from /api/summary" data-libs="jquery chart" data-h="360" data-wait="1600">
+    <script type="text/plain" data-pane="html">
+<div style="max-width:560px"><canvas id="scoreChart"></canvas></div>
+    </script>
+    <script type="text/plain" data-pane="js">
+$.ajax({
+  url: "/api/summary",
+  type: "GET",
+  dataType: "json",
+  success: function (data) {
+    console.log(data);   // { labels: [...], best: [...], average: [...], games: [...] }
+
+    // TODO: draw a "bar" chart on #scoreChart
+    //   labels    -> data.labels   (the player names)
+    //   dataset 1 -> label "Best score",    data: data.best
+    //   dataset 2 -> label "Average score", data: data.average
+  }
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$.ajax({
+  url: "/api/summary",
+  type: "GET",
+  dataType: "json",
+  success: function (data) {
+    console.log(data);
+
+    new Chart(document.getElementById("scoreChart"), {
+      type: "bar",
+      data: {
+        labels: data.labels,
+        datasets: [
+          { label: "Best score", data: data.best },
+          { label: "Average score", data: data.average }
+        ]
+      },
+      options: { scales: { y: { beginAtZero: true } } }
+    });
+  }
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+return new Promise(function (resolve) {
+  setTimeout(function () {
+    const c = Chart.getChart('scoreChart');
+    if (!c) return resolve('No chart yet. Create it inside success(), after the data arrives.');
+    resolve((c.data.datasets.length === 2 && c.data.labels.length >= 3) || 'Needs 2 datasets and the player names (data.labels) as labels');
+  }, 500);
+});
+    </script>
+    <script type="text/plain" data-pane="hint">It is the same <code>new Chart(...)</code> as 5.1, but <code>labels: data.labels</code> and each dataset's <code>data:</code> comes from the server's reply.</script>
+  </div>
+
+  <div class="tasks"><b>Exercise 5.2b · your turn: score history</b> <code>/api/history</code> returns <code>{ labels: ["#1", "#2", …], scores: [14, 9, …] }</code>. Draw a <b>line</b> chart of every game played, in order. Play a few rounds of the game in Section 4 first, then see your scores appear on the end.</div>
+  <div class="pg" data-id="s5-line" data-title="Exercise 5.2b · line chart" data-libs="jquery chart" data-h="360" data-wait="1600">
+    <script type="text/plain" data-pane="html">
+<div style="max-width:620px"><canvas id="lineChart"></canvas></div>
+    </script>
+    <script type="text/plain" data-pane="js">
+$.getJSON("/api/history", function (data) {
+  console.log(data);
+  // TODO: new Chart(document.getElementById("lineChart"), { type: "line", data: {...} })
+  //   labels   -> data.labels
+  //   datasets -> one dataset: label "Score per game", data: data.scores
+  //   bonus    -> tension: 0.3 in the dataset for a smooth curve
+});
+    </script>
+    <script type="text/plain" data-pane="solution">
+$.getJSON("/api/history", function (data) {
+  console.log(data);
+  new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [{ label: "Score per game", data: data.scores, tension: 0.3 }]
+    },
+    options: { scales: { y: { beginAtZero: true } } }
+  });
+});
+    </script>
+    <script type="text/plain" data-pane="check">
+return new Promise(function (resolve) {
+  setTimeout(function () {
+    const c = Chart.getChart('lineChart');
+    if (!c) return resolve('No chart yet. Create it inside the getJSON callback.');
+    if (c.config.type !== 'line') return resolve('Use type: "line"');
+    resolve((c.data.datasets.length === 1 && c.data.labels.length >= 5) || 'One dataset, with data.labels as labels and data.scores as data');
+  }, 500);
+});
+    </script>
+    <script type="text/plain" data-pane="hint">Dataset: <code>{ label: "Score per game", data: data.scores }</code>. Chart config: <code>data: { labels: data.labels, datasets: [ ... ] }</code></script>
+  </div>
+</section>
+
+<!-- ===================== SECTION 6 ===================== -->
+<section id="s6">
+  <h2><span class="num">6</span>Putting it together: the Mole Arcade</h2>
+  <p class="sub">Everything you have learned in one page: a jQuery game, an AJAX leaderboard, and two Chart.js charts that redraw after every round. It is also the shape of a real front-end task: <b>state → events → AJAX → render</b>.</p>
+  <div class="flow">
+    <div class="col"><h4>What happens in one round</h4>
+      <ol><li>Page loads → <code>loadDashboard()</code> does three GETs</li><li>Click Start → timers move the mole (DOM + jQuery)</li><li>Time up → <code>POST /api/scores</code></li><li>Reply arrives → <code>loadDashboard()</code> again</li><li>Charts are destroyed and redrawn with fresh data</li></ol></div>
+    <div class="col"><h4>Run it for real with Flask</h4>
+      <p style="font-size:14.5px;margin:0">Put this HTML in <code>templates/arcade.html</code> and the JavaScript in <code>static/arcade.js</code>. Add the three routes (<code>/api/scores</code>, <code>/api/summary</code>, <code>/api/history</code>) using <code>jsonify</code>, as in Section 4. The JavaScript does not change at all.</p></div>
+  </div>
+  <div class="pg" data-id="s6-capstone" data-title="Mole Arcade · jQuery + AJAX + Chart.js" data-libs="jquery chart" data-css="game" data-h="860" data-auto="1" data-nocheck="1">
+    <script type="text/plain" data-pane="html">
+<style>
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.grow{flex:1 1 200px;min-width:200px}
+#lb{margin:4px 0;padding-left:22px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:16px}
+</style>
+<div class="row">
+  <div>
+    <div class="hud">
+      <span>Score: <b id="score">0</b></span>
+      <span>Time: <b id="time">30</b>s</span>
+      <input id="player" value="Student" size="9" aria-label="Your name">
+      <button id="start">Start</button>
+    </div>
+    <div id="board"></div>
+    <p id="msg">Enter your name and press Start.</p>
+  </div>
+  <div class="grow"><b>🏆 Top 5</b><ol id="lb"></ol></div>
+</div>
+<div class="charts">
+  <div><canvas id="barChart"></canvas></div>
+  <div><canvas id="lineChart"></canvas></div>
+</div>
+    </script>
+    <script type="text/plain" data-pane="js">
+$(function () {
+  const HOLES = 9, ROUND_SECONDS = 30, MOLE_MS = 800;
+  const game = { score: 0, timeLeft: ROUND_SECONDS, moleAt: -1, running: false };
+  let moleTimer, clockTimer, barChart, lineChart;
+
+  // ---------- board ----------
+  for (let i = 0; i < HOLES; i++) $("<div>").addClass("hole").appendTo("#board");
+
+  function showMole() {
+    $(".hole").removeClass("mole");
+    game.moleAt = Math.floor(Math.random() * HOLES);
+    $(".hole").eq(game.moleAt).addClass("mole");
+  }
+  function render() {
+    $("#score").text(game.score);
+    $("#time").text(game.timeLeft);
+  }
+
+  // ---------- dashboard: three GET requests ----------
+  function loadDashboard() {
+    $.getJSON("/api/scores", { limit: 5 }, function (data) {
+      $("#lb").empty();
+      data.scores.forEach(function (s) {
+        $("<li>").text(s.name + " – " + s.score).appendTo("#lb");
+      });
+    });
+
+    $.getJSON("/api/summary", function (data) {
+      if (barChart) barChart.destroy();
+      barChart = new Chart($("#barChart")[0], {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [
+            { label: "Best", data: data.best },
+            { label: "Average", data: data.average }
+          ]
+        },
+        options: {
+          plugins: { title: { display: true, text: "Best vs average per player" } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    });
+
+    $.getJSON("/api/history", function (data) {
+      if (lineChart) lineChart.destroy();
+      lineChart = new Chart($("#lineChart")[0], {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: [{ label: "Score", data: data.scores, tension: 0.3 }]
+        },
+        options: {
+          plugins: { title: { display: true, text: "Every game, oldest to newest" } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    });
+  }
+
+  // ---------- save a score: POST, then refresh everything ----------
+  function saveScore() {
+    $.ajax({
+      url: "/api/scores",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ name: $("#player").val(), score: game.score }),
+      success: function (data) {
+        $("#msg").text("Score " + game.score + " saved. You are rank " + data.rank + "!");
+        loadDashboard();
+      },
+      error: function (xhr) {
+        const e = xhr.responseJSON && xhr.responseJSON.error;
+        $("#msg").text("Could not save: " + (e || "network error"));
+      }
+    });
+  }
+
+  // ---------- game flow ----------
+  function startGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.score = 0;
+    game.timeLeft = ROUND_SECONDS;
+    game.running = true;
+    $("#msg").text("Go go go!");
+    render();
+    showMole();
+    moleTimer = setInterval(showMole, MOLE_MS);
+    clockTimer = setInterval(tick, 1000);
+  }
+  function tick() {
+    game.timeLeft--;
+    render();
+    if (game.timeLeft <= 0) endGame();
+  }
+  function endGame() {
+    clearInterval(moleTimer);
+    clearInterval(clockTimer);
+    game.running = false;
+    game.moleAt = -1;
+    $(".hole").removeClass("mole");
+    saveScore();
+  }
+
+  $("#board").on("click", ".hole", function () {
+    if (!game.running) return;
+    if ($(this).index() === game.moleAt) {
+      game.score++;
+      game.moleAt = -1;
+      $(".hole").removeClass("mole");
+      render();
+    }
+  });
+  $("#start").on("click", startGame);
+
+  loadDashboard();
+});
+    </script>
+  </div>
+  <div class="tasks"><b>Level up (pick any)</b>
+    <ul>
+      <li><b>Easy:</b> change the chart colours with <code>backgroundColor: "#e4572e"</code> and <code>borderColor</code> in a dataset.</li>
+      <li><b>Easy:</b> show the player's own best score in <code>#msg</code> by filtering <code>data.scores</code> in <code>saveScore</code>'s success handler.</li>
+      <li><b>Medium:</b> add a <code>&lt;select id="level"&gt;</code> (Easy / Normal / Hard) that changes <code>MOLE_MS</code>, and send <code>level</code> along with the score.</li>
+      <li><b>Medium:</b> turn the line chart into a <code>"bar"</code> chart of the last 10 games only (<code>data.scores.slice(-10)</code>).</li>
+      <li><b>Hard:</b> a pie chart of "games per player" using <code>data.games</code> from <code>/api/summary</code>.</li>
+    </ul></div>
+  <div class="callout tip"><b>Reset the demo data</b>Scores live in your browser's storage so they survive a refresh. <button class="btn" id="reset-db" type="button">Reset scores to the starting data</button> <span id="reset-note" style="color:var(--muted);font-size:14px"></span></div>
+</section>
+
+<!-- ===================== SECTION 7 ===================== -->
+<section id="s7">
+  <h2><span class="num">7</span>Cheat sheet &amp; your lab</h2>
+  <p class="sub">Keep this page open while you work on the lab and the project.</p>
+
+  <h3>The whole seminar on one screen</h3>
+  <div class="scroll"><table class="xl">
+    <tr><th>You want to…</th><th>JavaScript</th><th>jQuery</th></tr>
+    <tr><td>find elements</td><td><code data-hl="js">document.querySelector("#a")
+document.querySelectorAll(".b")</code></td><td><code data-hl="js">$("#a")   $(".b")</code></td></tr>
+    <tr><td>read / write text</td><td><code data-hl="js">el.textContent = "x"</code></td><td><code data-hl="js">$(el).text("x")   $(el).text()</code></td></tr>
+    <tr><td>read an input</td><td><code data-hl="js">input.value</code></td><td><code data-hl="js">$("#in").val()</code></td></tr>
+    <tr><td>switch a style</td><td><code data-hl="js">el.classList.toggle("on")</code></td><td><code data-hl="js">$(el).toggleClass("on")</code></td></tr>
+    <tr><td>create &amp; add</td><td><code data-hl="js">createElement + appendChild</code></td><td><code data-hl="js">$("&lt;li&gt;").text(t).appendTo("#ul")</code></td></tr>
+    <tr><td>react to a click</td><td><code data-hl="js">el.addEventListener("click", fn)</code></td><td><code data-hl="js">$(el).on("click", fn)
+$("#ul").on("click", "li", fn)</code></td></tr>
+    <tr><td>call the server</td><td><code data-hl="js">fetch(url).then(r =&gt; r.json())</code></td><td><code data-hl="js">$.ajax({ url, type, data, success, error })</code></td></tr>
+    <tr><td>JSON ↔ object</td><td colspan="2"><code data-hl="js">JSON.parse(text)   JSON.stringify(obj)</code>   (Python: <code data-hl="py">json.loads / json.dumps</code>, Flask: <code data-hl="py">jsonify</code>)</td></tr>
+    <tr><td>draw a chart</td><td colspan="2"><code data-hl="js">new Chart(canvas, { type, data: { labels, datasets }, options })</code></td></tr>
+  </table></div>
+
+  <h3>Debugging checklist</h3>
+  <ol>
+    <li>Press <code>F12</code> → <b>Console</b>. Read the <b>first</b> red error; the rest are usually side effects.</li>
+    <li><code>x is not defined</code> / <code>$ is not defined</code>: a typo, a missing <code>&lt;script src&gt;</code>, or the library loads <i>after</i> your code.</li>
+    <li><code>Cannot read properties of null</code>: your selector found nothing (wrong id? script runs before the element exists?).</li>
+    <li>Nothing happens on click: <code>console.log("clicked")</code> inside the handler to prove it runs.</li>
+    <li>AJAX shows <code>undefined</code>: you are using the data outside the callback.</li>
+    <li><b>Network</b> tab: is the request sent? What status? What does the response look like?</li>
+  </ol>
+
+  <h3>Where this goes next: your lab</h3>
+  <p>The lab applies exactly these tools to your Flask project:</p>
+  <ul>
+    <li><b>Package search.</b> Two inputs for a lower and an upper price. On click, <code>$.ajax</code> POSTs them to a Flask route that queries MongoDB and returns <code>jsonify(...)</code>. In <code>success</code>, build the result cards on the client (client-side rendering, like 4.3a). Handle the empty result and the error case.</li>
+    <li><b>BMI dashboard.</b> POST weight and height, show the BMI and category on the page without a reload (like 4.3b), and draw the user's history with Chart.js from <code>chartDim</code> and <code>labels</code> (like 5.2).</li>
+  </ul>
+
+  <h3>I can…</h3>
+  <ul style="list-style:none;padding-left:0">
+    <li><label><input type="checkbox"> translate a Python list, dict, loop and function into JavaScript</label></li>
+    <li><label><input type="checkbox"> explain why JavaScript uses callbacks instead of waiting</label></li>
+    <li><label><input type="checkbox"> select, change, create and remove DOM elements (plain and jQuery)</label></li>
+    <li><label><input type="checkbox"> attach events, including delegated events for elements added later</label></li>
+    <li><label><input type="checkbox"> send and receive JSON with <code>$.ajax</code> and render it on the client</label></li>
+    <li><label><input type="checkbox"> draw a bar and a line chart from server data</label></li>
+  </ul>
+
+  <h3>Keep reading</h3>
+  <ul>
+    <li><a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript">MDN: Learn JavaScript</a> (first steps, building blocks, objects, asynchronous JS, client-side web APIs)</li>
+    <li><a href="https://www.w3schools.com/js/default.asp">W3Schools JavaScript</a> · <a href="https://www.w3schools.com/jquery/">W3Schools jQuery</a> · <a href="https://api.jquery.com/">jQuery API reference</a></li>
+    <li><a href="https://www.chartjs.org/docs/latest/">Chart.js documentation</a> · <a href="https://javascript.info/bubbling-and-capturing">javascript.info: event bubbling</a></li>
+  </ul>
+  <footer>ICT239 Web Programming · Seminar 5 · Front-end development: JavaScript, jQuery, AJAX, Chart.js</footer>
+</section>
+</main>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ================= tiny helpers ================= */
+const qs = (s, r = document) => r.querySelector(s);
+const qsa = (s, r = document) => Array.from(r.querySelectorAll(s));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode: ignore */ } }
+};
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function dedent(t) {
+  t = t.replace(/^\s*\n/, '').replace(/\s+$/, '');
+  const lines = t.split('\n');
+  const ind = Math.min.apply(null, lines.filter(l => l.trim()).map(l => l.match(/^ */)[0].length));
+  return ind > 0 && isFinite(ind) ? lines.map(l => l.slice(ind)).join('\n') : t;
+}
+
+/* ================= syntax highlighting ================= */
+const RX = {
+  js: /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|(`(?:\\[\s\S]|[^`\\])*`|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*")|\b(\d+(?:\.\d+)?)\b|\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|new|class|this|typeof|of|in|true|false|null|undefined|async|await|try|catch|throw|default|delete)\b/g,
+  py: /(#[^\n]*)|("""[\s\S]*?"""|'''[\s\S]*?'''|f?"(?:\\.|[^"\\\n])*"|f?'(?:\\.|[^'\\\n])*')|\b(\d+(?:\.\d+)?)\b|\b(def|return|if|elif|else|for|while|in|import|from|as|class|lambda|True|False|None|and|or|not|try|except|with|pass|break|continue|is)\b/g
+};
+function hl(code, lang) {
+  if (lang === 'html') {
+    return code.split(/(<!--[\s\S]*?-->|<\/?[a-zA-Z][^>]*>)/).map(function (seg) {
+      if (seg.startsWith('<!--')) return '<span class="tk-c">' + esc(seg) + '</span>';
+      if (/^<\/?[a-zA-Z]/.test(seg)) {
+        return esc(seg)
+          .replace(/("[^"]*"|'[^']*')/g, '<span class="tk-s">$1</span>')
+          .replace(/^(&lt;\/?[\w-]+)/, '<span class="tk-t">$1</span>');
+      }
+      return esc(seg);
+    }).join('');
+  }
+  const rx = RX[lang];
+  if (!rx) return esc(code);
+  rx.lastIndex = 0;
+  let out = '', last = 0, m;
+  while ((m = rx.exec(code))) {
+    out += esc(code.slice(last, m.index));
+    const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k';
+    out += '<span class="tk-' + cls + '">' + esc(m[0]) + '</span>';
+    last = rx.lastIndex;
+  }
+  return out + esc(code.slice(last));
+}
+
+/* ================= the pretend server (lives in this page) ================= */
+const DB_KEY = 'ict239.seminar5.scores.v1';
+let memDb = null;
+function seedScores() {
+  const rows = [['Ann', 14], ['Ben', 9], ['Cara', 17], ['Dev', 12], ['Eli', 20], ['Ann', 18], ['Ben', 13], ['Cara', 22], ['Dev', 15], ['Eli', 19], ['Ann', 23], ['Ben', 16]];
+  return rows.map(function (p, i) {
+    return { id: i + 1, name: p[0], score: p[1], date: new Date(Date.now() - (rows.length - i) * 864e5).toISOString().slice(0, 10) };
+  });
+}
+function db() {
+  if (!memDb) {
+    memDb = store.get(DB_KEY, null);
+    if (!Array.isArray(memDb)) memDb = seedScores();
+  }
+  return memDb;
+}
+function saveDb() { store.set(DB_KEY, memDb); }
+
+function handleApi(req) {
+  let u;
+  try { u = new URL(req.url, 'http://server.local'); } catch (e) { return { status: 400, body: { error: 'Bad URL' } }; }
+  const path = u.pathname, m = (req.method || 'GET').toUpperCase(), rows = db();
+  const reply = (body, status) => ({ status: status || 200, body: body });
+
+  if (path === '/api/scores' && m === 'GET') {
+    const limit = parseInt(u.searchParams.get('limit') || '', 10);
+    const sorted = rows.slice().sort((a, b) => b.score - a.score || a.id - b.id);
+    return reply({ scores: limit > 0 ? sorted.slice(0, limit) : sorted, count: rows.length });
+  }
+  if (path === '/api/scores' && m === 'POST') {
+    let data = {};
+    try {
+      if (req.body) data = /json/i.test(req.ct || '') ? JSON.parse(req.body) : Object.fromEntries(new URLSearchParams(req.body));
+    } catch (e) { return reply({ error: 'Malformed request body' }, 400); }
+    const name = String(data.name == null ? '' : data.name).trim();
+    const score = Number(data.score);
+    if (!name) return reply({ error: 'Name is required' }, 400);
+    if (name.length > 12) return reply({ error: 'Name must be 12 characters or fewer' }, 400);
+    if (data.score === '' || data.score == null || !Number.isInteger(score) || score < 0) return reply({ error: 'Score must be a whole number, 0 or more' }, 400);
+    const rec = { id: Math.max(0, ...rows.map(r => r.id)) + 1, name: name, score: score, date: new Date().toISOString().slice(0, 10) };
+    const rank = 1 + rows.filter(r => r.score > score).length;
+    if (!name.startsWith('__test')) { rows.push(rec); saveDb(); }   // __test names: used by the auto-checks, never stored
+    return reply({ ok: true, rank: rank, saved: rec });
+  }
+  if (path === '/api/scores' && m === 'DELETE') { memDb = seedScores(); saveDb(); return reply({ ok: true }); }
+  if (path === '/api/summary' && m === 'GET') {
+    const by = new Map();
+    rows.slice().sort((a, b) => a.id - b.id).forEach(function (r) {
+      if (!by.has(r.name)) by.set(r.name, []);
+      by.get(r.name).push(r.score);
+    });
+    const labels = Array.from(by.keys());
+    return reply({
+      labels: labels,
+      best: labels.map(n => Math.max.apply(null, by.get(n))),
+      average: labels.map(n => Math.round(by.get(n).reduce((a, b) => a + b, 0) / by.get(n).length * 10) / 10),
+      games: labels.map(n => by.get(n).length)
+    });
+  }
+  if (path === '/api/history' && m === 'GET') {
+    const chron = rows.slice().sort((a, b) => a.id - b.id);
+    const start = Math.max(0, chron.length - 30);
+    const part = chron.slice(start);
+    return reply({ labels: part.map((r, i) => '#' + (start + i + 1)), scores: part.map(r => r.score) });
+  }
+  if (path === '/api/broken') return reply({ error: 'Server exploded' }, 500);
+  return reply({ error: 'Not found: ' + m + ' ' + path }, 404);
+}
+
+/* ================= code that runs INSIDE each sandbox frame ================= */
+function preludeFn(cfg) {
+  var logs = window.__logs = [];
+  function ins(v, d) {
+    var t = typeof v;
+    if (t === 'string') return d ? "'" + v + "'" : v;
+    if (v === null || t === 'undefined' || t === 'number' || t === 'boolean' || t === 'bigint' || t === 'symbol') return String(v);
+    if (t === 'function') return '[Function' + (v.name ? ': ' + v.name : '') + ']';
+    if (d > 4) return '…';
+    if (v instanceof Error) return v.name + ': ' + v.message;
+    if (v instanceof Date) return isNaN(v) ? 'Invalid Date' : v.toISOString();
+    if (window.jQuery && v instanceof window.jQuery) return 'jQuery(' + v.length + ')';
+    if (typeof Node !== 'undefined' && v instanceof Node) return '<' + (v.nodeName || '').toLowerCase() + (v.id ? '#' + v.id : '') + '>';
+    if (Array.isArray(v)) return '[' + v.map(function (x) { return ins(x, d + 1); }).join(', ') + ']';
+    if (v instanceof Set) return 'Set(' + v.size + ') { ' + Array.from(v).map(function (x) { return ins(x, d + 1); }).join(', ') + ' }';
+    if (v instanceof Map) return 'Map(' + v.size + ') { ' + Array.from(v).map(function (kv) { return ins(kv[0], d + 1) + ' => ' + ins(kv[1], d + 1); }).join(', ') + ' }';
+    var keys = Object.keys(v);
+    if (!keys.length) return '{}';
+    return '{ ' + keys.map(function (k) { return k + ': ' + ins(v[k], d + 1); }).join(', ') + ' }';
+  }
+  function post(m) { m.__pg = cfg.id; m.run = cfg.run; try { parent.postMessage(m, '*'); } catch (e) { /* ignore */ } }
+  function out(level, args) {
+    var t;
+    try { t = Array.prototype.map.call(args, function (a) { return ins(a, 0); }).join(' '); } catch (e) { t = String(args[0]); }
+    if (level === 'log' || level === 'info') logs.push(t);
+    post({ type: 'log', level: level, text: t });
+  }
+  ['log', 'info', 'warn', 'error', 'debug'].forEach(function (k) {
+    var orig = console[k];
+    console[k] = function () {
+      out(k === 'debug' ? 'log' : k, arguments);
+      try { orig.apply(console, arguments); } catch (e) { /* ignore */ }
+    };
+  });
+  console.table = function (x) { out('log', [x]); };
+  window.alert = function (m) { out('log', ['[alert] ' + m]); };
+  window.confirm = function (m) { out('log', ['[confirm] ' + m]); return true; };
+  window.prompt = function (m, d) { out('log', ['[prompt] ' + m]); return d == null ? 'Student' : d; };
+  window.addEventListener('error', function (e) {
+    var where = (e.lineno && !/^https?:/.test(e.filename || '')) ? ' (line ' + Math.max(1, e.lineno - cfg.offset) + ')' : '';
+    out('error', [(e.message || 'Error') + where]);
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    out('error', ['Unhandled promise error: ' + (e.reason && e.reason.message || e.reason)]);
+  });
+
+  /* pretend network: forward /api/... to the parent page */
+  var seq = 0, pending = {};
+  function apiCall(method, url, body, ct) {
+    return new Promise(function (resolve) {
+      var id = ++seq; pending[id] = resolve;
+      post({ type: 'api', id: id, method: method, url: url, body: body == null ? null : String(body), ct: ct || '' });
+    });
+  }
+  if (window.jQuery) {
+    window.jQuery.ajaxTransport('+*', function (opts) {
+      if (!/^\/api\//.test(opts.url)) return;
+      var aborted = false;
+      return {
+        send: function (headers, complete) {
+          apiCall(opts.type, opts.url, opts.data, opts.contentType).then(function (r) {
+            if (aborted) return;
+            complete(r.status, r.status < 400 ? 'OK' : 'Error', { text: JSON.stringify(r.body) }, 'Content-Type: application/json');
+          });
+        },
+        abort: function () { aborted = true; }
+      };
+    });
+  }
+  var realFetch = window.fetch;
+  window.fetch = function (input, init) {
+    init = init || {};
+    var url = typeof input === 'string' ? input : input.url;
+    if (/^\/api\//.test(url)) {
+      var h = init.headers || {};
+      var ct = h['Content-Type'] || h['content-type'] || '';
+      return apiCall((init.method || 'GET').toUpperCase(), url, init.body, ct).then(function (r) {
+        return new Response(JSON.stringify(r.body), { status: r.status, headers: { 'Content-Type': 'application/json' } });
+      });
+    }
+    return realFetch.apply(window, arguments);
+  };
+
+  /* messages from the lesson page */
+  window.addEventListener('message', function (e) {
+    if (e.source !== parent) return;
+    var d = e.data || {};
+    if (d.__apiRes && pending[d.id]) { var f = pending[d.id]; delete pending[d.id]; f(d); }
+    if (d.__check) {
+      var r;
+      try { r = window.__check ? window.__check(logs) : true; } catch (err) { r = 'Check error: ' + err.message; }
+      Promise.resolve(r).then(function (v) { post({ type: 'check', result: v }); },
+                              function (err) { post({ type: 'check', result: 'Check error: ' + err }); });
+    }
+  });
+  if (cfg.check) window.__check = new Function('logs', cfg.check);
+
+  window.expectLines = function (got, want) {
+    var n = function (s) { return String(s).replace(/\s/g, '').replace(/"/g, "'"); };
+    for (var i = 0; i < want.length; i++) {
+      if (got[i] === undefined) return 'Line ' + (i + 1) + ' is missing. Expected: ' + want[i];
+      if (n(got[i]) !== n(want[i])) return 'Line ' + (i + 1) + ' should print: ' + want[i] + '   (you printed: ' + got[i] + ')';
+    }
+    return got.length === want.length || 'Too many lines: expected ' + want.length + ' but got ' + got.length;
+  };
+  if (cfg.libs.jquery && !window.jQuery) out('error', ['jQuery did not load. Are you offline?']);
+  if (cfg.libs.chart && !window.Chart) out('error', ['Chart.js did not load. Are you offline?']);
+}
+
+const CDN = {
+  jquery: 'https://code.jquery.com/jquery-3.7.1.min.js',
+  chart: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'
+};
+const BASE_CSS = '*{box-sizing:border-box}body{font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1f2430;background:#fff;margin:0;padding:12px}' +
+  'button{font:inherit;padding:.35em .85em;border:1px solid #b9c0d0;border-radius:6px;background:#f3f5fa;cursor:pointer}button:hover{background:#e7ebf5}' +
+  'input,select{font:inherit;padding:.35em .5em;border:1px solid #b9c0d0;border-radius:6px}';
+const GAME_CSS = '.hud{display:flex;gap:16px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.hud b{font-variant-numeric:tabular-nums}' +
+  '#board{display:grid;grid-template-columns:repeat(3,84px);gap:10px;justify-content:start}' +
+  '.hole{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#6b4a2f,#3b2716);display:grid;place-items:center;font-size:44px;cursor:pointer;user-select:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.35)}' +
+  '.hole.mole::after{content:"🐹";animation:pop .15s ease-out}@keyframes pop{from{transform:scale(.3)}to{transform:scale(1)}}#msg{min-height:1.4em;font-weight:600}';
+
+/* ================= editor with syntax highlighting ================= */
+function insertText(ta, text) {
+  ta.focus();
+  if (!document.execCommand('insertText', false, text)) {
+    ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end');
+    ta.dispatchEvent(new Event('input'));
+  }
+}
+function makeEditor(value, lang, label, run) {
+  const wrap = document.createElement('div'); wrap.className = 'ed';
+  if (label) { const l = document.createElement('div'); l.className = 'pane-label'; l.textContent = label; wrap.appendChild(l); }
+  const inner = document.createElement('div'); inner.className = 'ed-in';
+  const pre = document.createElement('pre'); pre.setAttribute('aria-hidden', 'true');
+  const code = document.createElement('code'); pre.appendChild(code);
+  const ta = document.createElement('textarea');
+  ta.spellcheck = false; ta.value = value; ta.setAttribute('aria-label', (label || 'JavaScript') + ' code editor');
+  ta.setAttribute('autocapitalize', 'off'); ta.setAttribute('autocorrect', 'off');
+  inner.append(pre, ta); wrap.appendChild(inner);
+  const paint = () => { code.innerHTML = hl(ta.value, lang) + '\n'; };
+  let trap = true;                       // Esc releases the Tab key so keyboard users can leave the editor
+  ta.addEventListener('input', paint);
+  ta.addEventListener('blur', () => { trap = true; });
+  ta.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); return; }
+    if (e.key === 'Escape') { trap = false; return; }
+    if (e.key === 'Tab' && !e.shiftKey && trap) { e.preventDefault(); insertText(ta, '  '); return; }
+    if (e.key === 'Enter' && !e.shiftKey && !e.altKey) {
+      const s = ta.selectionStart, before = ta.value.slice(0, s);
+      const line = before.slice(before.lastIndexOf('\n') + 1);
+      let ind = line.match(/^\s*/)[0];
+      if (/[{(\[]\s*$/.test(line)) ind += '  ';
+      e.preventDefault(); insertText(ta, '\n' + ind);
+    }
+  });
+  paint();
+  return { el: wrap, get: () => ta.value, set: v => { ta.value = v; paint(); } };
+}
+
+/* ================= playground ================= */
+const registry = new Map();
+const done = store.get('l6.done', {});
+let pgSeq = 0;
+
+class Playground {
+  constructor(el) {
+    this.el = el;
+    this.id = el.dataset.id || ('pg' + (++pgSeq));
+    this.title = el.dataset.title || 'Code';
+    this.libs = (el.dataset.libs || '').split(/\s+/).filter(Boolean);
+    this.css = el.dataset.css || '';
+    this.wait = parseInt(el.dataset.wait || '300', 10);
+    const pane = n => { const s = el.querySelector('script[data-pane="' + n + '"]'); return s ? s.textContent : null; };
+    const dd = v => v == null ? null : dedent(v);
+    this.src = { html: dd(pane('html')), js: dd(pane('js')) || '', py: dd(pane('py')), solution: dd(pane('solution')), check: pane('check'), hint: pane('hint') };
+    this.hasCheck = !!this.src.check && !el.dataset.nocheck;
+    this.frameH = this.src.html !== null ? parseInt(el.dataset.h || '240', 10) : parseInt(el.dataset.h || '0', 10);
+    this.runN = 0; this.showingSol = false; this.mine = null;
+    registry.set(this.id, this);
+    this.build();
+  }
+
+  build() {
+    const el = this.el;
+    el.textContent = '';
+    el.classList.add('pg');
+    if (done[this.id]) el.classList.add('done');
+
+    const head = document.createElement('div'); head.className = 'pg-head';
+    head.innerHTML = '<span class="pg-title"></span><span class="pg-badge">✓ done</span>';
+    head.firstChild.textContent = this.title;
+    const mk = (cls, text, fn, title) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn ' + cls; b.textContent = text; if (title) b.title = title; b.addEventListener('click', fn); head.appendChild(b); return b; };
+    mk('run', 'Run ▶', () => this.run(), 'Ctrl/⌘ + Enter');
+    mk('', 'Reset', () => this.reset());
+    if (this.src.hint) this.hintBtn = mk('', 'Hint', () => this.hintBox.classList.toggle('show'));
+    if (this.src.solution) this.solBtn = mk('', 'Solution', () => this.toggleSolution());
+    mk('', 'Copy', e => this.copy(e.currentTarget));
+    const sa = document.createElement('a'); sa.className = 'btn'; sa.textContent = 'Standalone ↗';
+    sa.href = 'seminar-5-exercises/' + this.id + '.html'; sa.target = '_blank'; sa.rel = 'noopener';
+    sa.title = 'Open this exercise as its own HTML file (from the seminar-5-exercises folder)'; sa.style.textDecoration = 'none';
+    head.appendChild(sa);
+    el.appendChild(head);
+
+    if (this.src.hint) {
+      this.hintBox = document.createElement('div'); this.hintBox.className = 'pg-hint';
+      this.hintBox.innerHTML = '<b>Hint · </b>' + this.src.hint;
+      el.appendChild(this.hintBox);
+    }
+    if (this.src.py) {
+      const d = document.createElement('details'); d.className = 'pg-py'; d.open = true;
+      d.innerHTML = '<summary>The Python you already know</summary><pre></pre>';
+      d.querySelector('pre').innerHTML = hl(this.src.py, 'py');
+      el.appendChild(d);
+    }
+    const run = () => this.run();
+    this.ed = {};
+    if (this.src.html !== null) this.ed.html = makeEditor(this.src.html, 'html', 'HTML', run);
+    this.ed.js = makeEditor(this.src.js, 'js', this.src.html !== null ? 'JavaScript' : '', run);
+
+    const out = document.createElement('div'); out.className = 'pg-out' + (this.frameH > 0 ? '' : ' noframe');
+    this.frame = document.createElement('iframe');
+    this.frame.setAttribute('sandbox', 'allow-scripts');
+    this.frame.title = this.title + ' (result)';
+    this.frame.style.height = this.frameH + 'px';
+    this.con = document.createElement('div'); this.con.className = 'pg-console';
+    out.append(this.frame, this.con);
+    this.status = document.createElement('div'); this.status.className = 'pg-status';
+    this.status.hidden = !this.hasCheck;
+
+    // result first when there is something to look at, so it stays in view while you edit below it
+    const editors = [this.ed.html && this.ed.html.el, this.ed.js.el].filter(Boolean);
+    if (this.frameH > 0) el.append(out, this.status, ...editors);
+    else el.append(...editors, out, this.status);
+    this.clearConsole();
+    this.setStatus('', this.hasCheck ? 'Run your code to check it.' : '');
+  }
+
+  clearConsole() {
+    this.con.innerHTML = '<div class="ln empty">console output appears here</div>';
+    this.conEmpty = true;
+  }
+  line(level, text) {
+    if (this.conEmpty) { this.con.textContent = ''; this.conEmpty = false; }
+    if (this.con.childNodes.length > 300) return;
+    const d = document.createElement('div'); d.className = 'ln ' + level;
+    d.textContent = (level === 'error' ? '✖ ' : level === 'warn' ? '⚠ ' : '') + String(text).slice(0, 2000);
+    this.con.appendChild(d);
+    this.con.scrollTop = this.con.scrollHeight;
+  }
+  setStatus(cls, text) { this.status.className = 'pg-status ' + cls; this.status.textContent = text; }
+
+  buildDoc(html, js) {
+    const cfgBase = { id: this.id, run: this.runN, check: this.src.check || '', libs: { jquery: this.libs.includes('jquery'), chart: this.libs.includes('chart') } };
+    const make = offset => {
+      const cfg = Object.assign({ offset: offset }, cfgBase);
+      const head = '<!doctype html><html><head><meta charset="utf-8"><meta name="run" content="' + this.runN + '"><style>' + BASE_CSS + (this.css === 'game' ? GAME_CSS : '') + '</style>' +
+        this.libs.filter(l => CDN[l]).map(l => '<script src="' + CDN[l] + '"><\/script>').join('') +
+        '<script>(' + preludeFn.toString() + ')(' + JSON.stringify(cfg).replace(/</g, '\\u003c') + ');<\/script></head><body>\n' + html + '\n<script>';
+      return { head: head, tail: js + '\n<\/script><button id="to-top" type="button" aria-label="Scroll to top"><i class="fa-solid fa-arrow-up"></i></button>
+<script>
+(function(){var b=document.getElementById('to-top');
+function t(){b.classList.toggle('show',window.scrollY>400)}
+window.addEventListener('scroll',t,{passive:true});t();
+b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'})});})();
+</script>
+</body></html>' };
+    };
+    const first = make(0);
+    const offset = first.head.split('\n').length - 1;
+    const real = make(offset);
+    return real.head + real.tail;
+  }
+
+  run() {
+    clearTimeout(this.checkTimer); clearTimeout(this.timeoutTimer);
+    this.runN++;
+    this.clearConsole();
+    if (this.hasCheck) this.setStatus('', 'Running…');
+    const html = this.ed.html ? this.ed.html.get() : '';
+    const js = this.ed.js.get();
+    this.frame.onload = () => {
+      if (this.hasCheck) this.checkTimer = setTimeout(() => this.sendCheck(), this.wait);
+    };
+    this.frame.srcdoc = this.buildDoc(html, js);
+    this.ranOnce = true;
+  }
+
+  sendCheck() {
+    this.setStatus('', 'Checking…');
+    try { this.frame.contentWindow.postMessage({ __check: true }, '*'); } catch (e) { /* ignore */ }
+    this.timeoutTimer = setTimeout(() => this.setStatus('no', 'The check did not finish. Does your code throw an error or never run?'), 9000);
+  }
+
+  onMessage(d, source) {
+    if (d.run !== this.runN) return;                // stale message from a previous run
+    if (d.type === 'log') this.line(d.level, d.text);
+    else if (d.type === 'api') this.serve(d, source);
+    else if (d.type === 'check') {
+      clearTimeout(this.timeoutTimer);
+      if (d.result === true) {
+        this.setStatus('ok', this.showingSol ? '✓ The solution passes. Switch back to your code to earn the tick.' : '✓ Passed. Nice work!');
+        if (!this.showingSol) this.markDone();
+      } else {
+        this.setStatus('no', 'Not yet: ' + (typeof d.result === 'string' ? d.result : 'the result is not what we expected.'));
+      }
+    }
+  }
+
+  serve(d, source) {
+    const t0 = performance.now(), delay = 250 + Math.random() * 350;
+    setTimeout(() => {
+      const r = handleApi(d);
+      this.line('net', '↔ ' + d.method + ' ' + d.url + '   ' + r.status + '   ' + Math.round(performance.now() - t0) + ' ms');
+      try { source.postMessage({ __apiRes: true, id: d.id, status: r.status, body: r.body }, '*'); } catch (e) { /* frame gone */ }
+    }, delay);
+  }
+
+  markDone() {
+    this.el.classList.add('done');
+    if (!done[this.id]) { done[this.id] = 1; store.set('l6.done', done); updateProgress(); }
+  }
+
+  reset() {
+    this.showingSol = false; this.mine = null;
+    if (this.solBtn) this.solBtn.textContent = 'Solution';
+    if (this.ed.html) this.ed.html.set(this.src.html);
+    this.ed.js.set(this.src.js);
+    this.frame.removeAttribute('srcdoc'); this.runN++;
+    clearTimeout(this.checkTimer); clearTimeout(this.timeoutTimer);
+    this.clearConsole();
+    if (this.hasCheck) this.setStatus('', 'Run your code to check it.');
+  }
+
+  toggleSolution() {
+    if (!this.showingSol) {
+      this.mine = this.ed.js.get();
+      this.ed.js.set(this.src.solution);
+      this.showingSol = true; this.solBtn.textContent = 'My code';
+    } else {
+      this.ed.js.set(this.mine == null ? this.src.js : this.mine);
+      this.showingSol = false; this.solBtn.textContent = 'Solution';
+    }
+    this.run();
+  }
+
+  copy(btn) {
+    const text = (this.ed.html ? '<!-- HTML -->\n' + this.ed.html.get() + '\n\n<!-- JavaScript (custom.js) -->\n' : '') + this.ed.js.get();
+    const ok = () => { const o = btn.textContent; btn.textContent = 'Copied ✓'; setTimeout(() => { btn.textContent = o; }, 1200); };
+    try { navigator.clipboard.writeText(text).then(ok, () => { }); } catch (e) { /* clipboard blocked */ }
+  }
+}
+
+window.addEventListener('message', function (e) {
+  const d = e.data;
+  if (!d || typeof d !== 'object' || !d.__pg) return;
+  const pg = registry.get(d.__pg);
+  if (!pg || e.source !== pg.frame.contentWindow) return;
+  pg.onMessage(d, e.source);
+});
+
+/* ================= quizzes ================= */
+const QUIZ = {
+  gotchas: [
+    { code: 'console.log("5" + 3);', opts: ['8', '53', 'NaN', 'TypeError'], a: 1,
+      why: 'With <code>+</code>, if either side is a string JavaScript joins them as text. Python raises <code>TypeError</code>. (<code>"5" - 3</code> is <code>2</code>, because <code>-</code> only works on numbers.) Convert on purpose: <code>Number("5") + 3</code>.' },
+    { code: 'console.log([1, 2, 3] == [1, 2, 3]);', opts: ['true', 'false'], a: 1,
+      why: 'JavaScript compares arrays and objects by <i>identity</i> (are they the same object in memory?), not by contents. Python gives <code>True</code>. Compare contents with <code>JSON.stringify(a) === JSON.stringify(b)</code> or a loop. (Even <code>[1] == [1]</code> is false.)' },
+    { code: 'if ([]) { console.log("yes"); } else { console.log("no"); }', opts: ['yes', 'no'], a: 0,
+      why: 'In Python an empty list is falsy. In JavaScript only <code>false, 0, "", null, undefined, NaN</code> (plus <code>-0</code> and <code>0n</code>) are falsy: empty arrays and objects are <b>truthy</b>. Test <code>arr.length === 0</code> instead.' },
+    { code: 'console.log([10, 9, 1].sort());', opts: ['[1, 9, 10]', '[1, 10, 9]', '[10, 9, 1]'], a: 1,
+      why: '<code>sort()</code> without a function compares items as <i>text</i>: "1" &lt; "10" &lt; "9". It also changes the array in place. For numbers use <code>sort((a, b) =&gt; a - b)</code>.' },
+    { code: 'console.log(typeof null);', opts: ['null', 'object', 'undefined'], a: 1,
+      why: '<code>typeof null</code> gives <code>object</code>: a famous quirk from the first version of JavaScript, kept for backwards compatibility. Check for null with <code>x === null</code>.' },
+    { code: 'console.log(10 / 0);', opts: ['Infinity', 'ZeroDivisionError', 'NaN'], a: 0,
+      why: 'JavaScript does not raise an error for division by zero: you get <code>Infinity</code> (and <code>0 / 0</code> is <code>NaN</code>). Python raises <code>ZeroDivisionError</code>.' }
+  ],
+  async: [
+    { code: 'console.log("A");\nsetTimeout(() => console.log("B"), 0);\nconsole.log("C");', opts: ['A B C', 'A C B', 'B A C'], a: 1,
+      why: 'Even with a delay of 0, the callback waits until the current script has finished. Callbacks always run <i>after</i> the code that scheduled them. The same is true for every AJAX <code>success</code>.' }
+  ],
+  jquery: [
+    { code: '$("p.intro")', q: 'What does this select?', opts: ['The element with id="intro"', 'Every &lt;p&gt; that has class="intro"', 'The first &lt;p&gt; on the page'], a: 1, html: true,
+      why: '<code>p</code> is the tag, <code>.intro</code> the class, with no space between them. <code>#intro</code> would be an id.' },
+    { code: '$("#out").text("<b>hi</b>");', q: 'What does the visitor see?', opts: ['bold hi', 'the literal characters <b>hi</b>', 'nothing'], a: 1,
+      why: '<code>.text()</code> treats everything as plain text, which makes it the safe choice for user-supplied content. <code>.html()</code> would render the bold tag.' },
+    { code: '// items are added to the list AFTER the page loads\n$("#list").on("click", "li", function () { ... });', q: 'Why does this work for the new items?', opts: ['jQuery re-scans the page every second', 'The listener is on #list (it exists) and checks which li was clicked', 'It only works for the first li'], a: 1,
+      why: 'This is <b>event delegation</b>: clicks bubble up from the <code>li</code> to <code>#list</code>, where one listener decides whether it cares. <code>$("li").on(...)</code> would only cover elements that exist when it runs.' }
+  ],
+  ajax: [
+    { code: 'let result;\n$.ajax({ url: "/api/scores", success: function (d) { result = d; } });\nconsole.log(result);', q: 'What is printed?', opts: ['the scores', 'undefined', 'an error'], a: 1,
+      why: 'The request is still travelling when <code>console.log</code> runs. Use the data <i>inside</i> <code>success</code> (or with <code>await</code>).' },
+    { code: '', q: 'Which Flask return value fits <b>client-side rendering</b>?', opts: ['render_template("scores.html")', 'jsonify({"scores": rows})', 'redirect(url_for("home"))'], a: 1,
+      why: '<code>jsonify</code> sends raw data; JavaScript decides how to draw it. <code>render_template</code> sends finished HTML, which is server-side rendering.' },
+    { code: '', q: 'To send a JavaScript object as a JSON request body you call…', opts: ['JSON.parse(obj)', 'JSON.stringify(obj)', 'obj.toJSON.dumps()'], a: 1,
+      why: '<code>JSON.stringify</code> ↔ Python\'s <code>json.dumps</code>; <code>JSON.parse</code> ↔ <code>json.loads</code>. Remember <code>contentType: "application/json"</code> so Flask knows what it is receiving.' },
+    { code: '', q: 'A request returns HTTP 404 or 500. Which jQuery callback runs?', opts: ['success', 'error'], a: 1,
+      why: 'Any status outside 2xx (and network failures) calls <code>error</code>. The server\'s JSON body is in <code>xhr.responseJSON</code>.' },
+    { code: '', q: 'Your page at localhost:5000 requests another website\'s URL and the browser blocks the response. Why?', opts: ['jQuery is out of date', 'Same-origin policy: the other server did not allow it (CORS)', 'AJAX only works with GET'], a: 1,
+      why: 'Browsers only let a page read responses from its <i>own</i> origin unless the other server sends CORS headers. Your own Flask server is same-origin, so it just works.' }
+  ]
+};
+function renderQuiz(box) {
+  (QUIZ[box.dataset.quiz] || []).forEach(function (q, i) {
+    const card = document.createElement('div'); card.className = 'q';
+    card.innerHTML = '<h5>Question ' + (i + 1) + '</h5>';
+    if (q.code) { const pre = document.createElement('pre'); pre.className = 'code'; pre.innerHTML = hl(q.code, 'js'); card.appendChild(pre); }
+    if (q.q) { const p = document.createElement('p'); p.innerHTML = q.q; card.appendChild(p); }
+    else { const p = document.createElement('p'); p.textContent = 'What is printed?'; card.appendChild(p); }
+    const opts = document.createElement('div'); opts.className = 'opts';
+    const why = document.createElement('div'); why.className = 'why'; why.innerHTML = '<b>' + '</b> ' + q.why;
+    q.opts.forEach(function (o, k) {
+      const b = document.createElement('button'); b.type = 'button';
+      if (q.html) b.innerHTML = o; else b.textContent = o;
+      b.addEventListener('click', function () {
+        if (card.classList.contains('answered')) return;
+        card.classList.add('answered');
+        qsa('button', opts).forEach(function (x, j) { x.disabled = true; if (j === q.a) x.classList.add('right'); });
+        if (k !== q.a) b.classList.add('wrong');
+        why.firstChild.textContent = k === q.a ? '✓ Correct.' : '✗ Not quite.';
+      });
+      opts.appendChild(b);
+    });
+    card.append(opts, why);
+    box.appendChild(card);
+  });
+}
+
+/* ================= selector lab ================= */
+const labDone = store.get('l6.lab', {});
+const LAB = [
+  { t: 'The heading (id "title")', css: '#title', a: '$("#title")' },
+  { t: 'All the list items', css: 'li', a: '$("li")   or   $(".item")' },
+  { t: 'Only the hot drinks', css: '.hot', a: '$(".hot")' },
+  { t: 'Drinks that are both cold <i>and</i> special', css: '.cold.special', a: '$(".cold.special")' },
+  { t: 'Only the first list item', css: 'li:first-child', a: '$("li:first")   or   $("li").first()' },
+  { t: 'The paragraph containing the &lt;span&gt;: start at the span, go up', css: 'p.intro', a: '$("span").parent()' },
+  { t: 'Only links whose href starts with https', css: 'a[href^="https"]', a: '$("a[href^=\'https\']")' },
+  { t: 'Every list item <i>except</i> Tea', css: 'li:not(:nth-child(2))', a: '$("li:contains(\'Tea\')").siblings()' }
+];
+function initLab() {
+  const lab = qs('#lab');
+  if (!lab) return;
+  if (!window.jQuery) { lab.insertAdjacentHTML('beforeend', '<p style="grid-column:1/-1">jQuery did not load (offline?), so the lab is unavailable.</p>'); return; }
+  const J = window.jQuery, root = qs('#lab-sample'), input = qs('#lab-in'), res = qs('#lab-res'), list = qs('#lab-ch');
+  const scoped = function (s) { return J(s, root); };
+  const rows = LAB.map(function (c, i) {
+    const li = document.createElement('li');
+    li.innerHTML = '<i>' + (i + 1) + '</i><span>' + c.t + '</span><button type="button">answer</button>';
+    li.querySelector('button').addEventListener('click', function (e) {
+      e.stopPropagation(); input.value = c.a.split('   or   ')[0]; input.focus(); evaluate();
+    });
+    if (labDone[i]) li.classList.add('done');
+    list.appendChild(li); return li;
+  });
+  function paintTicks() { rows.forEach(function (li, i) { li.classList.toggle('done', !!labDone[i]); li.firstChild.textContent = labDone[i] ? '✓' : String(i + 1); }); }
+  function clear() { qsa('.hl', root).forEach(function (n) { n.classList.remove('hl'); }); }
+  function evaluate() {
+    clear();
+    const expr = input.value.trim();
+    if (!expr) { res.className = 'lab-res'; res.textContent = 'Type a jQuery expression, for example $(".item")'; return; }
+    let found;
+    try {
+      found = new Function('$', 'jQuery', 'return (' + expr + ');')(scoped, scoped);
+    } catch (err) { res.className = 'lab-res bad'; res.textContent = 'Not valid yet: ' + err.message + '   (write a full expression like $(".item"))'; return; }
+    if (!found || !found.jquery) { res.className = 'lab-res bad'; res.textContent = 'The expression must return a jQuery selection, e.g. $("li")'; return; }
+    const els = found.get().filter(function (n) { return root.contains(n) && n !== root; });
+    els.forEach(function (n) { n.classList.add('hl'); });
+    res.className = 'lab-res ok';
+    res.textContent = '.length = ' + els.length + (els.length ? '   → highlighted above' : '   (nothing matched)');
+    let changed = false;
+    LAB.forEach(function (c, i) {
+      const target = qsa(c.css, root);
+      if (target.length === els.length && target.every(function (n) { return els.indexOf(n) > -1; }) && !labDone[i]) { labDone[i] = 1; changed = true; }
+    });
+    if (changed) { store.set('l6.lab', labDone); paintTicks(); updateProgress(); }
+  }
+  input.addEventListener('input', evaluate);
+  input.value = '$(".item")'; evaluate();
+  paintTicks();
+}
+
+/* ================= progress + navigation ================= */
+function labComplete() { return LAB.every(function (c, i) { return labDone[i]; }); }
+function updateProgress() {
+  const per = {};
+  registry.forEach(function (pg) {
+    if (!pg.hasCheck) return;
+    const sec = pg.el.closest('section'); const id = sec ? sec.id : 'x';
+    per[id] = per[id] || { n: 0, t: 0 };
+    per[id].t++; if (done[pg.id]) per[id].n++;
+  });
+  per.s3 = per.s3 || { n: 0, t: 0 }; per.s3.t++; if (labComplete()) per.s3.n++;
+  let n = 0, t = 0;
+  Object.keys(per).forEach(function (k) { n += per[k].n; t += per[k].t; });
+  qs('#prog-n').textContent = n; qs('#prog-t').textContent = t;
+  qs('#prog-bar').style.width = (t ? 100 * n / t : 0) + '%';
+  qsa('#nav a[data-sec]').forEach(function (a) {
+    const p = per[a.dataset.sec], s = qs('small', a);
+    if (!p || !s) return;
+    s.textContent = p.n + '/' + p.t;
+    a.classList.toggle('full', p.n === p.t);
+  });
+}
+
+/* ================= boot ================= */
+function boot() {
+  qsa('pre.code[data-lang]').forEach(function (p) { p.innerHTML = hl(p.textContent, p.dataset.lang); });
+  qsa('code[data-hl]').forEach(function (c) { c.innerHTML = hl(c.textContent, c.dataset.hl); });
+  qsa('.pg').forEach(function (el) { new Playground(el); });
+  qsa('.quiz').forEach(renderQuiz);
+  initLab();
+  updateProgress();
+
+  qs('#prog-reset').addEventListener('click', function () {
+    if (!confirm('Clear all your ticks on this page?')) return;
+    Object.keys(done).forEach(function (k) { delete done[k]; });
+    Object.keys(labDone).forEach(function (k) { delete labDone[k]; });
+    store.set('l6.done', done); store.set('l6.lab', labDone);
+    registry.forEach(function (pg) { pg.el.classList.remove('done'); });
+    qsa('#lab-ch li').forEach(function (li, i) { li.classList.remove('done'); li.firstChild.textContent = String(i + 1); });
+    updateProgress();
+  });
+  const rb = qs('#reset-db');
+  if (rb) rb.addEventListener('click', function () {
+    memDb = seedScores(); saveDb();
+    qs('#reset-note').textContent = 'Done. Press Run on an AJAX exercise to see the original data.';
+  });
+
+  if ('IntersectionObserver' in window) {
+    const auto = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        const pg = registry.get(en.target.dataset.id);
+        auto.unobserve(en.target);
+        if (pg && !pg.ranOnce) pg.run();
+      });
+    }, { rootMargin: '200px' });
+    registry.forEach(function (pg) { if (pg.el.dataset.auto) auto.observe(pg.el); });
+
+    const links = {};
+    qsa('#nav a[data-sec]').forEach(function (a) { links[a.dataset.sec] = a; });
+    const spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        qsa('#nav a.on').forEach(function (a) { a.classList.remove('on'); });
+        const a = links[en.target.id === 's0' ? 'start' : en.target.id];
+        if (a) a.classList.add('on');
+      });
+    }, { rootMargin: '-25% 0px -65% 0px' });
+    qsa('main section').forEach(function (s) { spy.observe(s); });
+  } else {
+    registry.forEach(function (pg) { if (pg.el.dataset.auto) pg.run(); });
+  }
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+</script>
+</body>
+</html>
