@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT239 Lab 5 - JSON, AJAX and Charts | Grandee Lee</title>
+<meta name="description" content="ICT239 Lab 5: JSON endpoints in Flask, AJAX with jQuery $.ajax, and revenue charts with Chart.js, built on the Essentials shop.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<style>
+    :root {
+        --c1: #e2c6b5;
+        --c2: #c8a48a;
+        --c3: #a77b5b;
+        --c4: #7b4a3a;
+        --c5: #4e2b1e;
+        --cream: #f5ede5;
+        --cream-dark: #ede2d5;
+        --text-dark: #3b1f14;
+        --text-mid: #5a3a2c;
+        --text-light: #7a6558;
+
+        --accent: var(--c3);
+        --accent-dark: var(--c4);
+        --accent-soft: rgba(167, 123, 91, 0.12);
+        --border: rgba(200, 164, 138, 0.28);
+
+        --code-bg: #282c34;
+        --code-bg-2: #21252b;
+        --code-line: #3a3f4b;
+        --code-text: #abb2bf;
+        --code-muted: #7f8790;
+        --code-kw: #c678dd;
+        --code-str: #98c379;
+        --code-dec: #e5c07b;
+        --code-com: #5c6370;
+
+        --success: #3f7d52;
+        --success-bg: #e4efe6;
+        --success-border: #9dc7a8;
+        --danger: #a9432f;
+        --danger-bg: #f7e7e2;
+        --danger-border: #dba493;
+
+        --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--cream);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 clamp(1.2rem, 4vw, 2.5rem) 5rem;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+        color: var(--c5);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: clamp(1.4rem, 3vw, 1.8rem);
+        font-weight: 900;
+        margin-top: 3.2rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--border);
+        scroll-margin-top: 84px;
+    }
+    h3 {
+        font-size: clamp(1.05rem, 2vw, 1.25rem);
+        font-weight: 700;
+        color: var(--c4);
+        margin-top: 2rem;
+        scroll-margin-top: 84px;
+    }
+    h4 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        color: var(--text-light);
+        margin: 1.8rem 0 0.6rem;
+    }
+
+    p { color: var(--text-mid); max-width: 68ch; }
+    .muted { color: var(--text-light); }
+    .lede { font-size: 1.02rem; color: rgba(226,198,181,0.85); max-width: 640px; }
+
+    a { color: var(--accent); text-decoration-color: rgba(167,123,91,0.4); text-underline-offset: 3px; }
+    a:hover { color: var(--accent-dark); }
+
+    code.inline {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--cream-dark);
+        color: var(--c5);
+        border: 1px solid var(--border);
+        padding: 0.12em 0.42em;
+        border-radius: 6px;
+        font-size: 0.88em;
+    }
+
+    ul.notes { padding-left: 1.2rem; max-width: 68ch; color: var(--text-mid); }
+    ul.notes li { margin-bottom: 0.55rem; }
+
+    /* ---- top nav (matches walkthrough.html) ---- */
+    #nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(245, 237, 229, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 1px 0 rgba(167, 123, 91, 0.15);
+        padding: 0 clamp(1.2rem, 4vw, 3rem);
+    }
+    .nav-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        gap: 1rem;
+    }
+    .nav-back {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--c5);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .nav-back i { font-size: 0.85rem; color: var(--c3); transition: transform 0.25s ease; }
+    .nav-back:hover i { transform: translateX(-3px); }
+    .nav-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        display: none;
+    }
+    @media (min-width: 700px) { .nav-title { display: block; } }
+
+    /* ---- hero band ---- */
+    #doc-hero {
+        position: relative;
+        background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 45%, var(--c3) 100%);
+        padding: clamp(2.6rem, 7vw, 4.5rem) clamp(1.5rem, 6vw, 4rem);
+        overflow: hidden;
+    }
+    #doc-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 70% 55% at 12% 90%, rgba(226,198,181,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 70% at 88% 10%, rgba(226,198,181,0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    .doc-hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; text-align: center; }
+    .doc-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        text-transform: uppercase;
+        color: var(--c2);
+        margin-bottom: 1rem;
+    }
+    .doc-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: clamp(1.8rem, 4.6vw, 2.7rem);
+        color: var(--c1);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    /* ---- score badge ---- */
+    #score-badge {
+        position: sticky;
+        top: 76px;
+        z-index: 30;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: rgba(245, 237, 229, 0.96);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 18px 8px 13px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--c5);
+        box-shadow: 0 4px 20px rgba(59,31,20,0.12);
+        margin: 1.6rem 0 0;
+    }
+    #score-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c3); flex-shrink: 0; }
+    #score-badge.complete .dot { background: var(--success); }
+    #score-badge.complete { border-color: var(--success-border); color: var(--success); background: var(--success-bg); }
+
+    /* ---- instructions box ---- */
+    .howto {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+        padding: 1.2rem 1.4rem;
+        margin-top: 1.6rem;
+        display: flex;
+        gap: 14px;
+    }
+    .howto .icon {
+        width: 30px; height: 30px; flex-shrink: 0;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--c4);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+    }
+    .howto p { margin: 0; font-size: 0.94rem; }
+    .howto p + p { margin-top: 6px; }
+
+    /* ---- tables ---- */
+    table.grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        background: white;
+    }
+    .table-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+    }
+    table.grid th, table.grid td { text-align: left; padding: 0.7rem 1rem; vertical-align: top; }
+    table.grid th {
+        background: var(--cream-dark);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--c5);
+        font-weight: 700;
+    }
+    table.grid td { border-top: 1px solid var(--border); color: var(--text-mid); line-height: 1.6; }
+    table.grid tr:hover td { background: rgba(167,123,91,0.04); }
+    table.grid code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+
+    .doc-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* ---- code panel ---- */
+    .panel { margin-top: 1.2rem; }
+    .panel-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--text-light);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .panel-label .file-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c3); }
+
+    pre.code {
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: var(--radius);
+        padding: 1.3rem 1.4rem;
+        overflow-x: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        line-height: 1.7;
+        margin: 0;
+        border: 1px solid rgba(167,123,91,0.15);
+        box-shadow: 0 8px 30px rgba(59,31,20,0.14);
+    }
+    pre.code .kw { color: var(--code-kw); }
+    pre.code .str { color: var(--code-str); }
+    pre.code .com { color: var(--code-com); font-style: italic; }
+    pre.code .dec { color: var(--code-dec); }
+
+    /* ---- blank dropdown ---- */
+    select.blank {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        font-weight: 600;
+        background: var(--code-bg-2);
+        color: var(--code-text);
+        border: 1.5px dashed var(--code-muted);
+        border-radius: 6px;
+        padding: 1px 6px;
+        margin: 0 1px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        min-width: 5.5ch;
+    }
+    select.blank:hover { border-color: var(--c2); }
+    select.blank:focus-visible { outline: 2px solid var(--c2); outline-offset: 2px; }
+    select.blank.correct { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success-border); }
+    select.blank.incorrect { background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger-border); }
+    select.blank option { color: var(--text-dark); background: #fff; }
+
+    /* ---- approach tag ---- */
+    .approach-tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 8px;
+    }
+    .approach-tag.ref { background: var(--accent-soft); color: var(--c4); }
+    .approach-tag.py { background: var(--cream-dark); color: var(--text-light); border: 1px solid var(--border); }
+
+    .callout {
+        border-left: 3px solid var(--c3);
+        background: rgba(167,123,91,0.07);
+        padding: 1rem 1.3rem;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        font-size: 0.93rem;
+        margin-top: 1.2rem;
+        max-width: 68ch;
+    }
+    .callout p { margin: 0; color: var(--text-mid); }
+    .callout p + p { margin-top: 6px; }
+
+    /* ---- footer ---- */
+    .lab-footnote {
+        margin-top: 3.5rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.88rem;
+        color: var(--text-light);
+    }
+    footer {
+        background: var(--c5);
+        padding: clamp(2rem, 5vw, 3rem);
+        text-align: center;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
+    .footer-links a {
+        width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 50%; border: 1px solid rgba(200,164,138,0.2); color: var(--c2);
+        font-size: 0.95rem; text-decoration: none; transition: all 0.3s ease;
+    }
+    .footer-links a:hover { background: rgba(167,123,91,0.2); border-color: var(--c3); color: var(--c1); transform: translateY(-2px); }
+    .footer-copy { font-size: 0.78rem; color: rgba(200,164,138,0.4); }
+
+    /* ---- back to top ---- */
+    #back-to-top {
+        position: fixed;
+        right: clamp(1rem, 3vw, 2.2rem);
+        bottom: clamp(1rem, 3vw, 2.2rem);
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: var(--c5);
+        color: var(--c1);
+        display: flex; align-items: center; justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 24px rgba(59,31,20,0.3);
+        opacity: 0; pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 900;
+        font-size: 0.95rem;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    @media (max-width: 480px) {
+        pre.code { font-size: 0.76rem; padding: 1rem; }
+        table.grid { font-size: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    /* ---- lab-5 additions ---- */
+    kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.82em; background: var(--cream-dark); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 0.05em 0.4em; color: var(--c5); }
+    .callout.check { border-left-color: var(--success); background: var(--success-bg); }
+    .callout.check pre.code { margin-top: 0.8rem; }
+    .callout > :first-child { margin-top: 0; }
+    .callout > :last-child { margin-bottom: 0; }
+    nav.toc { background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 16px rgba(59,31,20,0.05); padding: 0.9rem 1.4rem 0.9rem 2.6rem; margin-top: 1.6rem; color: var(--text-mid); }
+    nav.toc li { margin: 0.25rem 0; }
+    main ul, main ol { color: var(--text-mid); max-width: 68ch; }
+    li pre.code { margin: 0.6rem 0; }
+    li { margin-bottom: 0.35rem; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+        <span class="nav-title">ICT239 &middot; Lab 5</span>
+    </div>
+</nav>
+
+<header id="doc-hero">
+    <div class="doc-hero-inner">
+        <p class="doc-eyebrow">ICT239 Web Programming &middot; Seminar 5 lab</p>
+        <h1 class="doc-title">Lab 5 - JSON endpoints, AJAX and Charts</h1>
+    </div>
+</header>
+
+<main>
+<nav class="toc">
+  <ol>
+    <li><a href="#setup">Set up</a></li>
+    <li><a href="#step1">Step 1 - Prepare the JSON endpoints</a></li>
+    <li><a href="#step2">Step 2 - Product details popup with <code class="inline">$.ajax</code></a></li>
+    <li><a href="#step3">Step 3 - Revenue charts with AJAX and Chart.js</a></li>
+    <li><a href="#extra">Extra challenges</a></li>
+  </ol>
+</nav>
+
+<h2>What you will build</h2>
+<p>You start from the Essentials shop you built in earlier labs (the <code class="inline">app/</code> folder in the zip). By the end it will have:</p>
+<ul>
+  <li><strong>Two JSON endpoints</strong>: <code class="inline">/api/products/&lt;id&gt;</code> (one product's details) and <code class="inline">/api/revenue</code> (revenue analytics).</li>
+  <li><strong>A hover popup</strong> on the shop page. When the mouse enters a product card, the page calls the product endpoint with <code class="inline">$.ajax</code> and shows the details in a floating box, with no page reload.</li>
+  <li><strong>A revenue page</strong> at <code class="inline">/revenue</code> that calls the revenue endpoint with <code class="inline">$.ajax</code> and draws a doughnut chart and a stacked bar chart with Chart.js.</li>
+</ul>
+
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Concept (Seminar 5)</th><th>Where you use it</th></tr>
+  <tr><td>Write data as JSON from a Flask route</td><td>Step 1 - <code class="inline">jsonify()</code></td></tr>
+  <tr><td>Read JSON with jQuery AJAX, client-side rendering</td><td>Steps 2 and 3 - <code class="inline">$.ajax()</code></td></tr>
+  <tr><td>Data visualisation with Chart.js</td><td>Step 3 - <code class="inline">new Chart()</code></td></tr>
+</table>
+</div>
+
+<h2 id="setup">Set up</h2>
+<ol>
+  <li>Download <a href="app.zip" download><code class="inline">app.zip</code></a> and unzip it. You get an <code class="inline">app/</code> folder, the same layout as the previous labs.</li>
+  <li>Make sure MongoDB is running, then start the app from inside <code class="inline">app/</code>:
+    <pre class="code">cd app
+bash start.sh</pre>
+  </li>
+  <li>Open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a>. You should see the shop with 8 products. (The first visit inserts the sample products.)</li>
+</ol>
+<p>Flask runs in debug mode, so it reloads automatically each time you save a file. Refresh the browser to see changes.</p>
+
+<p>You will create or edit these files:</p>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>File</th><th>Change</th><th>Step</th></tr>
+  <tr><td><code class="inline">controllers/api.py</code></td><td>new</td><td>1, 3</td></tr>
+  <tr><td><code class="inline">app.py</code></td><td>register the new blueprint</td><td>1</td></tr>
+  <tr><td><code class="inline">templates/base.html</code></td><td>add jQuery, a scripts block, a nav link</td><td>2, 3</td></tr>
+  <tr><td><code class="inline">templates/shopping.html</code></td><td>popup markup and AJAX script</td><td>2</td></tr>
+  <tr><td><code class="inline">assets/css/custom.css</code></td><td>popup style</td><td>2</td></tr>
+  <tr><td><code class="inline">templates/revenue.html</code></td><td>new</td><td>3</td></tr>
+</table>
+</div>
+
+<!-- ===================================================== STEP 1 -->
+<h2 id="step1">Step 1 - Prepare the JSON endpoints</h2>
+<p>A JSON endpoint is an ordinary Flask route, but it returns data instead of an HTML page. Browsers and JavaScript can then fetch just the data they need.</p>
+
+<h3>1.1 Create the API blueprint</h3>
+<p>Create a new file <code class="inline">controllers/api.py</code>. It follows the same pattern as <code class="inline">shop.py</code> and <code class="inline">auth.py</code>.</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>controllers/api.py</div><pre class="code">from flask import Blueprint, jsonify
+
+from models.product import Product
+
+api = Blueprint(&quot;api&quot;, __name__)  # endpoints become api.productDetail, api.revenue, api.revenuePage
+
+
+@api.route(&quot;/api/products/&lt;product_id&gt;&quot;)
+def productDetail(product_id):
+    &quot;&quot;&quot;One product as JSON - called by the hover popup on the shop page.&quot;&quot;&quot;
+    product = Product.getProduct(product_id)
+    if not product:
+        return jsonify({&quot;error&quot;: &quot;Product not found&quot;}), 404
+    return jsonify({
+        &quot;id&quot;: str(product.id),
+        &quot;name&quot;: product.name,
+        &quot;description&quot;: product.description,
+        &quot;price&quot;: product.price,
+    })</pre></div>
+<p>Points to note:</p>
+<ul>
+  <li><code class="inline">jsonify()</code> converts a Python dict to a JSON response and sets the <code class="inline">Content-Type: application/json</code> header for you.</li>
+  <li>The product comes from MongoDB via the existing <code class="inline">Product.getProduct()</code>. It returns <code class="inline">None</code> for an unknown or malformed id, so we answer with <strong>404</strong> and a small JSON error. The status code is the second value in the returned tuple.</li>
+  <li>A MongoEngine document is not JSON-serialisable by itself, so we pick the fields to expose. <code class="inline">product.id</code> is an <code class="inline">ObjectId</code>, which is why it is wrapped in <code class="inline">str()</code>.</li>
+</ul>
+
+<h3>1.2 Add the revenue endpoint</h3>
+<p>For this lab the revenue figures are hard-coded sample data (in a real shop you would compute them from orders). The data is organised by category, with one value per month, so that it can be drawn in several ways.</p>
+<p>Add this route below <code class="inline">productDetail</code> in the same file:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>controllers/api.py</div><pre class="code">@api.route(&quot;/api/revenue&quot;)
+def revenue():
+    &quot;&quot;&quot;Sample revenue figures (SGD) as JSON - called by the charts on the revenue page.&quot;&quot;&quot;
+    return jsonify({
+        &quot;currency&quot;: &quot;SGD&quot;,
+        &quot;months&quot;: [&quot;Jan&quot;, &quot;Feb&quot;, &quot;Mar&quot;, &quot;Apr&quot;, &quot;May&quot;, &quot;Jun&quot;],
+        &quot;categories&quot;: [
+            {&quot;name&quot;: &quot;Apparel&quot;,     &quot;monthly&quot;: [4200, 3900, 4600, 5200, 6100, 5800]},
+            {&quot;name&quot;: &quot;Bags&quot;,        &quot;monthly&quot;: [2100, 2300, 2000, 2800, 3100, 3500]},
+            {&quot;name&quot;: &quot;Home&quot;,        &quot;monthly&quot;: [1500, 1700, 1600, 1900, 2200, 2600]},
+            {&quot;name&quot;: &quot;Stationery&quot;,  &quot;monthly&quot;: [800, 1200, 1500, 1100, 900, 1000]},
+        ],
+    })</pre></div>
+
+<h3>1.3 Register the blueprint</h3>
+<p>Flask does not know about the new routes until the blueprint is registered. Edit <code class="inline">app.py</code>.</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>app.py</div><pre class="code">from controllers.demo import demo
+from controllers.api import api          # &lt;-- add
+
+app.register_blueprint(auth)
+app.register_blueprint(shop)
+app.register_blueprint(api)              # &lt;-- add
+app.register_blueprint(demo, url_prefix=&quot;/demo&quot;)</pre></div>
+
+<div class="callout check"><strong>Checkpoint 1.</strong> Open <a href="http://127.0.0.1:5000/api/revenue">/api/revenue</a> in the browser. You should see the JSON. Next, get a product id: open <code class="inline">mongosh</code>, run <code class="inline">use shop</code> then <code class="inline">db.products.findOne()</code>, and copy the <code class="inline">_id</code> value. Then open <code class="inline">/api/products/&lt;that id&gt;</code>:
+<pre class="code">{&quot;description&quot;:&quot;Sturdy everyday bag.&quot;,&quot;id&quot;:&quot;6650...&quot;,&quot;name&quot;:&quot;Canvas Tote&quot;,&quot;price&quot;:35.5}</pre>
+Try <code class="inline">/api/products/abc</code> too. You should get a <code class="inline">404</code> with <code class="inline">{"error": "Product not found"}</code>.</div>
+
+<!-- ===================================================== STEP 2 -->
+<h2 id="step2">Step 2 - Product details popup with <code class="inline">$.ajax</code></h2>
+<p><strong>AJAX</strong> lets JavaScript request data from the server in the background and update part of the page, without a reload. You will use jQuery's low-level <code class="inline">$.ajax()</code> function only (not <code class="inline">$.get</code>, <code class="inline">$.getJSON</code> or <code class="inline">fetch</code>), so that the options are explicit:</p>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Option</th><th>Meaning</th></tr>
+  <tr><td><code class="inline">url</code></td><td>the endpoint to call</td></tr>
+  <tr><td><code class="inline">method</code></td><td>HTTP method, <code class="inline">"GET"</code> here</td></tr>
+  <tr><td><code class="inline">dataType</code></td><td>what we expect back; <code class="inline">"json"</code> makes jQuery parse it into a JavaScript object</td></tr>
+  <tr><td><code class="inline">success</code></td><td>callback that runs with the parsed data when the call succeeds (2xx)</td></tr>
+  <tr><td><code class="inline">error</code></td><td>callback that runs when the call fails (e.g. the 404 above, or the server is down)</td></tr>
+</table>
+</div>
+
+<h3>2.1 Load jQuery and add a scripts block to the base template</h3>
+<p>jQuery is not in the project yet. Add it to <code class="inline">base.html</code> just before <code class="inline">&lt;/body&gt;</code>, after the Bootstrap script. The empty <code class="inline">{% block scripts %}</code> lets each page add its own JavaScript, loaded after jQuery.</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/base.html</div><pre class="code">  &lt;!-- Bootstrap JS (needed for the collapsing navbar on phones) --&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
+  &lt;!-- jQuery: the full build (the &quot;slim&quot; build has no $.ajax) --&gt;
+  &lt;script src=&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;&gt;&lt;/script&gt;
+  {% block scripts %}{% endblock %}
+&lt;/body&gt;</pre></div>
+<div class="callout"><p><strong>Watch out:</strong> jQuery also ships a "slim" build (<code class="inline">jquery-3.7.1.slim.min.js</code>). It leaves out the AJAX module, so <code class="inline">$.ajax</code> would be undefined. Use the full build above.</p></div>
+
+<h3>2.2 Give each product card the URL of its detail endpoint</h3>
+<p>The page needs to know which endpoint belongs to which card. Let Flask build the URL with <code class="inline">url_for</code> and store it in a <code class="inline">data-</code> attribute, which jQuery reads with <code class="inline">.data()</code>. In <code class="inline">shopping.html</code>, change the card's opening <code class="inline">&lt;div&gt;</code>:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/shopping.html</div><pre class="code">&lt;div class=&quot;card h-100 product-card rounded-0&quot;
+     data-detail-url=&quot;{{ url_for(&#x27;api.productDetail&#x27;, product_id=product.id) }}&quot;&gt;</pre></div>
+<p>Reload the shop page and use "View source" to confirm each card now has a <code class="inline">data-detail-url</code> such as <code class="inline">/api/products/6650...</code>.</p>
+
+<h3>2.3 Add the popup container and the script</h3>
+<p>At the bottom of <code class="inline">shopping.html</code>, after the closing <code class="inline">&lt;/main&gt;</code> and still inside <code class="inline">{% block content %}</code>, add one shared popup element. Then add a <code class="inline">{% block scripts %}</code> after <code class="inline">{% endblock %}</code> of the content block:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/shopping.html</div><pre class="code">&lt;/main&gt;
+
+&lt;!-- One shared popup; the script moves it and fills it in --&gt;
+&lt;div id=&quot;product-popup&quot; class=&quot;product-popup&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;
+{% endblock %}
+
+{% block scripts %}
+&lt;script&gt;
+$(function () {
+  const $popup = $(&quot;#product-popup&quot;);
+
+  function showPopup(html) {
+    $popup.html(html).show();
+  }
+
+  $(&quot;.product-card&quot;).on(&quot;mouseenter&quot;, function (event) {
+    const url = $(this).data(&quot;detail-url&quot;);
+    showPopup(&quot;Loading...&quot;);
+    $.ajax({
+      url: url,
+      method: &quot;GET&quot;,
+      dataType: &quot;json&quot;,
+      success: function (product) {
+        // .text() on every field: never inject server data as raw HTML
+        const $box = $(&quot;&lt;div&gt;&quot;);
+        $(&quot;&lt;strong&gt;&quot;).text(product.name).appendTo($box);
+        $(&quot;&lt;p class=&#x27;mb-1&#x27;&gt;&quot;).text(product.description).appendTo($box);
+        $(&quot;&lt;span&gt;&quot;).text(&quot;$&quot; + product.price.toFixed(2)).appendTo($box);
+        $popup.empty().append($box).show();
+      },
+      error: function () {
+        showPopup(&quot;Could not load product details.&quot;);
+      }
+    });
+  });
+
+  $(&quot;.product-card&quot;).on(&quot;mousemove&quot;, function (event) {
+    $popup.css({ left: event.pageX + 15, top: event.pageY + 15 });
+  });
+
+  $(&quot;.product-card&quot;).on(&quot;mouseleave&quot;, function () {
+    $popup.hide();
+  });
+});
+&lt;/script&gt;
+{% endblock %}</pre></div>
+<p>Read the script through. It does four things:</p>
+<ol>
+  <li><code class="inline">mouseenter</code> on a card: show "Loading...", then call the endpoint with <code class="inline">$.ajax</code>.</li>
+  <li><code class="inline">success</code>: build the popup content from the returned JSON object (<code class="inline">product.name</code>, <code class="inline">product.description</code>, <code class="inline">product.price</code>).</li>
+  <li><code class="inline">mousemove</code>: keep the popup next to the cursor.</li>
+  <li><code class="inline">mouseleave</code>: hide it.</li>
+</ol>
+<div class="callout"><p><strong>Why <code class="inline">.text()</code> and not string concatenation into <code class="inline">.html()</code>?</strong> Product names and descriptions are data. If they contained <code class="inline">&lt;script&gt;</code> and were injected as HTML, the script would run in every visitor's browser (cross-site scripting). <code class="inline">.text()</code> always treats the value as plain text.</p></div>
+
+<h3>2.4 Style the popup</h3>
+<p>The popup must float above the page, so it is <code class="inline">position: absolute</code> with a high <code class="inline">z-index</code>. Append this to <code class="inline">assets/css/custom.css</code>:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>assets/css/custom.css</div><pre class="code">/* Hover popup for product details (filled by AJAX) */
+.product-popup {
+  position: absolute;
+  z-index: 2000;
+  max-width: 260px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #212529;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  font-size: 0.9rem;
+  pointer-events: none;   /* so the popup never steals the mouse from the card */
+}</pre></div>
+
+<div class="callout check"><strong>Checkpoint 2.</strong> Reload the shop page and hover over a product. A box with its name, description and price should follow the mouse and disappear when you leave the card. Then open the browser developer tools (<kbd>F12</kbd>) &rarr; <em>Network</em> tab, filter by <em>Fetch/XHR</em>, and hover again. You should see one request to <code class="inline">/api/products/...</code> per card you enter, each returning the JSON from Step 1.</div>
+
+<p><strong>Try it:</strong> change <code class="inline">url</code> in the <code class="inline">$.ajax</code> call to a wrong path (for example add an <code class="inline">x</code> at the end). Hover again and observe that the <code class="inline">error</code> callback shows the failure message. Change it back afterwards.</p>
+
+<!-- ===================================================== STEP 3 -->
+<h2 id="step3">Step 3 - Revenue charts with AJAX and Chart.js</h2>
+<p>You will build the page <code class="inline">/revenue</code>. The route only serves an HTML shell; the numbers arrive afterwards through <code class="inline">$.ajax</code> from <code class="inline">/api/revenue</code>, and are drawn with <a href="https://www.chartjs.org/">Chart.js</a> (the same library as in the seminar's <code class="inline">exercise.html</code>).</p>
+
+<h3>3.1 Add the page route</h3>
+<p>In <code class="inline">controllers/api.py</code>, change the import on the first line to include <code class="inline">render_template</code>, and add the route at the bottom:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>controllers/api.py</div><pre class="code">from flask import Blueprint, jsonify, render_template
+
+# ... existing routes ...
+
+@api.route(&quot;/revenue&quot;)
+def revenuePage():
+    &quot;&quot;&quot;The HTML page; the numbers are fetched by JavaScript afterwards.&quot;&quot;&quot;
+    return render_template(&quot;revenue.html&quot;)</pre></div>
+
+<h3>3.2 Add a nav link</h3>
+<p>In <code class="inline">templates/base.html</code>, add a link next to "Shop All":</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/base.html</div><pre class="code">&lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-dark text-decoration-none&quot; href=&quot;{{ url_for(&#x27;shop.home&#x27;) }}&quot;&gt;Shop All&lt;/a&gt;&lt;/li&gt;
+&lt;li class=&quot;nav-item px-2&quot;&gt;&lt;a class=&quot;text-dark text-decoration-none&quot; href=&quot;{{ url_for(&#x27;api.revenuePage&#x27;) }}&quot;&gt;Revenue&lt;/a&gt;&lt;/li&gt;   &lt;!-- add --&gt;</pre></div>
+
+<h3>3.3 Create the page template</h3>
+<p>Create <code class="inline">templates/revenue.html</code>. First the layout, with two <code class="inline">&lt;canvas&gt;</code> elements that Chart.js will draw on:</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/revenue.html</div><pre class="code">{% extends &quot;base.html&quot; %}
+
+{% block title %}Revenue{% endblock %}
+
+{% block content %}
+&lt;main class=&quot;container my-5&quot;&gt;
+  &lt;h1 class=&quot;h3 mb-4&quot;&gt;Revenue analytics&lt;/h1&gt;
+
+  &lt;div class=&quot;row g-4&quot;&gt;
+    &lt;div class=&quot;col-12 col-lg-5&quot;&gt;
+      &lt;div class=&quot;card rounded-0 p-3&quot;&gt;
+        &lt;h2 class=&quot;h6&quot;&gt;Share of revenue by category&lt;/h2&gt;
+        &lt;canvas id=&quot;shareChart&quot;&gt;&lt;/canvas&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;col-12 col-lg-7&quot;&gt;
+      &lt;div class=&quot;card rounded-0 p-3&quot;&gt;
+        &lt;h2 class=&quot;h6&quot;&gt;Monthly revenue by category&lt;/h2&gt;
+        &lt;canvas id=&quot;monthlyChart&quot;&gt;&lt;/canvas&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/main&gt;
+{% endblock %}</pre></div>
+<p>Then add the script below it (still in the same file). Chart.js is loaded from a CDN, and this page's script runs after jQuery because of the <code class="inline">scripts</code> block from Step 2.</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>templates/revenue.html</div><pre class="code">{% block scripts %}
+&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+$(function () {
+  $.ajax({
+    url: &quot;{{ url_for(&#x27;api.revenue&#x27;) }}&quot;,
+    method: &quot;GET&quot;,
+    dataType: &quot;json&quot;,
+    success: function (data) {
+      drawShareChart(data);
+      drawMonthlyChart(data);
+    },
+    error: function () {
+      $(&quot;main&quot;).append(&quot;&lt;p class=&#x27;text-danger&#x27;&gt;Could not load revenue data.&lt;/p&gt;&quot;);
+    }
+  });
+
+  function drawShareChart(data) {
+    const totals = data.categories.map(function (c) {
+      return c.monthly.reduce(function (sum, v) { return sum + v; }, 0);
+    });
+    new Chart($(&quot;#shareChart&quot;), {
+      type: &quot;doughnut&quot;,
+      data: {
+        labels: data.categories.map(function (c) { return c.name; }),
+        datasets: [{ data: totals }]
+      }
+    });
+  }
+
+  function drawMonthlyChart(data) {
+    new Chart($(&quot;#monthlyChart&quot;), {
+      type: &quot;bar&quot;,
+      data: {
+        labels: data.months,
+        datasets: data.categories.map(function (c) {
+          return { label: c.name, data: c.monthly };
+        })
+      },
+      options: {
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, title: { display: true, text: data.currency } }
+        }
+      }
+    });
+  }
+});
+&lt;/script&gt;
+{% endblock %}</pre></div>
+
+<h3>3.4 How it works</h3>
+<ul>
+  <li><strong>One request, two charts.</strong> The data is fetched once. In <code class="inline">success</code>, the same object is passed to two functions.</li>
+  <li><strong>Doughnut</strong> needs one number per category, so the monthly values are totalled with <code class="inline">reduce</code>. This is client-side processing of the JSON.</li>
+  <li><strong>Stacked bar</strong> needs one dataset per category and one value per month. <code class="inline">data.categories.map(...)</code> reshapes the JSON into Chart.js <code class="inline">datasets</code>. Setting <code class="inline">stacked: true</code> on both axes stacks the bars.</li>
+  <li>Compare this with the seminar's <code class="inline">exercise.html</code>: <code class="inline">labels</code> and <code class="inline">datasets</code> are the same structure, but here the values come from the server instead of being typed in.</li>
+</ul>
+
+<div class="callout check"><strong>Checkpoint 3.</strong> Click <em>Revenue</em> in the navbar. You should see a doughnut chart (share by category) next to a stacked bar chart (Jan-Jun, split by category). Hover over the segments to see tooltips. In the <em>Network</em> tab you should see a single request to <code class="inline">/api/revenue</code>.</div>
+
+<!-- ===================================================== EXTRA -->
+<h2 id="extra">Extra challenges</h2>
+<ol>
+  <li><strong>Change the format.</strong> Change <code class="inline">type: "doughnut"</code> to <code class="inline">"pie"</code>, then to <code class="inline">"polarArea"</code>. Change the monthly chart so that it is a <code class="inline">"line"</code> chart with <code class="inline">stacked</code> removed. Notice that only <code class="inline">type</code> and <code class="inline">options</code> change; the data stays the same.</li>
+  <li><strong>Add a total line.</strong> In <code class="inline">drawMonthlyChart</code>, add a dataset of type <code class="inline">"line"</code> whose values are the total across categories for each month (a mixed bar + line chart).</li>
+  <li><strong>Add a format selector.</strong> Add a <code class="inline">&lt;select&gt;</code> with <em>Doughnut / Pie / Bar</em> above the first chart. When it changes, destroy the old chart (<code class="inline">chart.destroy()</code>) and redraw with the chosen <code class="inline">type</code>, without calling the server again (keep the data in a variable).</li>
+  <li><strong>Colours and labels.</strong> Give each category a fixed colour via <code class="inline">backgroundColor</code>, and format tooltips as <code class="inline">S$ 4,200</code> using <code class="inline">options.plugins.tooltip.callbacks.label</code>.</li>
+  <li><strong>Price in the popup.</strong> Cache each product's JSON in a JavaScript object keyed by id so that hovering the same card again does not call the server a second time.</li>
+</ol>
+
+<h2>Summary</h2>
+<ul>
+  <li>An endpoint that returns JSON is just a route using <code class="inline">jsonify()</code>; the same data can feed many different views.</li>
+  <li><code class="inline">$.ajax({url, method, dataType, success, error})</code> fetches JSON without reloading, and the page is updated in the callback (client-side rendering).</li>
+  <li>Insert server data into the page with <code class="inline">.text()</code>, not as raw HTML.</li>
+  <li>Chart.js only needs <code class="inline">type</code>, <code class="inline">labels</code> and <code class="inline">datasets</code>; JSON from the server is reshaped into that form.</li>
+</ul>
+
+
+</main>
+
+<a href="#doc-hero" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grandee Lee. All Rights Reserved.</p>
+</footer>
+
+
+<script>
+(function () {
+  var backToTop = document.getElementById("back-to-top");
+  window.addEventListener("scroll", function () {
+    backToTop.classList.toggle("show", window.scrollY > 800);
+  });
+})();
+</script>
+</body>
+</html>
