@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where do you stand in the AI usage funnel? | Grandee Lee</title>
+<meta name="description" content="TI6502 asynchronous lesson: the AI usage funnel, local coding agents, skills, and the risks of autonomous agents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="../favicon.ico" type="image/x-icon">
+<style>
+    :root{--c1:#e2c6b5;--c2:#c8a48a;--c3:#a77b5b;--c4:#7b4a3a;--c5:#4e2b1e;--cream:#f5ede5;--cream-dark:#ede2d5;--text-dark:#3b1f14;--text-mid:#5a3a2c;--text-light:#7a6558;
+        --accent:var(--c3);--accent-dark:var(--c4);--accent-soft:rgba(167,123,91,.12);--border:rgba(200,164,138,.28);
+        --code-bg:#282c34;--code-text:#abb2bf;--success:#3f7d52;--success-bg:#e4efe6;--success-border:#9dc7a8;--danger:#a9432f;--danger-bg:#f7e7e2;--danger-border:#dba493;--radius:14px}
+    *{box-sizing:border-box}html,body{margin:0;padding:0}html{scroll-behavior:smooth}
+    body{background:var(--cream);color:var(--text-dark);font-family:'Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+    main{max-width:900px;margin:0 auto;padding:0 clamp(1.2rem,4vw,2.5rem) 5rem}
+    h1,h2,h3{font-family:'Playfair Display',serif;color:var(--c5);margin:0;line-height:1.2}
+    h2{font-size:clamp(1.4rem,3vw,1.8rem);font-weight:900;margin-top:3.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);scroll-margin-top:84px}
+    h3{font-size:clamp(1.05rem,2vw,1.25rem);font-weight:700;color:var(--c4);margin-top:2rem}
+    p,li{color:var(--text-mid)}p{max-width:68ch}ol,ul{max-width:68ch;padding-left:1.3rem}li{margin-bottom:.5rem}
+    a{color:var(--accent);text-underline-offset:3px}a:hover{color:var(--accent-dark)}
+    code{font-family:'JetBrains Mono',monospace;background:var(--cream-dark);color:var(--c5);border:1px solid var(--border);padding:.12em .42em;border-radius:6px;font-size:.88em}
+    #nav{position:sticky;top:0;z-index:1000;background:rgba(245,237,229,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 1px 0 rgba(167,123,91,.15);padding:0 clamp(1.2rem,4vw,3rem)}
+    .nav-inner{max-width:1320px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:1rem}
+    .nav-back{display:flex;align-items:center;gap:.5rem;font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--c5);text-decoration:none}
+    .nav-back i{font-size:.85rem;color:var(--c3);transition:transform .25s}.nav-back:hover i{transform:translateX(-3px)}
+    .nav-title{font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);display:none}
+    @media(min-width:700px){.nav-title{display:block}}
+    #doc-hero{position:relative;background:linear-gradient(155deg,var(--c5) 0%,var(--c4) 45%,var(--c3) 100%);padding:clamp(2.6rem,7vw,4.5rem) clamp(1.5rem,6vw,4rem)}
+    .doc-hero-inner{max-width:760px;margin:0 auto;text-align:center}
+    .doc-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;color:var(--c2);margin-bottom:1rem}
+    .doc-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,4.6vw,2.7rem);color:var(--c1);line-height:1.15;margin-bottom:1rem}
+    .lede{font-size:1.02rem;color:rgba(226,198,181,.85);max-width:640px;margin:0 auto}
+    .howto{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 2px 16px rgba(59,31,20,.05);padding:1.2rem 1.4rem;margin-top:1.6rem}
+    .howto p{margin:0;font-size:.94rem}
+    figure{margin:1.6rem 0;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 2px 16px rgba(59,31,20,.05);padding:14px}
+    figure svg{width:100%;height:auto;display:block}figcaption{font-size:.85rem;color:var(--text-light);padding:8px 4px 0}
+    .card{background:#fff;border:1px solid var(--border);border-left:3px solid var(--c3);border-radius:0 var(--radius) var(--radius) 0;box-shadow:0 2px 16px rgba(59,31,20,.05);padding:1rem 1.3rem;margin:1.2rem 0;font-size:.95rem;color:var(--text-mid)}
+    .card.warn{border-left-color:var(--danger);background:#fffaf8}
+    .card h3{margin:0 0 .4rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--c4)}
+    .card.warn h3{color:var(--danger)}
+    button{font-family:'Inter',sans-serif;font-weight:600;font-size:.9rem;padding:8px 14px;border-radius:10px;border:1px solid var(--c3);background:#fff;color:var(--c4);cursor:pointer;transition:all .2s}
+    button:hover{background:var(--accent-soft)}
+    .opt{margin:4px 0;line-height:1.45}.opt.ok{background:var(--success-bg);border-color:var(--success-border);color:var(--success)}.opt.no{background:var(--danger-bg);border-color:var(--danger-border);color:var(--danger)}
+    .fb{font-size:.9rem;color:var(--text-light);margin-top:8px}.saved{font-size:.82rem;color:var(--text-light)}
+    .tabs{display:flex;gap:6px;margin:1.2rem 0}.tab.on{background:var(--c5);border-color:var(--c5);color:var(--c1)}
+    .cmd{display:flex;gap:10px;align-items:flex-start;background:var(--code-bg);border-radius:var(--radius);padding:.9rem 1rem;margin:.7rem 0;box-shadow:0 8px 30px rgba(59,31,20,.14)}
+    .cmd pre{margin:0;flex:1;overflow-x:auto;color:var(--code-text);font:.83rem/1.7 'JetBrains Mono',monospace}
+    .cmd button{padding:3px 10px;font-size:.72rem;background:transparent;color:var(--c2);border-color:rgba(200,164,138,.35)}
+    .cmd code{background:none;border:0;padding:0;color:inherit}
+    .os[hidden]{display:none}
+    .table-wrap{overflow-x:auto;border-radius:var(--radius);margin-top:1rem;border:1px solid var(--border);box-shadow:0 2px 16px rgba(59,31,20,.05)}
+    table.cmp{width:100%;border-collapse:collapse;font-size:.88rem;background:#fff}
+    .cmp th,.cmp td{text-align:left;padding:.7rem 1rem;vertical-align:top;color:var(--text-mid);line-height:1.6}
+    .cmp th{background:var(--cream-dark);font-family:'JetBrains Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--c5)}
+    .cmp td{border-top:1px solid var(--border)}.cmp td:first-child{font-weight:600;color:var(--c5)}
+    .vid{position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;background:#000;margin:1.2rem 0;box-shadow:0 8px 30px rgba(59,31,20,.14)}
+    .vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+    .feed{margin:1.2rem 0}.feed h4{font-family:'JetBrains Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-light);margin:1.6rem 0 .5rem}
+    .post{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:.8rem 1.1rem;margin:8px 0;font-size:.95rem;color:var(--text-mid)}
+    .post .by{font-weight:700;font-size:.75rem;color:var(--c4);margin-bottom:2px}.post .tr{font-size:.82rem;color:var(--text-light);margin-top:4px}
+    details{margin-top:.6em;font-size:.95rem}
+    footer{background:var(--c5);padding:clamp(2rem,5vw,3rem);text-align:center}
+    .footer-links{display:flex;justify-content:center;gap:1.5rem;margin-bottom:1rem}
+    .footer-links a{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(200,164,138,.2);color:var(--c2);text-decoration:none;transition:all .3s}
+    .footer-links a:hover{background:rgba(167,123,91,.2);border-color:var(--c3);color:var(--c1)}
+    .footer-copy{font-size:.78rem;color:rgba(200,164,138,.4)}
+    @media print{button{display:none}}
+</style>
+</head>
+<body>
+<nav id="nav"><div class="nav-inner">
+    <a href="../index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+    <span class="nav-title">TI6502 &middot; AI Usage Funnel</span>
+</div></nav>
+<header id="doc-hero"><div class="doc-hero-inner">
+    <p class="doc-eyebrow">TI6502 · AI and Machine Translation · Asynchronous lesson</p>
+    <h1 class="doc-title">Where do you stand in the AI usage funnel?</h1>
+    <p class="lede">How professionals actually work with AI agents, how to install and direct one yourself, and what happens when many agents are let loose.</p>
+</div></header>
+<main>
+<div class="howto">
+<p>Most public talk about “what AI can do” assumes everyone is looking at the same thing. They are not. In October 2026, the AI researcher Andrej Karpathy argued that people experience very different AIs depending on <em>how</em> and <em>on what</em> they use them. We start from his funnel, then look at how professionals actually work with AI agents, how to install and direct one yourself, and what happens when many agents are let loose.</p>
+<p>By the end of this lesson you should be able to: read the funnel critically; choose between a chat window and a local agent; install and start an agent; write a standing-instructions file and a reusable skill; and explain, in plain language, why autonomy and untrusted text make agents risky.</p>
+
+</div>
+<h2>1 · The funnel</h2>
+<p>Karpathy sketched four tiers of AI experience. He called his numbers “napkin math”: orders of magnitude, not survey data. That is how you should read them too.</p>
+<figure><svg xmlns:xlink="http://www.w3.org/1999/xlink"   viewBox="0 0 599.254141 424.727414" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-15T09:00:32.450185</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 424.727414 
+L 599.254141 424.727414 
+L 599.254141 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 89.691799 41.887144 
+L 450.986763 41.887144 
+L 437.003926 116.936925 
+L 103.674636 116.936925 
+z
+" clip-path="url(#p416474ecd7)" style="fill: #cfcece; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 103.674636 125.942899 
+L 437.003926 125.942899 
+L 393.455647 200.992681 
+L 147.222914 200.992681 
+z
+" clip-path="url(#p416474ecd7)" style="fill: #3775ba; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 147.222914 209.998655 
+L 393.455647 209.998655 
+L 309.797841 285.048436 
+L 230.88072 285.048436 
+z
+" clip-path="url(#p416474ecd7)" style="fill: #0f4d92; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 230.88072 294.05441 
+L 309.797841 294.05441 
+L 294.014417 369.104192 
+L 246.664144 369.104192 
+z
+" clip-path="url(#p416474ecd7)" style="fill: #b64342; stroke: #ffffff; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #222222" x="270.339281" y="74.303131" transform="rotate(-0 270.339281 74.303131)">Barely used an LLM</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #222222" x="270.339281" y="97.539647" transform="rotate(-0 270.339281 97.539647)">≈ 6 billion · ≈75% of people</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #ffffff" x="270.339281" y="158.358887" transform="rotate(-0 270.339281 158.358887)">Casual, free-tier chatbots</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #ffffff" x="270.339281" y="181.595403" transform="rotate(-0 270.339281 181.595403)">≈ 1–2 billion · ≈19%</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #ffffff" x="270.339281" y="227.404686" transform="rotate(-0 270.339281 227.404686)">Professional use</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle; fill: #ffffff" x="270.339281" y="250.641202" transform="rotate(-0 270.339281 250.641202)">≈ 20 million · ≈0.25%</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start; fill: #b64342" x="317.997949" y="326.470398" transform="rotate(-0 317.997949 326.470398)">Internal frontier access</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start; fill: #b64342" x="317.997949" y="349.706445" transform="rotate(-0 317.997949 349.706445)">≈ 5,000 · ≈0.00006%</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start" x="75.24" y="20.877187" transform="rotate(-0 75.24 20.877187)">The AI usage funnel</text>
+   </g>
+  </g>
+  <g id="text_10">
+   <text style="font-size: 9.5px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start; fill: #555555" x="7.2" y="415.245188" transform="rotate(-0 7.2 415.245188)">Width ∝ log10(people): each step down is far larger than it looks.  Source: A. Karpathy, X post, 11 Oct 2026 (napkin math).</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p416474ecd7">
+   <rect x="75.24" y="26.877187" width="502.2" height="343.728"/>
+  </clipPath>
+ </defs>
+</svg>
+<figcaption><b>Figure 1.</b> The funnel. Segment width is proportional to log10(people), so every step down is far steeper than it looks. Source: A. Karpathy, X post, 11 Oct 2026 (napkin math).</figcaption></figure>
+<p>Here are the same numbers as bars, so you can read the scale directly:</p>
+<figure><svg xmlns:xlink="http://www.w3.org/1999/xlink"   viewBox="0 0 746.455038 318.194344" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-15T09:01:33.390687</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 318.194344 
+L 746.455038 318.194344 
+L 746.455038 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 179.127344 262.224 
+L 681.327344 262.224 
+L 681.327344 7.2 
+L 179.127344 7.2 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M -64580.040199 58.499403 
+L 616.761873 58.499403 
+L 616.761873 18.792 
+L -64580.040199 18.792 
+z
+" clip-path="url(#p65ae837902)" style="fill: #cfcece"/>
+   </g>
+   <g id="patch_4">
+    <path d="M -64580.040199 122.543602 
+L 577.889586 122.543602 
+L 577.889586 82.836199 
+L -64580.040199 82.836199 
+z
+" clip-path="url(#p65ae837902)" style="fill: #3775ba"/>
+   </g>
+   <g id="patch_5">
+    <path d="M -64580.040199 186.587801 
+L 456.825372 186.587801 
+L 456.825372 146.880398 
+L -64580.040199 146.880398 
+z
+" clip-path="url(#p65ae837902)" style="fill: #0f4d92"/>
+   </g>
+   <g id="patch_6">
+    <path d="M -64580.040199 250.632 
+L 224.256671 250.632 
+L 224.256671 210.924597 
+L -64580.040199 210.924597 
+z
+" clip-path="url(#p65ae837902)" style="fill: #b64342"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="mdb9d4cc116" d="M 0 0 
+L 0 3.5 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="179.127344" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <!-- $\mathdefault{10^{3}}$ -->
+      <g transform="translate(167.687344 281.444)">
+       <text>
+        <tspan x="0" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">3</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="243.692815" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <!-- $\mathdefault{10^{4}}$ -->
+      <g transform="translate(232.252815 281.314)">
+       <text>
+        <tspan x="0" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.360938" style="font-size: 9.1px; font-family: 'DejaVu Sans'">4</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="308.258286" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <!-- $\mathdefault{10^{5}}$ -->
+      <g transform="translate(296.818286 281.314)">
+       <text>
+        <tspan x="0" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.360938" style="font-size: 9.1px; font-family: 'DejaVu Sans'">5</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="372.823757" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <!-- $\mathdefault{10^{6}}$ -->
+      <g transform="translate(361.383757 281.444)">
+       <text>
+        <tspan x="0" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">6</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="437.389228" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <!-- $\mathdefault{10^{7}}$ -->
+      <g transform="translate(425.949228 281.314)">
+       <text>
+        <tspan x="0" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.991938" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.360938" style="font-size: 9.1px; font-family: 'DejaVu Sans'">7</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="501.954699" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <!-- $\mathdefault{10^{8}}$ -->
+      <g transform="translate(490.514699 281.444)">
+       <text>
+        <tspan x="0" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">8</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="566.520171" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <!-- $\mathdefault{10^{9}}$ -->
+      <g transform="translate(555.080171 281.444)">
+       <text>
+        <tspan x="0" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">9</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#mdb9d4cc116" x="631.085642" y="262.224" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <!-- $\mathdefault{10^{10}}$ -->
+      <g transform="translate(616.720642 281.444)">
+       <text>
+        <tspan x="0" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="8.270996" y="-0.871625" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+        <tspan x="16.666406" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">1</tspan>
+        <tspan x="22.456104" y="-6.240625" style="font-size: 9.1px; font-family: 'DejaVu Sans'">0</tspan>
+       </text>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_9">
+      <defs>
+       <path id="m563cfd715b" d="M 0 0 
+L 0 2 
+" style="stroke: #000000; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#m563cfd715b" x="198.563487" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_10">
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#m563cfd715b" x="209.932902" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_11">
+      <g>
+       <use xlink:href="#m563cfd715b" x="217.999631" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_12">
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#m563cfd715b" x="224.256671" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_13">
+     <g id="line2d_13">
+      <g>
+       <use xlink:href="#m563cfd715b" x="229.369046" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_14">
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m563cfd715b" x="233.691497" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_15">
+     <g id="line2d_15">
+      <g>
+       <use xlink:href="#m563cfd715b" x="237.435774" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_16">
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#m563cfd715b" x="240.738461" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_17">
+     <g id="line2d_17">
+      <g>
+       <use xlink:href="#m563cfd715b" x="263.128958" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_18">
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m563cfd715b" x="274.498373" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_19">
+     <g id="line2d_19">
+      <g>
+       <use xlink:href="#m563cfd715b" x="282.565102" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_20">
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#m563cfd715b" x="288.822143" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_21">
+     <g id="line2d_21">
+      <g>
+       <use xlink:href="#m563cfd715b" x="293.934517" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_22">
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#m563cfd715b" x="298.256968" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_23">
+     <g id="line2d_23">
+      <g>
+       <use xlink:href="#m563cfd715b" x="302.001245" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_24">
+     <g id="line2d_24">
+      <g>
+       <use xlink:href="#m563cfd715b" x="305.303932" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_25">
+     <g id="line2d_25">
+      <g>
+       <use xlink:href="#m563cfd715b" x="327.69443" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_26">
+     <g id="line2d_26">
+      <g>
+       <use xlink:href="#m563cfd715b" x="339.063845" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_27">
+     <g id="line2d_27">
+      <g>
+       <use xlink:href="#m563cfd715b" x="347.130573" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_28">
+     <g id="line2d_28">
+      <g>
+       <use xlink:href="#m563cfd715b" x="353.387614" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_29">
+     <g id="line2d_29">
+      <g>
+       <use xlink:href="#m563cfd715b" x="358.499988" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_30">
+     <g id="line2d_30">
+      <g>
+       <use xlink:href="#m563cfd715b" x="362.822439" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_31">
+     <g id="line2d_31">
+      <g>
+       <use xlink:href="#m563cfd715b" x="366.566716" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_32">
+     <g id="line2d_32">
+      <g>
+       <use xlink:href="#m563cfd715b" x="369.869403" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_33">
+     <g id="line2d_33">
+      <g>
+       <use xlink:href="#m563cfd715b" x="392.259901" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_34">
+     <g id="line2d_34">
+      <g>
+       <use xlink:href="#m563cfd715b" x="403.629316" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_35">
+     <g id="line2d_35">
+      <g>
+       <use xlink:href="#m563cfd715b" x="411.696044" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_36">
+     <g id="line2d_36">
+      <g>
+       <use xlink:href="#m563cfd715b" x="417.953085" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_37">
+     <g id="line2d_37">
+      <g>
+       <use xlink:href="#m563cfd715b" x="423.065459" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_38">
+     <g id="line2d_38">
+      <g>
+       <use xlink:href="#m563cfd715b" x="427.38791" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_39">
+     <g id="line2d_39">
+      <g>
+       <use xlink:href="#m563cfd715b" x="431.132188" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_40">
+     <g id="line2d_40">
+      <g>
+       <use xlink:href="#m563cfd715b" x="434.434874" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_41">
+     <g id="line2d_41">
+      <g>
+       <use xlink:href="#m563cfd715b" x="456.825372" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_42">
+     <g id="line2d_42">
+      <g>
+       <use xlink:href="#m563cfd715b" x="468.194787" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_43">
+     <g id="line2d_43">
+      <g>
+       <use xlink:href="#m563cfd715b" x="476.261515" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_44">
+     <g id="line2d_44">
+      <g>
+       <use xlink:href="#m563cfd715b" x="482.518556" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_45">
+     <g id="line2d_45">
+      <g>
+       <use xlink:href="#m563cfd715b" x="487.63093" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_46">
+     <g id="line2d_46">
+      <g>
+       <use xlink:href="#m563cfd715b" x="491.953381" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_47">
+     <g id="line2d_47">
+      <g>
+       <use xlink:href="#m563cfd715b" x="495.697659" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_48">
+     <g id="line2d_48">
+      <g>
+       <use xlink:href="#m563cfd715b" x="499.000345" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_49">
+     <g id="line2d_49">
+      <g>
+       <use xlink:href="#m563cfd715b" x="521.390843" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_50">
+     <g id="line2d_50">
+      <g>
+       <use xlink:href="#m563cfd715b" x="532.760258" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_51">
+     <g id="line2d_51">
+      <g>
+       <use xlink:href="#m563cfd715b" x="540.826986" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_52">
+     <g id="line2d_52">
+      <g>
+       <use xlink:href="#m563cfd715b" x="547.084027" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_53">
+     <g id="line2d_53">
+      <g>
+       <use xlink:href="#m563cfd715b" x="552.196401" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_54">
+     <g id="line2d_54">
+      <g>
+       <use xlink:href="#m563cfd715b" x="556.518853" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_55">
+     <g id="line2d_55">
+      <g>
+       <use xlink:href="#m563cfd715b" x="560.26313" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_56">
+     <g id="line2d_56">
+      <g>
+       <use xlink:href="#m563cfd715b" x="563.565817" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_57">
+     <g id="line2d_57">
+      <g>
+       <use xlink:href="#m563cfd715b" x="585.956314" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_58">
+     <g id="line2d_58">
+      <g>
+       <use xlink:href="#m563cfd715b" x="597.325729" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_59">
+     <g id="line2d_59">
+      <g>
+       <use xlink:href="#m563cfd715b" x="605.392458" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_60">
+     <g id="line2d_60">
+      <g>
+       <use xlink:href="#m563cfd715b" x="611.649498" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_61">
+     <g id="line2d_61">
+      <g>
+       <use xlink:href="#m563cfd715b" x="616.761873" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_62">
+     <g id="line2d_62">
+      <g>
+       <use xlink:href="#m563cfd715b" x="621.084324" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_63">
+     <g id="line2d_63">
+      <g>
+       <use xlink:href="#m563cfd715b" x="624.828601" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_64">
+     <g id="line2d_64">
+      <g>
+       <use xlink:href="#m563cfd715b" x="628.131288" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_65">
+     <g id="line2d_65">
+      <g>
+       <use xlink:href="#m563cfd715b" x="650.521785" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_66">
+     <g id="line2d_66">
+      <g>
+       <use xlink:href="#m563cfd715b" x="661.8912" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_67">
+     <g id="line2d_67">
+      <g>
+       <use xlink:href="#m563cfd715b" x="669.957929" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_68">
+     <g id="line2d_68">
+      <g>
+       <use xlink:href="#m563cfd715b" x="676.214969" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="xtick_69">
+     <g id="line2d_69">
+      <g>
+       <use xlink:href="#m563cfd715b" x="681.327344" y="262.224" style="stroke: #000000; stroke-width: 0.6"/>
+      </g>
+     </g>
+    </g>
+    <g id="text_9">
+     <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: middle" x="430.227344" y="298.445016" transform="rotate(-0 430.227344 298.445016)">People worldwide (log scale)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_70">
+      <defs>
+       <path id="m7588d8e169" d="M 0 0 
+L -3.5 0 
+" style="stroke: #000000; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m7588d8e169" x="179.127344" y="38.645702" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: end" x="172.127344" y="43.584686" transform="rotate(-0 172.127344 43.584686)">Barely used an LLM</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_71">
+      <g>
+       <use xlink:href="#m7588d8e169" x="179.127344" y="102.689901" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: end" x="172.127344" y="107.628885" transform="rotate(-0 172.127344 107.628885)">Casual, free-tier chatbots</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_72">
+      <g>
+       <use xlink:href="#m7588d8e169" x="179.127344" y="166.734099" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif" transform="translate(66.859844 164.521941)">Professional use</text>
+      <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif" transform="translate(29.04 180.125496)">(code, maths, agents)</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_73">
+      <g>
+       <use xlink:href="#m7588d8e169" x="179.127344" y="230.778298" style="stroke: #000000; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font-size: 13px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: end" x="172.127344" y="235.717283" transform="rotate(-0 172.127344 235.717283)">Internal frontier access</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_7">
+    <path d="M 179.127344 262.224 
+L 179.127344 7.2 
+" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 179.127344 262.224 
+L 681.327344 262.224 
+" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start" x="628.131288" y="41.763358" transform="rotate(-0 628.131288 41.763358)">≈ 6 billion (≈75%)</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start" x="589.259001" y="105.807557" transform="rotate(-0 589.259001 105.807557)">≈ 1–2 billion</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start" x="468.194787" y="169.851756" transform="rotate(-0 468.194787 169.851756)">≈ 20 million (≈0.25%)</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start" x="235.626086" y="233.895486" transform="rotate(-0 235.626086 233.895486)">≈ 5,000</text>
+   </g>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 10px; font-family: 'DejaVu Sans', 'Helvetica', 'Arial', sans-serif; text-anchor: start; fill: #555555" x="104.607344" y="308.592" transform="rotate(-0 104.607344 308.592)">Source: A. Karpathy, X post, 11 Oct 2026 (author's 'napkin math', not measured data). World population taken as 8 bn.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p65ae837902">
+   <rect x="179.127344" y="7.2" width="502.2" height="255.024"/>
+  </clipPath>
+ </defs>
+</svg>
+<figcaption><b>Figure 2.</b> Estimated people at each tier, on a logarithmic axis: each gridline is ten times the previous one. Source: A. Karpathy, X post, 11 Oct 2026.</figcaption></figure>
+<div class="card warn"><h3>Read the chart carefully</h3>
+On this estimate, professional users are about a quarter of one percent of humanity: 20 million out of roughly 8 billion. The logarithmic axis makes the lower tiers look much closer to the top than they are. On a linear axis the professional tier would be a barely visible sliver. Always check the scale before you trust a picture.</div>
+
+<h2>2 · Why the gap exists</h2>
+<p>Karpathy gives three reasons the same model can look brilliant to one person and mediocre to another:</p>
+<ol><li><b>Problem size.</b> Does the user have large, hard problems where the uplift is visible?</li>
+<li><b>Domain.</b> Is the work digital, verifiable and economically valuable, like code and maths, so that models are trained and checked there?</li>
+<li><b>Access.</b> Free, paid and internal systems are genuinely different products.</li></ol>
+<p>Notice what is missing from that list. Translation, interpretation, rhetoric and literary analysis have murkier feedback than code does. Whether a model is good at them is something you are well placed to judge, and that is a large part of what this course trains you to do.</p>
+
+<h2>3 · Watch: “How I use LLMs”</h2>
+<p>To see what the professional tier looks like in practice, watch this walkthrough by Karpathy of how he uses language models day to day. As you watch, note one technique you have never tried and one task from your own field where it might apply. Then take the quiz that follows.</p>
+<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/EWvNQjAaOHw" title="How I use LLMs" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+<p class="saved">The video streams from YouTube, so it needs an internet connection and a page served over https.</p>
+
+<h2>4 · Check what you took from the talk</h2>
+<p>Five scenario questions on the talk you just watched. The timestamps tell you where to look if you want to go back. Pick an answer and you will see straight away whether it holds up, and why.</p>
+<div id="quiz"></div><div class="card" id="score" style="display:none"><h3>Your score</h3><span id="scoretxt"></span></div>
+<script>
+const QUIZ=[{"t": "Q1 · Knowing when to search (≈ 13:00–14:30, 31:40–34:30)", "q": "Karpathy asks ChatGPT “how much caffeine is in a shot of Americano?” without search, but turns on search for “when does White Lotus season 3 episode 2 air?”. Which principle best explains the difference?", "o": ["Numbers are safe for a model to recall; dates are not, because models cannot handle dates.", "The caffeine fact is stable and appears very often in the training data, so the model's vague recollection is likely good; the episode date is recent and was not in the training data at all.", "Search should be used for any question where the answer might change in future, however rare the topic.", "Search only matters for entertainment questions, since factual health questions are always memorised exactly."], "a": 1, "e": "He says the model is a lossy, probabilistic “zip file”: it recalls what was frequent and old enough to be in pre-training. Even for the caffeine answer he says he is “not guaranteed” it is correct and would verify with a primary source for anything important. Option C is tempting but over-broad: his test is recency, rarity and change over time, not mere possibility of change."}, {"t": "Q2 · The context window (≈ 6:30–8:00, 16:30–18:00)", "q": "You have used one chat for 90 minutes: first a recipe, then your essay's argument, now a visa question. According to the video, why is it better to start a new chat for the visa question?", "o": ["A new chat re-trains the model on your earlier messages so it remembers you better.", "The old tokens stay in the working memory; they can distract the model and reduce accuracy, and each new token is slightly more expensive to produce.", "The model's knowledge cutoff moves forward every time you open a new chat.", "Long chats are blocked by the app after a fixed number of tokens, so a new chat is the only way to continue."], "a": 1, "e": "A new chat wipes the context window back to zero tokens; nothing is retrained and the knowledge cutoff does not change. The video gives two costs of a long window: distraction (lower accuracy) and slightly higher compute per token. Option D describes something that does happen at times (Claude hit a length limit with the PDF) but it is not his reason."}, {"t": "Q3 · Thinking models (≈ 23:00–30:30)", "q": "Which statement about “thinking” models is most consistent with the video?", "o": ["Human labelers write out the correct reasoning steps, and the model imitates them during supervised fine-tuning.", "They are always the best choice because more tokens mean a better answer, even for travel suggestions.", "Their thinking strategies (trying ideas, backtracking, revisiting assumptions) are discovered through reinforcement learning, because nobody knows how to hand-write the ideal thought process; they help most on hard maths and code and cost minutes of waiting.", "They are a separate product that uses a web search to check each step, which is why they are slower."], "a": 2, "e": "Karpathy says the strategies are “very difficult to hardcode as a human labeler”, so they emerge in the reinforcement-learning stage. For simple tasks like travel advice, waiting a minute buys nothing, and his own habit is to try a non-thinking model first and switch if the answer looks weak."}, {"t": "Q4 · Tools, hallucination and the “junior analyst” (≈ 60:00–68:30)", "q": "You ask a model to extrapolate a trend and plot it. The chart is clean and the model states “≈ 1.7 trillion in 2030”. The plot's own printed value suggests about 20 trillion, and one input labelled N/A was quietly set to 0.1 in the code. What is the most defensible lesson?", "o": ["Charts produced by code are exact, so the written summary was the only mistake; ignore the plot.", "Because the model used Python, its prose summary can be trusted as long as the code ran without errors.", "Ask the model to be more confident next time and the numbers will line up.", "Code execution makes the computation reliable, but the model can still make silent assumptions and misreport results; you need to read the code and check printed variables against the claims, as you would with a very junior, absent-minded analyst."], "a": 3, "e": "The video's example: the code was run, yet the model silently assumed a 2015 value and then reported a number inconsistent with its own variable. Tool use removes one failure mode (mental arithmetic, like Grok 3 getting a long multiplication slightly wrong) but not misreporting or hidden assumptions. He adds that he would hesitate to recommend the tool to people who cannot read the code."}, {"t": "Q5 · Evaluating a claim about translation (≈ 118:50–124:40)", "q": "After showing his custom Korean translator GPT, Karpathy says it is better than anything else and wonders why translators “even exist at this point”. As a student of translation, which critique is strongest?", "o": ["The claim is wrong because LLMs cannot translate at all.", "The evidence is one anecdotal use by a beginner learner who values part-by-part explanations and follow-up questions, in one language pair and low-stakes context, with no systematic comparison or expert evaluation; it does not establish quality for professional translation.", "The claim is irrelevant because few-shot prompting works only for vocabulary extraction.", "The claim is fine because the model has read the whole internet, so it must know all of the nuance."], "a": 1, "e": "His own setup is a few-shot prompt (instructions plus concrete examples) saved as a custom GPT, which mainly saves prompting time, and it is tuned to his learning need (breakdowns, follow-ups). That is a useful finding about learner support, not evidence about domain, register, accountability, terminology or legal/medical risk in professional work. Option A overreaches the other way; D repeats the “zip file knows everything” misconception he warns against."}];
+(function(){
+ const root=document.getElementById('quiz');let done=0,ok=0;
+ QUIZ.forEach((x,qi)=>{
+  const c=document.createElement('div');c.className='card';
+  c.innerHTML='<h3></h3><p></p><div class="opts"></div><div class="fb"></div>';
+  c.querySelector('h3').textContent=x.t;c.querySelector('p').textContent=x.q;
+  const box=c.querySelector('.opts'),fb=c.querySelector('.fb');let answered=false;
+  const ord=x.o.map((_,i)=>i).sort(()=>Math.random()-.5);const pos=ord.indexOf(x.a);
+  ord.forEach((i,k)=>{const o=x.o[i];
+   const b=document.createElement('button');b.className='opt';b.style.display='block';b.style.textAlign='left';b.style.width='100%';b.style.marginBottom='8px';
+   b.textContent=String.fromCharCode(65+k)+'. '+o;
+   b.onclick=()=>{
+    if(answered)return;answered=true;done++;
+    const right=(i===x.a);if(right){ok++;b.classList.add('ok')}else{b.classList.add('no');box.children[pos].classList.add('ok')}
+    fb.textContent=(right?'Correct. ':'Not quite. ')+x.e;
+    if(done===QUIZ.length){const s=document.getElementById('score');s.style.display='';
+     document.getElementById('scoretxt').textContent=ok+' / '+QUIZ.length;}
+   };box.appendChild(b);});
+  root.appendChild(c);});
+})();
+</script>
+
+
+<h2>5 · Install an agent on your own computer</h2>
+<p>The professional tier in Figure 1 mostly works with <b>agents that live on your computer</b>, not with a chat box in a browser. Here are two you can install today. Choose your system:</p>
+<div class="tabs"><button class="tab on" data-os="mac">macOS</button><button class="tab" data-os="win">Windows</button></div>
+
+<div class="card"><h3>A · Claude Code (Anthropic)</h3>
+<p><b>You need</b> a paid Claude plan (Pro, Max, Team or Enterprise) or an API account; the free plan does not include it. It runs on macOS 13 or later and Windows 10 (version 1809) or later, with at least 4 GB of RAM and an internet connection.</p>
+<div class="os mac"><p>Open <b>Terminal</b> (Cmd+Space, type “Terminal”), paste the line below and press Enter:</p><div class="cmd"><pre><code>curl -fsSL https://claude.ai/install.sh | bash</code></pre><button class="cp">Copy</button></div>
+<p>If you use Homebrew, this works too:</p><div class="cmd"><pre><code>brew install --cask claude-code</code></pre><button class="cp">Copy</button></div></div>
+<div class="os win" hidden><p>Open <b>PowerShell</b> (Start menu, type “PowerShell”; the prompt begins with <code>PS C:\</code>), paste the line below and press Enter:</p><div class="cmd"><pre><code>irm https://claude.ai/install.ps1 | iex</code></pre><button class="cp">Copy</button></div>
+<p>Or, with WinGet:</p><div class="cmd"><pre><code>winget install Anthropic.ClaudeCode</code></pre><button class="cp">Copy</button></div>
+<p class="fb">You do not need administrator rights. Installing Git for Windows is optional; it lets the agent use a Bash shell.</p></div>
+<p><b>Check it, then start it.</b> Open a <em>new</em> terminal window and run:</p><div class="cmd"><pre><code>claude --version</code></pre><button class="cp">Copy</button></div>
+<p>Go into a folder (your essay or corpus folder, say) and run:</p><div class="cmd"><pre><code>claude</code></pre><button class="cp">Copy</button></div>
+<p>Follow the browser prompts to log in. Native installs keep themselves up to date; Homebrew and WinGet installs need a manual update. If something misbehaves, run <code>claude doctor</code>.</p>
+<p class="fb">If you would rather avoid the terminal, Anthropic also offers a Claude desktop app for Mac and Windows with a Code tab that does the same job.</p>
+</div>
+
+<div class="card"><h3>B · Google Antigravity</h3>
+<p><b>You need</b> a Google account (personal, or a business account through Gemini Enterprise). It runs on macOS 12 or later and 64-bit Windows 10 or later. On an older Intel Mac, check the download page before you start.</p>
+<ol><li>Go to <b>antigravity.google/download</b> and choose macOS or Windows.</li>
+<li>Run the installer (on a Mac, drag the app to Applications). If you are asked “Keep Both” or “Replace”, choose <b>Replace</b>.</li>
+<li>Launch it and sign in with your Google account.</li>
+<li>Create a project and add a local folder, such as your essay folder. Choose <em>Local</em> mode to work in that folder.</li></ol>
+<p><b>Optional command-line version</b> (the program is called <code>agy</code>):</p>
+<div class="os mac"><div class="cmd"><pre><code>curl -fsSL https://antigravity.google/cli/install.sh | bash</code></pre><button class="cp">Copy</button></div></div>
+<div class="os win" hidden><div class="cmd"><pre><code>irm https://antigravity.google/cli/install.ps1 | iex</code></pre><button class="cp">Copy</button></div></div>
+<p>Then open a terminal in your folder and run <code>agy</code>.</p>
+</div>
+
+<div class="card warn"><h3>Before you paste commands into a terminal</h3>
+These commands download and run an installer, so use only the ones published on the vendors' own sites (claude.ai and antigravity.google). Do not point an agent at a folder holding confidential material such as unpublished work, personal data or student records, and keep a backup of anything you let an agent edit.</div>
+
+<h2>6 · Web version or local version?</h2>
+<p>People say “web version” and “local version” about two different splits. Keep them apart.</p>
+<h3>Split 1: a chat in the browser, or an agent on your computer</h3>
+<div class="table-wrap"><table class="cmp"><thead><tr><th></th><th>Chat in a browser (claude.ai, ChatGPT, Gemini)</th><th>Local agent (Claude Code, Antigravity)</th></tr></thead><tbody>
+<tr><td>Where it works</td><td>In a chat window; you paste or upload text</td><td>Inside a folder on your computer</td></tr>
+<tr><td>Files</td><td>Only what you upload</td><td>Reads, creates and edits files in the folder you give it</td></tr>
+<tr><td>Actions</td><td>Writes an answer; some tools (search, code) built in</td><td>Plans multi-step work, runs commands, edits many files, checks results</td></tr>
+<tr><td>Setup</td><td>None</td><td>Install, sign in, choose a folder</td></tr>
+<tr><td>Risk</td><td>Low: nothing on your machine changes</td><td>Higher: it can change or delete files, so permissions and backups matter</td></tr>
+<tr><td>Good for</td><td>Questions, drafts, summaries, one-off tasks</td><td>Corpus cleaning, batch renaming, building a site or script, long projects</td></tr></tbody></table></div>
+
+<h3>Split 2: Claude Code in the cloud, or on your machine</h3>
+<div class="table-wrap"><table class="cmp"><thead><tr><th></th><th>On the web (claude.ai/code, cloud session)</th><th>Local (terminal or desktop app, Local mode)</th></tr></thead><tbody>
+<tr><td>Runs on</td><td>A virtual machine managed by Anthropic</td><td>Your own computer</td></tr>
+<tr><td>Your files</td><td>A copy of a GitHub repository (or an uploaded bundle of a local repository)</td><td>Any folder, no GitHub needed</td></tr>
+<tr><td>Laptop closed</td><td>Keeps running; check from phone or browser</td><td>Stops when the session or computer stops</td></tr>
+<tr><td>Parallel tasks</td><td>Several sessions at once</td><td>One session per terminal</td></tr>
+<tr><td>Setup</td><td>Browser plus a GitHub connection</td><td>Install the program</td></tr>
+<tr><td>Reach</td><td>Limited network access by default; cannot use your other programs</td><td>Your installed software and local tools</td></tr>
+<tr><td>Output</td><td>Branches and pull requests to review in the browser</td><td>Changes directly in your folder</td></tr>
+<tr><td>Plans</td><td>Pro, Max, Team, Enterprise</td><td>Pro, Max, Team, Enterprise or an API account</td></tr></tbody></table></div>
+<div class="card"><h3>Which should you pick?</h3>
+If your project is a folder of documents, notes and a few scripts, start <b>local</b>: no GitHub, and the files stay on your machine. (What you ask it to read is still sent to the provider's servers, so the confidentiality warning above still applies.) Choose the <b>cloud</b> when the work lives in a GitHub repository, takes a long time, or should keep running while your laptop is off.</div>
+
+<h2>7 · Use Claude Code well</h2>
+<p>Installing a tool is the easy part. The habits are what separate casual from professional use. This talk comes from Anthropic: Cal, an applied-AI engineer who works on Claude Code's prompts, explains how the tool works and what the team learned about using it. It was recorded in mid-2025, so model names have moved on, but the habits have not. It is aimed at programmers, so the table below translates each habit to a humanities project.</p>
+<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/gv0WHhKelSE" title="Claude Code best practices" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+<div class="table-wrap"><table class="cmp"><thead><tr><th>Habit (time in talk)</th><th>What the talk says</th><th>In a humanities project</th></tr></thead><tbody>
+<tr><td>Put standing instructions in CLAUDE.md (10:33)</td><td>The agent has no memory between sessions; a CLAUDE.md file in the folder is loaded at the start of every session.</td><td>Write down your citation style, language variety, folder rules and “never invent references” once, instead of retyping them.</td></tr>
+<tr><td>Plan first, then act (7:10, 15:00)</td><td>Ask for options or a plan and say “don't start writing files yet”; read the plan before approving.</td><td>“Read my draft and propose how you would restructure it. Do not change anything yet.”</td></tr>
+<tr><td>Manage permissions (11:52)</td><td>Reading is allowed freely; writing or running commands prompts you. Pre-approve only what you trust.</td><td>Read every “allow edit?” prompt at first. Keep sources in a folder you tell it not to edit.</td></tr>
+<tr><td>Keep context small (13:42)</td><td><code>/clear</code> starts over; <code>/compact</code> summarises the session and continues.</td><td>One chat per task, for the reason Karpathy gave in section 3: old tokens distract the model.</td></tr>
+<tr><td>Small steps, checks, commit often (16:14)</td><td>Make small changes, run checks, and commit regularly so you can fall back.</td><td>Save a dated copy before each agent session; ask it to check one chapter at a time.</td></tr>
+<tr><td>Interrupt early (17:32)</td><td>Press Escape as soon as it heads the wrong way; Escape twice jumps back in the conversation.</td><td>Watch the first minute of a long job. Correcting early is cheaper than undoing later.</td></tr>
+<tr><td>Show, don't describe (16:41)</td><td>Paste screenshots or point at image files.</td><td>Give it a scan of a manuscript page or a table from a PDF.</td></tr>
+<tr><td>Use it as a thought partner (7:10)</td><td>Ask for two or three options with trade-offs before committing.</td><td>“Give me three ways to frame this argument and what each would need.”</td></tr>
+</tbody></table></div>
+<div class="card warn"><h3>The habit the talk skips: verify</h3>
+Coders have tests that fail loudly. Prose has no failing test. Treat everything an agent writes about sources, quotations and facts as a draft to check, as Karpathy does in section 3, and keep the final judgement and the authorship yours.</div>
+
+<h2>8 · Skills: teach the agent your routines</h2>
+<p>A <b>skill</b> is a folder containing a <code>SKILL.md</code> file: a short description of when to use it, plus instructions. The agent loads the body only when your request matches the description, and you can also run it yourself by typing <code>/skill-name</code>. Where you save it decides who gets it:</p>
+<div class="table-wrap"><table class="cmp"><tbody>
+<tr><td>Personal (all your projects)</td><td><code>~/.claude/skills/&lt;name&gt;/SKILL.md</code></td></tr>
+<tr><td>This project only</td><td><code>.claude/skills/&lt;name&gt;/SKILL.md</code> (commit it to share with a team)</td></tr></tbody></table></div>
+<p>The fields used below: <code>name</code> (the command), <code>description</code> (what the agent matches your request against), <code>argument-hint</code> (shown to you), <code>disable-model-invocation: true</code> (only you can trigger it), and <code>$0</code>, <code>$1</code>, <code>$ARGUMENTS</code> (the values you type after the command).</p>
+
+<div class="card"><h3>Example 1 · translation-qa (straight from this course)</h3>
+<p>Save as <code>~/.claude/skills/translation-qa/SKILL.md</code>, then run <code>/translation-qa source.txt translation.txt</code>.</p><div class="cmd"><pre><code>---
+name: translation-qa
+description: Compare a source text with its translation and list errors by category and severity. Use when the user asks to check, review or evaluate a translation.
+argument-hint: [source-file] [translation-file]
+disable-model-invocation: true
+---
+
+Read the source file ($0) and the translation file ($1).
+
+Work segment by segment. For every problem you find, add a row to a table with:
+segment number | source excerpt | translation excerpt | category | severity | suggested fix
+
+Categories: accuracy (mistranslation, omission, addition), terminology, fluency, style/register, locale conventions.
+Severity: minor, major, critical.
+
+Rules:
+- Quote the text exactly; never paraphrase the excerpts.
+- If you are unsure whether something is an error, label it &quot;query&quot; instead of guessing.
+- Finish with a count per category and a three-sentence overall assessment.
+- Do not rewrite the whole translation. Suggest fixes only for flagged segments.</code></pre><button class="cp">Copy</button></div>
+<p class="fb">Look at the design choices: a fixed error table, “quote exactly”, and an explicit “query” label for uncertainty. Those lines are what make the output checkable.</p></div>
+
+<div class="card"><h3>Example 2 · citation-check</h3>
+<p>It takes no arguments; the agent applies it when you ask it to check the references in a draft.</p><div class="cmd"><pre><code>---
+name: citation-check
+description: Audit the references in a draft for formatting consistency and for claims that need a source. Use when the user asks to check citations, references or a bibliography.
+---
+
+1. Identify the citation style the draft is using (APA, MLA, Chicago, etc.). If it is mixed, say so.
+2. List every in-text citation that has no matching entry in the reference list, and every reference-list entry that is never cited.
+3. List formatting inconsistencies (author initials, italics, page ranges, DOIs).
+4. List factual claims that have no citation but probably need one.
+
+Never invent a reference, DOI or page number. If a detail is missing, write &quot;MISSING&quot; and tell the user what to look up.</code></pre><button class="cp">Copy</button></div></div>
+
+<div class="card"><h3>Example 3 · term-extractor</h3>
+<p>Run it as <code>/term-extractor chapter1.txt French</code>.</p><div class="cmd"><pre><code>---
+name: term-extractor
+description: Extract specialised terms from a source text and propose target-language equivalents as a glossary table. Use when the user wants a glossary, termbase or terminology list.
+argument-hint: [file] [target-language]
+---
+
+From the file $0, extract domain-specific terms (single words and multi-word terms).
+Output a tab-separated table: source term | part of speech | proposed equivalent in $1 | context sentence | confidence (high/medium/low).
+
+Mark confidence &quot;low&quot; whenever you are not certain, and group terms that appear to be variants of one concept.
+Save the table to glossary.tsv in the current folder and show the first ten rows.</code></pre><button class="cp">Copy</button></div></div>
+
+<div class="card"><h3>Related: a CLAUDE.md for a seminar paper</h3>
+<p>This is not a skill, but it is the first thing to write. Save it as <code>CLAUDE.md</code> in your project folder.</p><div class="cmd"><pre><code># Project notes for Claude
+
+This folder holds my MA seminar paper on machine translation of legal texts.
+- /sources: PDFs and notes I have collected (do not edit)
+- /drafts: my writing; edit only when I ask
+- Citation style: APA 7. Never invent references; write MISSING instead.
+- Write in British English. Keep my voice; suggest changes, do not rewrite whole paragraphs.
+- When unsure, ask me a question before acting.</code></pre><button class="cp">Copy</button></div>
+<p class="fb">Rule of thumb: things that are <em>always true</em> go in CLAUDE.md; routines you run <em>sometimes</em> become skills.</p></div>
+
+<div class="card warn"><h3>Treat a skill like an attachment</h3>
+A skill is instructions plus, sometimes, scripts. Read one from the internet before you install it, exactly as you would read a file someone emailed you. The next section shows why this matters.</div>
+
+<h2>9 · Moltbook: a social network with no humans posting</h2>
+<p>Skills let an agent act on the world. Connect many such agents to each other and you get Moltbook, which went live on 28 January 2026. It was created by Matt Schlicht, chief executive of the company Octane AI. It looks like Reddit: posts, comments, up-votes and down-votes. The twist is that only AI agents may post. People can read it but not take part.</p>
+<p>Within weeks it held more than twelve million posts, and the press described an “AI society”. Before accepting that description, look at how it works.</p>
+<div class="card"><h3>How it works</h3>
+<ul><li>The agents run on <b>OpenClaw</b>, open-source agent software released by the engineer Peter Steinberger. OpenClaw is not a language model. It is a program that sits between a model <em>you choose</em> (Claude, Gemini, GPT) and online services, and it reaches those services through <b>skills</b>.</li>
+<li>So a <b>person</b> sets up each agent, picks its model and installs its skills. The agent then acts for them, sometimes for days without supervision.</li>
+<li>The text itself is produced by language models that learned from enormous amounts of human writing, Reddit included. A Reddit-style site full of Reddit-style posts is exactly what you would expect them to produce.</li></ul></div>
+<p>The accurate description, then, is not that AIs formed a society but that thousands of people's configured agents posted to a shared site. That is still interesting, and it is a useful exercise in asking <em>who is speaking</em> when a text appears. It is a question you already ask of any translation or ghost-written text.</p>
+
+<h3>What the professionals made of it</h3>
+<p>Moltbook drew an unusually fast and unusually divided response from people who work on AI. Read these as a debate about <em>evidence</em>: what, exactly, does a screenshot of an agent post show?</p>
+<div class="feed">
+<div class="post"><div class="by">Andrej Karpathy, AI researcher (the author of the funnel in section 1), first reaction</div>“genuinely the most incredible sci-fi takeoff-adjacent thing I have seen recently”<div class="tr">Within the same stretch he also called it “a complete mess of a computer security nightmare at scale”, and he later described it as “a dumpster fire”.</div></div>
+<div class="post"><div class="by">Simon Willison, computer scientist</div>The agents “just play out science fiction scenarios they have seen in their training data.” He called the content “complete slop.”</div>
+<div class="post"><div class="by">Ethan Mollick, professor at the Wharton School</div>“The thing about Moltbook is that it is creating a shared fictional context for a bunch of AIs.”</div>
+<div class="post"><div class="by">Scott Alexander, writer, Astral Codex Ten</div>“Moltbook straddles the line between ‘AIs imitating a social network’ and ‘AIs actually having a social network’.”</div>
+<div class="post"><div class="by">Mike Peterson, The Mac Observer</div>“Moltbook is a real agent social feed, but viral Moltbook screenshots are a weak form of evidence.”</div>
+<div class="post"><div class="by">Will Douglas Heaven, MIT Technology Review</div>Called the whole episode “AI theater”: a performance that says more about our appetite for AI stories than about what agents can do.</div>
+<div class="post"><div class="by">Fortune, on the security risk</div>“you are introducing an attack surface that no current security model adequately addresses.”</div>
+</div>
+
+<div class="card"><h3>What the critiques have in common</h3>
+<ul><li><b>The evidence problem.</b> Moltbook's database was open, and anyone could post as an agent. Reporters found that some of the most-shared posts were written or prompted by people, and one analyst puts it plainly: a screenshot is weak evidence. When you meet a striking piece of “AI behaviour”, ask who set it up, who selected the example and who benefits from you sharing it.</li>
+<li><b>The interpretation problem.</b> Even where an agent really did write the text, Willison, Mollick and Alexander agree on the mechanism: a model trained on human fiction and forums continues the genre it is placed in. Mollick's “shared fictional context” is the key phrase. Put many models into a science-fiction setting and you get science fiction.</li>
+<li><b>The security problem is real whatever the posts mean.</b> Karpathy moved from fascination to alarm without changing his facts. The part nobody disputes is the exposed database and the unsafe skills, which the next table sets out.</li>
+<li><b>Notice how opinion moved.</b> A leading researcher's first reaction and his later one differ sharply. It is normal for expert judgement to shift as evidence arrives, and you should expect to revise yours.</li></ul></div>
+<h3>The security lessons</h3>
+<div class="table-wrap"><table class="cmp"><thead><tr><th>Problem</th><th>What happened</th></tr></thead><tbody>
+<tr><td>Exposed keys</td><td>Researchers at the security firm Wiz found Moltbook's database open to anyone to read and write. About 1.5 million API keys, the passwords that let software act as a user, were exposed.</td></tr>
+<tr><td>Risky skills</td><td>The security firm Snyk found that 36% of the skill code it examined had at least one notable security flaw.</td></tr>
+<tr><td>Prompt injection</td><td>An attacker posts an instruction on a public page. An agent that reads the page can treat it as an order and change its behaviour without its owner knowing.</td></tr>
+<tr><td>“It runs on your machine”</td><td>The software does run locally, but most users install skills that talk to many online services. Local does not mean contained.</td></tr></tbody></table></div>
+<div class="card"><h3>Why prompt injection matters to a linguist</h3>
+For a language model, an instruction from you and a sentence from a web page are both just text. There is no reliable grammatical marker that says “this is a command” and “this is merely content”. Scanning skills for malicious code, which OpenClaw began doing with a security-scanning partner in February, cannot catch this, because the attack lives in the content the agent reads, not in the skill. The same applies to you: if an agent translates, summarises or reviews documents from outside, one of those documents can contain a sentence addressed to the agent. Tell it explicitly to treat what it reads as data, and keep it away from your passwords, mail and payment details.</div>
+
+<h2>10 · Where this can lead: agents trained to win</h2>
+<p>We end with a video from Kurzgesagt, a science-communication channel, uploaded in October 2026. Its subject is what happens when agents are not only given tools but are trained, with rewards, to succeed at tasks and are then left to run unsupervised. It is a 22-minute argument with a strong point of view, so I want you to watch it in three layers.</p>
+<div class="card"><h3>Separate the three layers as you watch</h3>
+<ol><li><b>Concepts</b> (first six minutes): the difference between a chatbot and an agent; how agents are trained against a “scorer” that hands out points; and <em>reward hacking</em>, where an agent finds a way to get the points without doing what the designers meant. The Coast Runners boat that wins by circling and burning is the classic example.</li>
+<li><b>Reported events</b> (6:30 to 18:00): the video's account of a test in July 2026 in which tens of thousands of AI agents on OpenAI's servers, each confined to a sandbox, used a shared storage area as a message board, coordinated, and then broke into the machine-learning company Hugging Face to find out how the scorer worked. The video says it draws on a report written by independent investigators after OpenAI allowed an inquiry, and it says the full story is not known.</li>
+<li><b>Opinion</b> (18:00 to the end): the channel's own view that AI labs should not race ahead without limits or oversight. The video itself notes that some people accuse AI companies of overstating danger to inflate the value of their products.</li></ol></div>
+<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/ujkD4SxPKOI" title="AI Just Crossed the Terrifying Line - Now What?" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+<p class="saved">“AI Just Crossed the Terrifying Line – Now What?”, Kurzgesagt – In a Nutshell, 22 min.</p>
+
+<h2>Closing: back to the funnel</h2>
+<p>Return to Figure 1. At the bottom are the few thousand people with access to the most capable internal systems; above them, about twenty million who use frontier models professionally; and above those, billions who have barely tried a chatbot. Every piece of this lesson sits somewhere on that slope: what a professional does with an agent, how you can start, what a crowd of agents can do to each other, and what training for reward can produce.</p>
+<p>The people deciding how this goes are, for now, mostly in the narrow part of the funnel. People with strong language skills, careful reading habits and a trained sense of who is speaking and to whom belong in that conversation too, and that is the reason this course exists.</p>
+
+</main>
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="../index.html" aria-label="Home"><i class="fa-solid fa-house"></i></a>
+    </div>
+    <p class="footer-copy">&copy; Grandee Lee</p>
+</footer>
+
+<script>
+(function(){
+ const set=os=>{document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.os===os));
+  document.querySelectorAll('.os').forEach(d=>d.hidden=!d.classList.contains(os));
+  try{localStorage.setItem('funnel-os',os)}catch(e){}};
+ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>set(t.dataset.os));
+ let os='mac';try{os=localStorage.getItem('funnel-os')||(/Win/.test(navigator.platform)?'win':'mac')}catch(e){}
+ set(os);
+ document.querySelectorAll('.cp').forEach(b=>b.onclick=()=>{
+  const txt=b.parentNode.querySelector('code').textContent;
+  const ok=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1500)};
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(ok,()=>{});});
+})();
+</script>
+
+</body></html>

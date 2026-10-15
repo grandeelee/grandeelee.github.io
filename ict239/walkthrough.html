@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" href="../favicon.ico" type="image/x-icon">
 <style>
     :root {
         --c1: #e2c6b5;
@@ -460,7 +460,7 @@
 
 <nav id="nav">
     <div class="nav-inner">
-        <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+        <a href="../index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
         <span class="nav-title">ICT239 &middot; Flask Walkthrough</span>
         <button class="toc-toggle" id="toc-toggle" aria-label="Toggle contents"><i class="fa-solid fa-list-ul"></i> Contents</button>
     </div>
@@ -476,7 +476,7 @@
         </p>
         <div class="doc-hero-actions">
             <a href="#step-0-the-big-picture" class="btn btn-filled"><i class="fa-solid fa-play"></i> Start at Step 0</a>
-            <a href="index.html" class="btn btn-outline"><i class="fa-solid fa-house"></i> Back to site</a>
+            <a href="../index.html" class="btn btn-outline"><i class="fa-solid fa-house"></i> Back to site</a>
         </div>
     </div>
 </header>
@@ -743,7 +743,7 @@ $ source venv/bin/activate
 <p>Tip: if you use git, add a <code>.gitignore</code> containing the line <code>venv/</code> – never commit the venv itself, only <code>requirements.txt</code>.</p>
 </blockquote>
 <h3 id="checkpoint-1">✅ Checkpoint 1</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-1.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-1.webm" controls muted playsinline preload="metadata"></video></div>
 
 <pre><code class="language-bash">(venv) $ python -c &quot;import flask; print(flask.__version__)&quot;
 </code></pre>
@@ -847,7 +847,7 @@ $env:FLASK_APP="app.py"; $env:PYTHONPATH="."; $env:FLASK_DEBUG="1"</code></p>
 <p>You have a <em>folder</em> called <code>app</code> (the package) that contains a <em>file</em> called <code>app.py</code>. When Flask loads <code>app.py</code> it does so as the module <code>app.app</code> (file <code>app.py</code> inside package <code>app</code>). Inside it, <code>from app import app</code> means "from the <strong>package</strong> <code>app</code> (i.e. <code>__init__.py</code>) import the <strong>variable</strong> <code>app</code>". Confusing names, but it works – and it is exactly how Seminars 1–3 and <code>staycation</code> are set up, so we keep it.</p>
 <p>One consequence: <strong>start the server with <code>flask run</code> (via <code>start.sh</code>), not with <code>python app.py</code></strong>, otherwise Python will find <code>app.py</code> when it looks for the package <code>app</code> and the import breaks.</p>
 <h3 id="checkpoint-2">✅ Checkpoint 2</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-2.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-2.webm" controls muted playsinline preload="metadata"></video></div>
 
 <p>The browser shows "Hello from the shop!" and the terminal shows a log line like <code>"GET / HTTP/1.1" 200 -</code>. That log line <em>is</em> the request/response conversation from Step 0.</p>
 <p>Try <a href="http://127.0.0.1:5000/nothing">http://127.0.0.1:5000/nothing</a> – you get <strong>404 Not Found</strong>, because no function is registered for that URL.</p>
@@ -1084,7 +1084,7 @@ def home():
 </code></pre>
 <p>The list of dictionaries is fake data – in Step 6 it will come from a real database. The template won't need to change much, which is the whole point of separating the two.</p>
 <h3 id="checkpoint-3">✅ Checkpoint 3</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-3.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-3.webm" controls muted playsinline preload="metadata"></video></div>
 
 <pre><code class="language-bash">(venv) $ bash start.sh
 </code></pre>
@@ -1297,7 +1297,7 @@ return render_template(&quot;login.html&quot;, form=form)   # otherwise (GET, or
 </code></pre>
 <p>(The next step replaces these hard-coded paths with <code>url_for</code>.)</p>
 <h3 id="checkpoint-4">✅ Checkpoint 4</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-4.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-4.webm" controls muted playsinline preload="metadata"></video></div>
 
 <p>Restart the server if it isn't running (<code>bash start.sh</code>) and visit <a href="http://127.0.0.1:5000/register">http://127.0.0.1:5000/register</a>.</p>
 <ol>
@@ -1493,10 +1493,10 @@ def register():
 <li>In the terminal you can see the <code>302</code> lines: <code>"POST /login" 302</code> followed by <code>"GET /" 200</code>.</li>
 </ul>
 <p><em>Flash messages (shown once):</em></p>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-5-flash.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-5-flash.webm" controls muted playsinline preload="metadata"></video></div>
 
 <p><em>Register and log in:</em></p>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-5-login-register.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-5-login-register.webm" controls muted playsinline preload="metadata"></video></div>
 
 <hr />
 <h2 id="step-6-the-database-mongodb-mongoengine">Step 6 – The database (MongoDB + MongoEngine)</h2>
@@ -1717,7 +1717,7 @@ def register():
 <pre><code class="language-html">          &lt;p class=&quot;text-muted small mb-3&quot;&gt;{{ product.description }}&lt;/p&gt;
 </code></pre>
 <h3 id="checkpoint-6">✅ Checkpoint 6</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-6.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-6.webm" controls muted playsinline preload="metadata"></video></div>
 
 <ol>
 <li><code>bash start.sh</code>, open <a href="http://127.0.0.1:5000/">http://127.0.0.1:5000/</a> → <strong>eight</strong> products, loaded from MongoDB.</li>
@@ -2260,7 +2260,7 @@ def cartClear():
 <p>Each row's <strong>Remove</strong> button and the <strong>Empty cart</strong> button are small POST forms with a CSRF token, just like <strong>Add</strong>. <code>item.product.id</code> is the id of the referenced product, which <code>cartRemove</code> uses to find the right line.</p>
 <p>The two other forms need no changes: <code>login.html</code> has no <code>action</code>, so after Flask-Login bounces you to <code>/login?next=%2Fcart</code> the form posts back to that same URL and the <code>next</code> value is preserved. <em>(Seminar 3's login form used <code>action="/login"</code>, which would have dropped it.)</em></p>
 <h3 id="checkpoint-7">✅ Checkpoint 7</h3>
-<div class="checkpoint-video"><video src="/checkpoints-for-walkthrough/checkpoint-7.webm" controls muted playsinline preload="metadata"></video></div>
+<div class="checkpoint-video"><video src="checkpoints-for-walkthrough/checkpoint-7.webm" controls muted playsinline preload="metadata"></video></div>
 
 <ol>
 <li>Logged out, click <strong>Cart</strong> → you're taken to the login page, and the address bar shows <code>/login?next=%2Fcart</code>. A banner says "Please log in to continue."</li>
