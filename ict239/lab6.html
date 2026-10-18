@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT239 Lab 6 - Deploying to Google Cloud Run | Grandee Lee</title>
+<meta name="description" content="ICT239 Lab 6: deploy the Essentials shop (Flask and FastAPI) to Google Cloud Run, step by step with the gcloud command line.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="icon" href="../favicon.ico" type="image/x-icon">
+<style>
+    :root {
+        --c1: #e2c6b5;
+        --c2: #c8a48a;
+        --c3: #a77b5b;
+        --c4: #7b4a3a;
+        --c5: #4e2b1e;
+        --cream: #f5ede5;
+        --cream-dark: #ede2d5;
+        --text-dark: #3b1f14;
+        --text-mid: #5a3a2c;
+        --text-light: #7a6558;
+
+        --accent: var(--c3);
+        --accent-dark: var(--c4);
+        --accent-soft: rgba(167, 123, 91, 0.12);
+        --border: rgba(200, 164, 138, 0.28);
+
+        --code-bg: #282c34;
+        --code-bg-2: #21252b;
+        --code-line: #3a3f4b;
+        --code-text: #abb2bf;
+        --code-muted: #7f8790;
+        --code-kw: #c678dd;
+        --code-str: #98c379;
+        --code-dec: #e5c07b;
+        --code-com: #5c6370;
+
+        --success: #3f7d52;
+        --success-bg: #e4efe6;
+        --success-border: #9dc7a8;
+        --danger: #a9432f;
+        --danger-bg: #f7e7e2;
+        --danger-border: #dba493;
+
+        --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+        background: var(--cream);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 clamp(1.2rem, 4vw, 2.5rem) 5rem;
+    }
+
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+        color: var(--c5);
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: clamp(1.4rem, 3vw, 1.8rem);
+        font-weight: 900;
+        margin-top: 3.2rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid var(--border);
+        scroll-margin-top: 84px;
+    }
+    h3 {
+        font-size: clamp(1.05rem, 2vw, 1.25rem);
+        font-weight: 700;
+        color: var(--c4);
+        margin-top: 2rem;
+        scroll-margin-top: 84px;
+    }
+    h4 {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        color: var(--text-light);
+        margin: 1.8rem 0 0.6rem;
+    }
+
+    p { color: var(--text-mid); max-width: 68ch; }
+    .muted { color: var(--text-light); }
+    .lede { font-size: 1.02rem; color: rgba(226,198,181,0.85); max-width: 640px; }
+
+    a { color: var(--accent); text-decoration-color: rgba(167,123,91,0.4); text-underline-offset: 3px; }
+    a:hover { color: var(--accent-dark); }
+
+    code.inline {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--cream-dark);
+        color: var(--c5);
+        border: 1px solid var(--border);
+        padding: 0.12em 0.42em;
+        border-radius: 6px;
+        font-size: 0.88em;
+    }
+
+    ul.notes { padding-left: 1.2rem; max-width: 68ch; color: var(--text-mid); }
+    ul.notes li { margin-bottom: 0.55rem; }
+
+    /* ---- top nav (matches walkthrough.html) ---- */
+    #nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(245, 237, 229, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 1px 0 rgba(167, 123, 91, 0.15);
+        padding: 0 clamp(1.2rem, 4vw, 3rem);
+    }
+    .nav-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        gap: 1rem;
+    }
+    .nav-back {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--c5);
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+    .nav-back i { font-size: 0.85rem; color: var(--c3); transition: transform 0.25s ease; }
+    .nav-back:hover i { transform: translateX(-3px); }
+    .nav-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        display: none;
+    }
+    @media (min-width: 700px) { .nav-title { display: block; } }
+
+    /* ---- hero band ---- */
+    #doc-hero {
+        position: relative;
+        background: linear-gradient(155deg, var(--c5) 0%, var(--c4) 45%, var(--c3) 100%);
+        padding: clamp(2.6rem, 7vw, 4.5rem) clamp(1.5rem, 6vw, 4rem);
+        overflow: hidden;
+    }
+    #doc-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(ellipse 70% 55% at 12% 90%, rgba(226,198,181,0.08) 0%, transparent 55%),
+            radial-gradient(ellipse 55% 70% at 88% 10%, rgba(226,198,181,0.06) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    .doc-hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; text-align: center; }
+    .doc-eyebrow {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 3.5px;
+        text-transform: uppercase;
+        color: var(--c2);
+        margin-bottom: 1rem;
+    }
+    .doc-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 900;
+        font-size: clamp(1.8rem, 4.6vw, 2.7rem);
+        color: var(--c1);
+        line-height: 1.15;
+        margin-bottom: 1rem;
+    }
+
+    /* ---- score badge ---- */
+    #score-badge {
+        position: sticky;
+        top: 76px;
+        z-index: 30;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        background: rgba(245, 237, 229, 0.96);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 18px 8px 13px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--c5);
+        box-shadow: 0 4px 20px rgba(59,31,20,0.12);
+        margin: 1.6rem 0 0;
+    }
+    #score-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c3); flex-shrink: 0; }
+    #score-badge.complete .dot { background: var(--success); }
+    #score-badge.complete { border-color: var(--success-border); color: var(--success); background: var(--success-bg); }
+
+    /* ---- instructions box ---- */
+    .howto {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+        padding: 1.2rem 1.4rem;
+        margin-top: 1.6rem;
+        display: flex;
+        gap: 14px;
+    }
+    .howto .icon {
+        width: 30px; height: 30px; flex-shrink: 0;
+        border-radius: 10px;
+        background: var(--accent-soft);
+        color: var(--c4);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.85rem;
+    }
+    .howto p { margin: 0; font-size: 0.94rem; }
+    .howto p + p { margin-top: 6px; }
+
+    /* ---- tables ---- */
+    table.grid {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.88rem;
+        background: white;
+    }
+    .table-wrap {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 16px rgba(59,31,20,0.05);
+    }
+    table.grid th, table.grid td { text-align: left; padding: 0.7rem 1rem; vertical-align: top; }
+    table.grid th {
+        background: var(--cream-dark);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--c5);
+        font-weight: 700;
+    }
+    table.grid td { border-top: 1px solid var(--border); color: var(--text-mid); line-height: 1.6; }
+    table.grid tr:hover td { background: rgba(167,123,91,0.04); }
+    table.grid code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+
+    .doc-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* ---- code panel ---- */
+    .panel { margin-top: 1.2rem; }
+    .panel-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--text-light);
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .panel-label .file-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c3); }
+
+    pre.code {
+        background: var(--code-bg);
+        color: var(--code-text);
+        border-radius: var(--radius);
+        padding: 1.3rem 1.4rem;
+        overflow-x: auto;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        line-height: 1.7;
+        margin: 0;
+        border: 1px solid rgba(167,123,91,0.15);
+        box-shadow: 0 8px 30px rgba(59,31,20,0.14);
+    }
+    pre.code .kw { color: var(--code-kw); }
+    pre.code .str { color: var(--code-str); }
+    pre.code .com { color: var(--code-com); font-style: italic; }
+    pre.code .dec { color: var(--code-dec); }
+
+    /* ---- blank dropdown ---- */
+    select.blank {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.83rem;
+        font-weight: 600;
+        background: var(--code-bg-2);
+        color: var(--code-text);
+        border: 1.5px dashed var(--code-muted);
+        border-radius: 6px;
+        padding: 1px 6px;
+        margin: 0 1px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        min-width: 5.5ch;
+    }
+    select.blank:hover { border-color: var(--c2); }
+    select.blank:focus-visible { outline: 2px solid var(--c2); outline-offset: 2px; }
+    select.blank.correct { background: var(--success-bg); color: var(--success); border: 1.5px solid var(--success-border); }
+    select.blank.incorrect { background: var(--danger-bg); color: var(--danger); border: 1.5px solid var(--danger-border); }
+    select.blank option { color: var(--text-dark); background: #fff; }
+
+    /* ---- approach tag ---- */
+    .approach-tag {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 8px;
+    }
+    .approach-tag.ref { background: var(--accent-soft); color: var(--c4); }
+    .approach-tag.py { background: var(--cream-dark); color: var(--text-light); border: 1px solid var(--border); }
+
+    .callout {
+        border-left: 3px solid var(--c3);
+        background: rgba(167,123,91,0.07);
+        padding: 1rem 1.3rem;
+        border-radius: 0 var(--radius) var(--radius) 0;
+        font-size: 0.93rem;
+        margin-top: 1.2rem;
+        max-width: 68ch;
+    }
+    .callout p { margin: 0; color: var(--text-mid); }
+    .callout p + p { margin-top: 6px; }
+
+    /* ---- footer ---- */
+    .lab-footnote {
+        margin-top: 3.5rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.88rem;
+        color: var(--text-light);
+    }
+    footer {
+        background: var(--c5);
+        padding: clamp(2rem, 5vw, 3rem);
+        text-align: center;
+    }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
+    .footer-links a {
+        width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 50%; border: 1px solid rgba(200,164,138,0.2); color: var(--c2);
+        font-size: 0.95rem; text-decoration: none; transition: all 0.3s ease;
+    }
+    .footer-links a:hover { background: rgba(167,123,91,0.2); border-color: var(--c3); color: var(--c1); transform: translateY(-2px); }
+    .footer-copy { font-size: 0.78rem; color: rgba(200,164,138,0.4); }
+
+    /* ---- back to top ---- */
+    #back-to-top {
+        position: fixed;
+        right: clamp(1rem, 3vw, 2.2rem);
+        bottom: clamp(1rem, 3vw, 2.2rem);
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        background: var(--c5);
+        color: var(--c1);
+        display: flex; align-items: center; justify-content: center;
+        text-decoration: none;
+        box-shadow: 0 6px 24px rgba(59,31,20,0.3);
+        opacity: 0; pointer-events: none;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        z-index: 900;
+        font-size: 0.95rem;
+    }
+    #back-to-top.show { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    @media (max-width: 480px) {
+        pre.code { font-size: 0.76rem; padding: 1rem; }
+        table.grid { font-size: 0.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    /* ---- lab-5 additions ---- */
+    kbd { font-family: 'JetBrains Mono', monospace; font-size: 0.82em; background: var(--cream-dark); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 0.05em 0.4em; color: var(--c5); }
+    .callout.check { border-left-color: var(--success); background: var(--success-bg); }
+    .callout.check pre.code { margin-top: 0.8rem; }
+    .callout > :first-child { margin-top: 0; }
+    .callout > :last-child { margin-bottom: 0; }
+    nav.toc { background: white; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 16px rgba(59,31,20,0.05); padding: 0.9rem 1.4rem 0.9rem 2.6rem; margin-top: 1.6rem; color: var(--text-mid); }
+    nav.toc li { margin: 0.25rem 0; }
+    main ul, main ol { color: var(--text-mid); max-width: 68ch; }
+    li pre.code { margin: 0.6rem 0; }
+    li { margin-bottom: 0.35rem; }
+    /* ---- lab-6 additions ---- */
+    .diagram { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 1.2rem 0; }
+    .diagram span.box { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 6px 12px; font-size: 0.88rem; color: var(--text-mid); box-shadow: 0 2px 10px rgba(59,31,20,0.05); }
+    .diagram span.arrow { color: var(--text-light); font-size: 0.88rem; }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="../index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Grandee Lee</a>
+        <span class="nav-title">ICT239 &middot; Lab 6</span>
+    </div>
+</nav>
+
+<header id="doc-hero">
+    <div class="doc-hero-inner">
+        <p class="doc-eyebrow">ICT239 Web Programming &middot; Seminar 6 lab</p>
+        <h1 class="doc-title">Lab 6 - Deploying the shop to Google Cloud Run</h1>
+        <p class="lede">Step by step with the <code style="font-family:'JetBrains Mono',monospace">gcloud</code> command line</p>
+    </div>
+</header>
+
+<main>
+
+<nav class="toc">
+  <ol>
+    <li><a href="#what">What you will deploy</a></li>
+    <li><a href="#prereq">Step 0 - Prerequisites</a></li>
+    <li><a href="#local">Step 1 - Run it on your own computer first</a></li>
+    <li><a href="#docker">Step 2 - Read the Dockerfile</a></li>
+    <li><a href="#project">Step 3 - Create a Google Cloud project</a></li>
+    <li><a href="#apis">Step 4 - Enable the services</a></li>
+    <li><a href="#deploy">Step 5 - Deploy</a></li>
+    <li><a href="#test">Step 6 - Try it and watch the live traffic</a></li>
+    <li><a href="#update">Step 7 - Change the code and redeploy</a></li>
+    <li><a href="#logs">Step 8 - Logs and settings</a></li>
+    <li><a href="#fastapi">Step 9 - Deploy the FastAPI version</a></li>
+    <li><a href="#cleanup">Step 10 - Clean up (so you are not billed)</a></li>
+    <li><a href="#trouble">Troubleshooting</a></li>
+  </ol>
+</nav>
+
+<h2 id="what">What you will deploy</h2>
+<p>The Essentials shop from Lab 5, adapted so it needs <strong>no database</strong>, plus an <strong>admin page</strong> with live traffic charts. The same shop exists twice:</p>
+<p>Download <a href="seminar-6-material.zip" download><code class="inline">seminar-6-material.zip</code></a> and unzip it. You get both folders below.</p>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Folder</th><th>Framework</th><th>Start command inside the container</th></tr>
+  <tr><td><code class="inline">app/</code></td><td>Flask + Flask-Login + Flask-WTF</td><td><code class="inline">gunicorn app:app</code></td></tr>
+  <tr><td><code class="inline">app-fastapi/</code></td><td>FastAPI + Jinja2 + WTForms</td><td><code class="inline">uvicorn main:app</code></td></tr>
+</table>
+</div>
+
+<h3>How Cloud Run works, in one picture</h3>
+<div class="diagram">
+  <span class="box">Your code + Dockerfile</span><span class="arrow">&rarr; Cloud Build</span>
+  <span class="box">Container image (Artifact Registry)</span><span class="arrow">&rarr;</span>
+  <span class="box">Cloud Run service</span><span class="arrow">&rarr;</span>
+  <span class="box">https://&hellip;.run.app</span>
+</div>
+<ul>
+  <li>Cloud Run runs <strong>containers</strong>. You give it a container image, it gives you an HTTPS URL, and it starts or stops copies of the container depending on traffic.</li>
+  <li>When nobody visits for a while it <strong>scales to zero</strong>: the container is stopped and you pay nothing. The next visitor waits a second or two while a new container starts (a <em>cold start</em>).</li>
+  <li>The container must listen on the port given in the <code class="inline">PORT</code> environment variable (8080 by default) on <code class="inline">0.0.0.0</code>, not <code class="inline">127.0.0.1</code>.</li>
+</ul>
+
+<h3>Why there is no database in this version</h3>
+<p>A container's disk is thrown away every time the container stops, and a local MongoDB would vanish with it. So the data is split into two kinds:</p>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Data</th><th>Where it lives</th><th>Survives a restart?</th></tr>
+  <tr><td>Products, revenue figures, the 3 starter users</td><td>JSON files in <code class="inline">data/</code>, baked into the image</td><td>Yes - they are part of the code</td></tr>
+  <tr><td>Newly registered users, shopping carts, the traffic log</td><td>Python dictionaries in memory</td><td><strong>No</strong> - gone when the container stops</td></tr>
+</table>
+</div>
+<div class="callout"><strong>Consequence:</strong> memory is private to each container. If Cloud Run started two copies, a user who registered on copy A would not exist on copy B, and the admin page would only show half the traffic. That is why Step 5 uses <code class="inline">--max-instances 1</code> and why each Dockerfile runs a single worker process. For a real shop you would swap the dictionaries for a managed database (Firestore, Cloud SQL, or MongoDB Atlas).</div>
+
+<h2 id="prereq">Step 0 - Prerequisites</h2>
+<ol>
+  <li>A <strong>Google account</strong>.</li>
+  <li>A <strong>billing account</strong> attached to the project (a credit/debit card is required, even for the free tier). Cloud Run has a monthly free allowance (at the time of writing: 2 million requests, 180,000 vCPU-seconds, 360,000 GiB-seconds) that a lab app will not come close to, but check the <a href="https://cloud.google.com/run/pricing">current pricing page</a>. New accounts also get free trial credit.</li>
+  <li>The <strong><code class="inline">gcloud</code> CLI</strong>. Either:
+    <ul>
+      <li>install it from <a href="https://cloud.google.com/sdk/docs/install">cloud.google.com/sdk/docs/install</a>, then check with <code class="inline">gcloud --version</code>; or</li>
+      <li>use <a href="https://shell.cloud.google.com">Cloud Shell</a> in the browser, where <code class="inline">gcloud</code> is already installed and logged in. Upload or <code class="inline">git clone</code> the unzipped <code class="inline">app</code> and <code class="inline">app-fastapi</code> folders into it.</li>
+    </ul>
+  </li>
+  <li>You do <strong>not</strong> need Docker installed for this guide. Cloud Build builds the image for you in the cloud.</li>
+</ol>
+
+<h2 id="local">Step 1 - Run it on your own computer first</h2>
+<p>Always make sure the app works locally before blaming the cloud.</p>
+<div class="panel"><pre class="code">cd app
+python3 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+sh start.sh                  # http://127.0.0.1:5000</pre></div>
+<p>Log in as <code class="inline">poh@abc.com</code> / <code class="inline">12345</code> to shop, or <code class="inline">admin@abc.com</code> / <code class="inline">12345</code> to see the <strong>Admin</strong> link in the navbar. For the FastAPI version do the same inside <code class="inline">app-fastapi</code>.</p>
+<div class="callout check"><strong>Checkpoint:</strong> you can add items to the cart, and the Admin page draws charts that move when you click around the shop in another tab.</div>
+
+<h2 id="docker">Step 2 - Read the Dockerfile</h2>
+<p>Each app folder contains a <code class="inline">Dockerfile</code>, the recipe for the container image.</p>
+<div class="panel"><div class="panel-label"><span class="file-dot"></span>app/Dockerfile</div><pre class="code"># start from a small Python image
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+WORKDIR /app
+
+# requirements first, so Docker caches the pip install layer
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# then the code and data/
+COPY . .
+
+CMD exec gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 1 --threads 8 --timeout 0 app:app</pre></div>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Part</th><th>Why</th></tr>
+  <tr><td><code class="inline">${PORT:-8080}</code></td><td>Cloud Run sets <code class="inline">PORT</code>; we fall back to 8080 elsewhere.</td></tr>
+  <tr><td><code class="inline">0.0.0.0</code></td><td>Listen on all interfaces so traffic from outside the container reaches the app.</td></tr>
+  <tr><td><code class="inline">--workers 1 --threads 8</code></td><td>One process (so one shared memory), eight threads for concurrent requests.</td></tr>
+  <tr><td><code class="inline">gunicorn</code>, not <code class="inline">flask run</code></td><td>The Flask dev server is for development only. Gunicorn is a production server.</td></tr>
+  <tr><td><code class="inline">.dockerignore</code></td><td>Keeps <code class="inline">venv/</code>, <code class="inline">__pycache__/</code> out of the image.</td></tr>
+</table>
+</div>
+<p>The FastAPI Dockerfile is the same idea with <code class="inline">uvicorn main:app --proxy-headers --forwarded-allow-ips='*'</code>. The proxy flags make the app trust Cloud Run's <code class="inline">X-Forwarded-Proto</code> header so it knows visitors arrive over HTTPS.</p>
+
+<h2 id="project">Step 3 - Create a Google Cloud project</h2>
+<div class="panel"><pre class="code"># log in (opens a browser window)
+gcloud auth login
+
+# project ids are global and lowercase; pick your own suffix
+gcloud projects create ict239-shop-yourname --name="ICT239 shop"
+
+# make it the default for every later command
+gcloud config set project ict239-shop-yourname
+
+# a region close to you: asia-southeast1 = Singapore
+gcloud config set run/region asia-southeast1</pre></div>
+<p>Now attach billing. In the console open <a href="https://console.cloud.google.com/billing/linkedaccount">Billing &rarr; Account management</a>, choose your project and link a billing account. Or from the command line:</p>
+<div class="panel"><pre class="code">gcloud billing accounts list
+gcloud billing projects link ict239-shop-yourname --billing-account=XXXXXX-XXXXXX-XXXXXX</pre></div>
+<div class="callout">While you are in the console, create a <strong>budget alert</strong> (Billing &rarr; Budgets &amp; alerts), for example SGD 5, so a mistake cannot become a surprise bill.</div>
+
+<h2 id="apis">Step 4 - Enable the services</h2>
+<p>Google Cloud keeps services switched off until you ask for them. Deploying from source needs three:</p>
+<div class="panel"><pre class="code">gcloud services enable run.googleapis.com \
+                       cloudbuild.googleapis.com \
+                       artifactregistry.googleapis.com</pre></div>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>API</th><th>What it does for you</th></tr>
+  <tr><td><code class="inline">run</code></td><td>Cloud Run itself</td></tr>
+  <tr><td><code class="inline">cloudbuild</code></td><td>Builds your Dockerfile into an image in the cloud</td></tr>
+  <tr><td><code class="inline">artifactregistry</code></td><td>Stores the built image</td></tr>
+</table>
+</div>
+<p>This takes about a minute.</p>
+
+<h2 id="deploy">Step 5 - Deploy</h2>
+<p>Generate a random secret for signing login cookies, then deploy from inside the app folder:</p>
+<div class="panel"><pre class="code">cd app
+
+SECRET=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+gcloud run deploy essentials-shop \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --max-instances 1 \
+  --set-env-vars "SECRET_KEY=$SECRET,ADMIN_PASSWORD=choose-a-strong-one"</pre></div>
+
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Flag</th><th>Meaning</th></tr>
+  <tr><td><code class="inline">essentials-shop</code></td><td>The service name (part of the URL).</td></tr>
+  <tr><td><code class="inline">--source .</code></td><td>Upload this folder, build the <code class="inline">Dockerfile</code> with Cloud Build, push the image, deploy it. One command instead of four.</td></tr>
+  <tr><td><code class="inline">--allow-unauthenticated</code></td><td>Make the site public. Without it every request needs a Google identity token and visitors get <code class="inline">403 Forbidden</code>.</td></tr>
+  <tr><td><code class="inline">--max-instances 1</code></td><td>Never run more than one container, so in-memory users, carts and traffic stay in one place (see Step 0).</td></tr>
+  <tr><td><code class="inline">SECRET_KEY</code></td><td>Signs the session cookie. Without it the app falls back to a public default that anyone could use to forge a login.</td></tr>
+  <tr><td><code class="inline">ADMIN_PASSWORD</code></td><td>Replaces the seeded password <code class="inline">12345</code> for <code class="inline">admin@abc.com</code>. The admin page is on the public internet, so do not leave the default.</td></tr>
+</table>
+</div>
+
+<p>The first time, <code class="inline">gcloud</code> asks two questions:</p>
+<div class="panel"><pre class="code">Deploying from source requires an Artifact Registry Docker repository ... Do you want to continue (Y/n)?   y
+Allow unauthenticated invocations to [essentials-shop] (y/N)?   (skipped if you passed the flag)</pre></div>
+<p>The build takes 2-4 minutes. At the end you get:</p>
+<div class="panel"><pre class="code">Service [essentials-shop] revision [essentials-shop-00001-abc] has been deployed and is serving 100 percent of traffic.
+Service URL: https://essentials-shop-123456789.asia-southeast1.run.app</pre></div>
+<div class="callout">Passwords and keys in <code class="inline">--set-env-vars</code> are visible to anyone with access to the project. Fine for a lab; for real projects store them in <strong>Secret Manager</strong> and attach with <code class="inline">--set-secrets</code>. Avoid commas in values, since commas separate variables.</div>
+
+<h2 id="test">Step 6 - Try it and watch the live traffic</h2>
+<ol>
+  <li>Open the Service URL. The shop loads with 8 products.</li>
+  <li>Register a new account, log in, add things to the cart. Hover a product to see the AJAX popup.</li>
+  <li>Log out and log in as <code class="inline">admin@abc.com</code> with your <code class="inline">ADMIN_PASSWORD</code>. Click <strong>Admin</strong>.</li>
+  <li>Press <strong>Simulate 30 visits</strong> and watch the line chart, route bars and status doughnut update every 2 seconds. Visit <code class="inline">/no-such-page</code> to produce a 404 and see it turn up in the 4xx slice.</li>
+  <li>Log in as <code class="inline">poh@abc.com</code> and open <code class="inline">/admin</code>: you should get <strong>403 Admins only</strong>.</li>
+</ol>
+<div class="callout check"><strong>Checkpoint:</strong> after a few minutes of no visits, reload the Admin page. The totals reset to 0 because Cloud Run scaled the container to zero and started a fresh one. That is the in-memory trade-off from Step 0, not a bug.</div>
+<p>To keep one container warm (costs money, roughly a few dollars a month for the smallest size) you could add <code class="inline">--min-instances 1</code>. It is not needed for this lab.</p>
+
+<h2 id="update">Step 7 - Change the code and redeploy</h2>
+<p>Edit something, for example a product price in <code class="inline">data/products.json</code> or the footer text, then run the <strong>same</strong> deploy command again. A flag you leave out keeps its previous value, so a short version is enough:</p>
+<div class="panel"><pre class="code">cd app
+gcloud run deploy essentials-shop --source . --region asia-southeast1</pre></div>
+<p>Each deploy creates a new <strong>revision</strong>. Cloud Run switches traffic to it once it is healthy. If it is broken, roll back instantly:</p>
+<div class="panel"><pre class="code">gcloud run revisions list --service essentials-shop --region asia-southeast1
+gcloud run services update-traffic essentials-shop --region asia-southeast1 \
+        --to-revisions essentials-shop-00001-abc=100</pre></div>
+
+<h2 id="logs">Step 8 - Logs and settings</h2>
+<div class="panel"><pre class="code"># the last 50 log lines (gunicorn / uvicorn access log and any Python errors)
+gcloud run services logs read essentials-shop --region asia-southeast1 --limit 50
+
+# URL, env vars, scaling and the current revision
+gcloud run services describe essentials-shop --region asia-southeast1
+
+# just the URL
+gcloud run services describe essentials-shop --region asia-southeast1 --format='value(status.url)'
+
+# change an env variable without rebuilding
+gcloud run services update essentials-shop --region asia-southeast1 --update-env-vars ADMIN_PASSWORD=new-one</pre></div>
+<p>The console equivalent is <a href="https://console.cloud.google.com/run">console.cloud.google.com/run</a> &rarr; click the service &rarr; tabs <strong>Metrics</strong>, <strong>Logs</strong>, <strong>Revisions</strong>. The Metrics tab shows the same request counts as your admin page, measured by Google instead of by your app, which is a nice way to compare the two.</p>
+
+<h3>Doing it from the console instead</h3>
+<ol>
+  <li>Cloud Run &rarr; <strong>Deploy container</strong> &rarr; <strong>Service</strong>.</li>
+  <li>Choose <strong>Continuously deploy from a repository</strong> (needs your code on GitHub) or <strong>Deploy one revision from an existing container image</strong>.</li>
+  <li>Set region, <strong>Allow unauthenticated invocations</strong>, then under <em>Container(s) &rarr; Variables</em> add <code class="inline">SECRET_KEY</code> and <code class="inline">ADMIN_PASSWORD</code>, and under <em>Revision autoscaling</em> set maximum instances to 1.</li>
+</ol>
+
+<h2 id="fastapi">Step 9 - Deploy the FastAPI version</h2>
+<p>Identical, from the other folder and with a different service name so both can run side by side:</p>
+<div class="panel"><pre class="code">cd app-fastapi
+
+gcloud run deploy essentials-shop-fastapi \
+  --source . \
+  --region asia-southeast1 \
+  --allow-unauthenticated \
+  --max-instances 1 \
+  --set-env-vars "SECRET_KEY=$SECRET,ADMIN_PASSWORD=choose-a-strong-one"</pre></div>
+<p>It also serves FastAPI's automatic API documentation at <code class="inline">/docs</code>. Open both Service URLs and compare: same pages, same behaviour, different framework.</p>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Flask</th><th>FastAPI</th></tr>
+  <tr><td><code class="inline">Blueprint</code> + <code class="inline">register_blueprint</code></td><td><code class="inline">APIRouter</code> + <code class="inline">include_router</code></td></tr>
+  <tr><td><code class="inline">@login_required</code> (Flask-Login)</td><td><code class="inline">Depends(login_required)</code> dependency in <code class="inline">core.py</code></td></tr>
+  <tr><td>Flask-WTF <code class="inline">CSRFProtect</code></td><td><code class="inline">Depends(verify_csrf)</code>, token stored in the session</td></tr>
+  <tr><td><code class="inline">session</code> / <code class="inline">flash()</code></td><td>Starlette <code class="inline">SessionMiddleware</code>, <code class="inline">request.session</code></td></tr>
+  <tr><td><code class="inline">@app.before_request</code> / <code class="inline">after_request</code></td><td><code class="inline">@app.middleware("http")</code></td></tr>
+  <tr><td><code class="inline">&lt;int:a&gt;</code> in the URL</td><td><code class="inline">a: int</code> in the function signature</td></tr>
+  <tr><td><code class="inline">jsonify(dict)</code></td><td>just <code class="inline">return dict</code></td></tr>
+</table>
+</div>
+
+<h2 id="cleanup">Step 10 - Clean up (so you are not billed)</h2>
+<p>A scaled-to-zero service costs almost nothing, but the stored container images do cost a little, so remove what you do not need.</p>
+<div class="panel"><pre class="code"># delete the services
+gcloud run services delete essentials-shop --region asia-southeast1
+gcloud run services delete essentials-shop-fastapi --region asia-southeast1
+
+# delete the stored images (the repository that --source created)
+gcloud artifacts repositories delete cloud-run-source-deploy --location asia-southeast1
+
+# or remove everything at once by deleting the whole project
+gcloud projects delete ict239-shop-yourname</pre></div>
+
+<h2 id="trouble">Troubleshooting</h2>
+<div class="table-wrap">
+<table class="grid">
+  <tr><th>Symptom</th><th>Likely cause and fix</th></tr>
+  <tr><td><code class="inline">The user-provided container failed to start and listen on the port defined by PORT=8080</code></td><td>The app crashed at start-up or listens on <code class="inline">127.0.0.1</code>. Read the logs (Step 8); look for an <code class="inline">ImportError</code>/<code class="inline">ModuleNotFoundError</code> or a missing package in <code class="inline">requirements.txt</code>. Check the <code class="inline">CMD</code> uses <code class="inline">0.0.0.0</code> and <code class="inline">$PORT</code>.</td></tr>
+  <tr><td>Browser shows <strong>403 Forbidden</strong> from Google before the shop loads</td><td>The service is private. Run <code class="inline">gcloud run services add-iam-policy-binding essentials-shop --region asia-southeast1 --member=allUsers --role=roles/run.invoker</code>. If an organisation policy blocks <code class="inline">allUsers</code>, use a personal Google account/project.</td></tr>
+  <tr><td><code class="inline">API [run.googleapis.com] not enabled</code> or <code class="inline">billing account ... not found</code></td><td>Redo Step 4, and make sure Step 3 linked billing to <em>this</em> project (<code class="inline">gcloud config get-value project</code>).</td></tr>
+  <tr><td>Build fails with <code class="inline">PERMISSION_DENIED</code> on Cloud Build or Artifact Registry</td><td>Wait a minute after enabling the APIs and retry; make sure you are Owner/Editor of the project.</td></tr>
+  <tr><td>"400 Bad Request - The CSRF session token is missing" (Flask) or "Invalid or missing CSRF token" (FastAPI)</td><td>The session cookie was lost, usually because the container restarted <em>and</em> <code class="inline">SECRET_KEY</code> was not set, so the old cookie no longer verifies. Set <code class="inline">SECRET_KEY</code>; reload the form page and submit again.</td></tr>
+  <tr><td>Registered user or cart suddenly gone</td><td>Container was recycled (idle scale-to-zero or redeploy). Expected with in-memory data. See Step 0.</td></tr>
+  <tr><td>Admin traffic looks lower than the Cloud Run Metrics tab</td><td>Your app ignores static files, <code class="inline">/healthz</code> and the admin page's own polling on purpose.</td></tr>
+  <tr><td>Page loads without styling, links point to <code class="inline">http://</code></td><td>(FastAPI) the proxy flags are missing from the <code class="inline">uvicorn</code> command, so the app thinks it is on plain HTTP.</td></tr>
+  <tr><td>Deploy command is slow every time</td><td>Normal for <code class="inline">--source</code> (2-4 min). Keep <code class="inline">COPY requirements.txt</code> + <code class="inline">pip install</code> <em>before</em> <code class="inline">COPY . .</code> so the dependency layer is cached.</td></tr>
+</table>
+</div>
+
+<h2>Extra challenges</h2>
+<ol>
+  <li>Add a <code class="inline">.gcloudignore</code> or tweak <code class="inline">.dockerignore</code> and see how the upload shrinks.</li>
+  <li>Add a new product to <code class="inline">products.json</code>, redeploy, and use <code class="inline">gcloud run revisions list</code> to confirm the new revision is serving.</li>
+  <li>Move <code class="inline">ADMIN_PASSWORD</code> into Secret Manager and attach it with <code class="inline">--set-secrets ADMIN_PASSWORD=admin-password:latest</code>.</li>
+  <li>Add a "unique visitors" tile to the admin page (hint: a <code class="inline">set()</code> of session ids in <code class="inline">TrafficLog</code>).</li>
+  <li>Replace the in-memory carts with Firestore so they survive restarts, then raise <code class="inline">--max-instances</code>.</li>
+</ol>
+
+</main>
+
+<a href="#doc-hero" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></a>
+
+<footer>
+    <div class="footer-links">
+        <a href="mailto:grandeelee@suss.edu.sg" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="https://linkedin.com/in/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="https://github.com/grandeelee" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Grandee Lee. All Rights Reserved.</p>
+</footer>
+
+
+<script>
+(function () {
+  var backToTop = document.getElementById("back-to-top");
+  window.addEventListener("scroll", function () {
+    backToTop.classList.toggle("show", window.scrollY > 800);
+  });
+})();
+</script>
+</body>
+</html>
