@@ -434,6 +434,9 @@
             margin-bottom: 0.35rem;
         }
 
+        .paper-title a { color: inherit; text-decoration: underline; text-decoration-color: var(--c3); text-underline-offset: 3px; }
+        .paper-title a:hover { color: var(--c3); }
+
         .paper-authors {
             font-size: clamp(0.8rem, 1.3vw, 0.88rem);
             color: var(--text-light);
@@ -771,6 +774,7 @@
 
     // ── DATA ──────────────────────────────────────────────────
     const papers = [
+        { year: "2026", title: "Generative-Evaluative Agreement: A Necessary Validity Criterion for LLM-Enabled Adaptive Assessment", authors: "Grandee Lee, Yue Wang, Che Yee Lye and Luke Peh", venue: "The 21st Workshop on Innovative Use of NLP for Building Educational Applications (BEA 2026)", url: "anfi-2026-gea/index.html" },
         { year: "2024", title: "Beyond Single-Event Extraction: Towards Efficient Document-Level Multi-Event Argument Extraction", authors: "Wanlong Liu, Li Zhou, DingYi Zeng, Yichen Xiao, Shaohuan Cheng, Chen Zhang, Grandee Lee, Malu Zhang and Wenyu Chen", venue: "The 62nd Annual Meeting of the Association for Computational Linguistics (ACL)" },
         { year: "2021", title: "Revisiting Self-training for Few-shot Learning of Language Model", authors: "Yiming Chen, Yan Zhang, Chen Zhang, Grandee Lee, Ran Cheng and Haizhou Li", venue: "EMNLP 2021" },
         { year: "2021", title: "DynaEval: Unifying Turn and Dialogue Level Evaluation", authors: "Chen Zhang, Yiming Chen, Luis Fernando D'Haro, Yan Zhang, Grandee Lee, Haizhou Li", venue: "Association for Computational Linguistics (ACL), Long Paper" },
@@ -802,7 +806,7 @@
         <article class="paper">
             <span class="paper-year">${p.year}</span>
             <div class="paper-body">
-                <h3 class="paper-title">${p.title}</h3>
+                <h3 class="paper-title">${p.url ? `<a href="${p.url}">${p.title}</a>` : p.title}</h3>
                 <p class="paper-authors">${p.authors}</p>
                 <p class="paper-venue">${p.venue}</p>
             </div>

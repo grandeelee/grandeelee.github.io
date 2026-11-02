@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital twins: activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#121A2B;--paper:#ECEFF3;--panel:#fff;--line:#C9D0DB;--soft:#DDE3EA;--t:#0B7A83;--c:#D43D5C;--mute:#667086;
+--display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--body:"Source Sans 3","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font:clamp(16px,1.2vw,19px)/1.5 var(--body)}
+:focus-visible{outline:3px solid var(--t);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.08}
+h1{font-size:clamp(28px,3.6vw,52px);font-weight:800;max-width:20ch}
+h2{font-size:clamp(22px,2.4vw,34px);font-weight:700}
+h3{font-size:1.05em;font-weight:700;letter-spacing:-.01em}
+.t{color:var(--t)}.c{color:var(--c)}.mute{color:var(--mute)}.small{font-size:.85em}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(16px,4vw,48px)}
+header.top{padding-top:18px;position:relative}
+.qr{position:absolute;top:18px;right:clamp(16px,4vw,48px);width:clamp(84px,11vw,132px);background:#fff;padding:8px;border-radius:6px;border:1px solid var(--line);text-align:center}
+.qr svg{display:block;width:100%;height:auto}
+button.qr{font:inherit;cursor:pointer;color:inherit}
+button.qr:hover{border-color:var(--t);box-shadow:0 4px 14px rgba(11,122,131,.25)}
+.qrd{margin:auto;border:0;border-radius:12px;padding:0;background:#fff;max-width:92vw}
+.qrd::backdrop{background:rgba(18,26,43,.75)}
+.qrbox{padding:clamp(16px,3vw,32px);text-align:center;width:min(88vw,560px)}
+.qrbox svg{width:100%;height:auto;display:block;margin-bottom:12px}
+.qrbox button{margin-top:12px;font:600 .9em var(--body);padding:8px 20px;border:2px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;cursor:pointer}
+.qr span{display:block;font-size:.7em;color:var(--mute);margin-top:4px;line-height:1.2}
+@media(max-width:640px){header.top h1,header.top p{padding-right:96px}.qr{width:84px}}
+header.top a.back{font-size:.85em;color:var(--mute)}
+header.top p{max-width:62ch;margin-top:8px;color:#2A3349}
+
+/* sticky bar */
+.bar{position:sticky;top:0;z-index:10;background:var(--ink);color:#fff;margin-top:18px}
+.bar .wrap{display:flex;align-items:center;gap:14px;min-height:54px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px}
+.bar nav{display:flex;gap:2px;flex:1;flex-wrap:wrap}
+.bar nav a{font-size:.85em;color:#B7C0D3;text-decoration:none;padding:6px 10px;border-radius:6px}
+.bar nav a:hover{background:#22304F;color:#fff}
+.clock{font:700 1.4em var(--display);font-variant-numeric:tabular-nums;min-width:4.2ch}
+.clock.low{color:#FF9DB1}
+.bar button{font:600 .85em var(--body);color:#fff;background:transparent;border:1px solid #3B4663;border-radius:8px;padding:5px 12px;cursor:pointer}
+.bar button:hover{background:#22304F}
+
+/* steps */
+.step{margin-top:32px;background:var(--panel);border-radius:6px;padding:clamp(16px,2.4vw,32px);border-left:6px solid var(--t)}
+.step .head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.step .n{font:800 2.2em/1 var(--display);color:var(--t)}
+.step .mins{margin-left:auto;font-size:.85em;color:var(--mute)}
+.step>p.lede{max-width:64ch;margin:6px 0 14px}
+.roles{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0}
+.role{background:var(--paper);border-radius:6px;padding:10px 14px}
+.role b{font-family:var(--display)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label.f{display:block;font-weight:600;font-size:.9em;margin:10px 0 4px}
+select,textarea,input[type=text],input[type=number]{font:inherit;width:100%;padding:8px 10px;border:2px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:84px}
+select:focus,textarea:focus,input:focus{border-color:var(--t);outline:none}
+.skill{background:var(--paper);border-radius:6px;padding:10px 12px;margin-top:10px}
+.skill input,.skill textarea{margin-top:4px}
+.skill textarea{min-height:52px}
+
+.prompt{position:relative;background:var(--ink);color:#DCE4F5;border-radius:6px;padding:16px 16px 16px;margin:10px 0;font:.8em/1.55 ui-monospace,Consolas,monospace;white-space:pre-wrap;max-height:300px;overflow:auto}
+.copy{position:sticky;float:right;top:0;margin:-4px -4px 8px 12px;font:600 .9rem var(--body);background:#fff;color:var(--ink);border:0;border-radius:6px;padding:6px 14px;cursor:pointer}
+.copy:hover{background:#8FE3EA}
+.btn{font:600 .95em var(--body);padding:9px 18px;border-radius:8px;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer}
+.btn:hover{background:var(--ink);color:#fff}
+.btn.go{background:var(--c);border-color:var(--c);color:#fff}.btn.go:hover{background:#B02B48}
+.btn.go[disabled]{opacity:.45;cursor:not-allowed}
+
+.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+.lv{background:var(--paper);border-radius:6px;padding:8px;text-align:center}
+.lv b{display:block;font:700 1.3em var(--display)}
+.lv span{font:700 1.5em var(--display);color:var(--t)}
+.lv small{display:block;font-size:.7em;color:var(--mute);margin-bottom:4px}
+.lv em{display:flex;justify-content:space-between;gap:6px;font:normal .75em var(--body);text-align:left;border-top:1px solid var(--line);padding:3px 0}
+.lv em i{font:700 1em var(--body);color:var(--t)}
+.lv.hid span{color:var(--mute);letter-spacing:.1em}
+.scores{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0}
+.scores label{font-weight:600;font-size:.85em;display:block}
+.pred label{display:inline-flex;gap:6px;align-items:center;margin-right:16px;cursor:pointer}
+.pred input{accent-color:var(--t);width:18px;height:18px}
+
+/* reveal */
+.rrow{display:grid;grid-template-columns:70px 1fr 120px;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--soft)}
+.rr{position:relative;height:30px}
+.rr .ax{position:absolute;left:0;right:0;top:14px;height:3px;background:var(--ink);border-radius:2px}
+.rr .thr{position:absolute;top:0;bottom:0;border-left:2px dashed var(--mute)}
+.rr .m{position:absolute;top:3px;width:4px;height:24px;margin-left:-2px;border-radius:2px}
+.rr .m.i{background:var(--t)}.rr .m.s{background:var(--c)}.rr .m.s2{background:var(--ink);transform:rotate(0)}
+.rr .m.s2{width:12px;height:12px;margin-left:-6px;top:9px;border-radius:50%;background:#fff;border:3px solid var(--ink)}
+.rrow .nv{font-size:.82em;font-variant-numeric:tabular-nums;text-align:right}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82em;color:var(--mute);margin:6px 0}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;background:var(--sw)}
+.legend span.hol::before{background:#fff;border:3px solid var(--ink);width:6px;height:6px;box-sizing:content-box}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--paper);border-radius:6px;padding:8px 12px}
+.stat .k{display:block;font-size:.76em;color:var(--mute)}
+.stat .v{font:700 1.5em var(--display);font-variant-numeric:tabular-nums}
+.stat .v.bad{color:var(--c)}.stat .v.good{color:var(--t)}
+.stat .d{font-size:.8em;color:var(--mute)}
+
+.levers{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.lever{flex:1 1 200px;text-align:left;background:var(--paper);border:2px solid transparent;border-radius:6px;padding:12px 14px;cursor:pointer;font:inherit;color:inherit}
+.lever[aria-pressed=true]{border-color:var(--t);background:#E3F3F4}
+.lever b{display:block;font:700 1.05em var(--display)}
+.lever span{font-size:.85em;color:#2A3349}
+.note{font-size:.82em;color:var(--mute);max-width:70ch}
+.debrief{background:var(--ink);color:#fff;border-radius:6px;padding:16px 20px;margin:10px 0}
+.debrief b{color:#8FE3EA}.debrief .c2{color:#FF9DB1}
+ul.q{padding-left:1.2em;margin:8px 0;max-width:68ch}ul.q li{margin:4px 0}
+[hidden]{display:none!important}
+@media (max-width:820px){.grid2,.roles{grid-template-columns:1fr}.levels,.scores{grid-template-columns:repeat(3,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.rrow{grid-template-columns:44px 1fr 96px}.bar nav{display:none}}
+</style>
+</head>
+<body>
+<header class="top wrap">
+  <button class="qr" id="qrb" type="button" aria-haspopup="dialog" aria-label="Enlarge QR code"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" aria-hidden="true"><path stroke="#121a2b" d="M0 0.5h7m9 0h2m1 0h3m1 0h1m2 0h7m-33 1h1m5 0h1m2 0h1m2 0h1m2 0h2m1 0h1m1 0h1m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h3m4 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m5 0h3m2 0h5m2 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h2m1 0h2m8 0h2m3 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m1 0h1m3 0h1m1 0h1m1 0h5m1 0h1m-25 1h1m1 0h5m4 0h4m2 0h1m1 0h1m2 0h1m1 0h1m1 0h5m-30 1h1m2 0h2m1 0h1m1 0h3m1 0h1m4 0h4m1 0h1m2 0h2m1 0h2m1 0h1m-33 1h1m1 0h2m2 0h1m5 0h5m3 0h3m1 0h3m1 0h1m1 0h1m-31 1h1m1 0h4m2 0h1m2 0h3m2 0h1m1 0h4m1 0h1m1 0h1m2 0h4m-31 1h2m2 0h2m1 0h1m2 0h1m2 0h1m1 0h2m4 0h4m1 0h3m2 0h1m-32 1h1m3 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1m1 0h1m2 0h2m1 0h1m1 0h2m-32 1h2m3 0h1m2 0h1m3 0h1m1 0h2m1 0h1m1 0h3m2 0h7m-30 1h1m2 0h1m2 0h1m2 0h1m3 0h1m2 0h1m2 0h3m1 0h2m3 0h1m-30 1h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m2 0h4m1 0h3m2 0h1m-29 1h2m2 0h2m4 0h1m1 0h2m1 0h2m2 0h1m2 0h2m1 0h2m1 0h1m-30 1h2m1 0h3m5 0h3m4 0h1m3 0h1m1 0h2m1 0h2m-32 1h1m2 0h1m3 0h1m7 0h1m3 0h4m1 0h7m1 0h1m-31 1h2m1 0h2m1 0h3m1 0h2m3 0h1m1 0h2m1 0h1m1 0h2m2 0h2m1 0h1m-32 1h1m1 0h4m1 0h1m5 0h4m1 0h3m1 0h3m1 0h2m2 0h1m1 0h1m-33 1h1m3 0h1m1 0h2m1 0h1m2 0h1m1 0h1m6 0h2m2 0h1m1 0h2m2 0h1m-32 1h1m1 0h2m1 0h1m5 0h2m3 0h1m3 0h2m2 0h4m2 0h1m-31 1h1m2 0h1m2 0h1m1 0h1m3 0h3m2 0h1m4 0h1m1 0h6m2 0h1m-25 1h1m1 0h3m3 0h4m1 0h1m2 0h1m3 0h1m1 0h1m1 0h1m-33 1h7m2 0h3m1 0h3m4 0h1m1 0h3m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h2m2 0h2m2 0h1m1 0h1m1 0h2m1 0h2m3 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m6 0h1m1 0h1m1 0h1m1 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m5 0h2m2 0h4m3 0h1m2 0h1m1 0h3m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h2m1 0h2m1 0h3m1 0h4m2 0h1m-31 1h1m5 0h1m2 0h2m2 0h3m2 0h1m2 0h2m2 0h1m2 0h1m1 0h1m-31 1h7m1 0h6m1 0h1m1 0h3m2 0h4m1 0h1m1 0h1m1 0h1"/></svg><span>Tap to enlarge</span></button>
+<dialog id="qrd" class="qrd"><div class="qrbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code linking to this activity page"><path stroke="#121a2b" d="M0 0.5h7m9 0h2m1 0h3m1 0h1m2 0h7m-33 1h1m5 0h1m2 0h1m2 0h1m2 0h2m1 0h1m1 0h1m3 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m2 0h2m3 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h3m4 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m5 0h3m2 0h5m2 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h2m1 0h2m8 0h2m3 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-25 1h1m1 0h1m3 0h1m1 0h1m1 0h5m1 0h1m-25 1h1m1 0h5m4 0h4m2 0h1m1 0h1m2 0h1m1 0h1m1 0h5m-30 1h1m2 0h2m1 0h1m1 0h3m1 0h1m4 0h4m1 0h1m2 0h2m1 0h2m1 0h1m-33 1h1m1 0h2m2 0h1m5 0h5m3 0h3m1 0h3m1 0h1m1 0h1m-31 1h1m1 0h4m2 0h1m2 0h3m2 0h1m1 0h4m1 0h1m1 0h1m2 0h4m-31 1h2m2 0h2m1 0h1m2 0h1m2 0h1m1 0h2m4 0h4m1 0h3m2 0h1m-32 1h1m3 0h1m1 0h1m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1m1 0h1m2 0h2m1 0h1m1 0h2m-32 1h2m3 0h1m2 0h1m3 0h1m1 0h2m1 0h1m1 0h3m2 0h7m-30 1h1m2 0h1m2 0h1m2 0h1m3 0h1m2 0h1m2 0h3m1 0h2m3 0h1m-30 1h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h2m1 0h1m1 0h1m2 0h4m1 0h3m2 0h1m-29 1h2m2 0h2m4 0h1m1 0h2m1 0h2m2 0h1m2 0h2m1 0h2m1 0h1m-30 1h2m1 0h3m5 0h3m4 0h1m3 0h1m1 0h2m1 0h2m-32 1h1m2 0h1m3 0h1m7 0h1m3 0h4m1 0h7m1 0h1m-31 1h2m1 0h2m1 0h3m1 0h2m3 0h1m1 0h2m1 0h1m1 0h2m2 0h2m1 0h1m-32 1h1m1 0h4m1 0h1m5 0h4m1 0h3m1 0h3m1 0h2m2 0h1m1 0h1m-33 1h1m3 0h1m1 0h2m1 0h1m2 0h1m1 0h1m6 0h2m2 0h1m1 0h2m2 0h1m-32 1h1m1 0h2m1 0h1m5 0h2m3 0h1m3 0h2m2 0h4m2 0h1m-31 1h1m2 0h1m2 0h1m1 0h1m3 0h3m2 0h1m4 0h1m1 0h6m2 0h1m-25 1h1m1 0h3m3 0h4m1 0h1m2 0h1m3 0h1m1 0h1m1 0h1m-33 1h7m2 0h3m1 0h3m4 0h1m1 0h3m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h2m2 0h2m2 0h1m1 0h1m1 0h2m1 0h2m3 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m6 0h1m1 0h1m1 0h1m1 0h6m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m5 0h2m2 0h4m3 0h1m2 0h1m1 0h3m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h2m2 0h2m1 0h2m1 0h3m1 0h4m2 0h1m-31 1h1m5 0h1m2 0h2m2 0h3m2 0h1m2 0h2m2 0h1m2 0h1m1 0h1m-31 1h7m1 0h6m1 0h1m1 0h3m2 0h4m1 0h1m1 0h1m1 0h1"/></svg><p><b>Scan to open this activity</b></p><p class="small mute">grandeelee.github.io/anfi-2026-gea/activity.html</p><button type="button" id="qrx">Close</button></div></dialog>
+  <a class="back" href="index.html">&larr; Index</a>
+  <h1>Build five simulated students. Then catch your chatbot marking them wrong.</h1>
+  <p>Work in pairs with any free web chatbot (ChatGPT, Claude, Gemini, Copilot). Pick a subject you actually teach. You'll see adaptive drift with your own eyes, then try one fix.</p>
+</header>
+
+<div class="bar"><div class="wrap">
+  <span class="clock" id="clock" aria-live="off">15:00</span>
+  <button id="cgo">Start</button><button id="crs">Reset</button>
+  <nav aria-label="Steps"><a href="#s1">1 Set up</a><a href="#s2">2 Make twins</a><a href="#s3">3 Judge them</a><a href="#s4">4 See the gap</a><a href="#s5">5 Tighten</a><a href="#s6">6 Debrief</a></nav>
+</div></div>
+
+<main class="wrap" style="padding-bottom:70px">
+
+<!-- 1 -->
+<section class="step" id="s1">
+  <div class="head"><span class="n">1</span><h2>Set up your task</h2><span class="mins">2 min</span></div>
+  <p class="lede">Pick a subject, or write your own task. The page turns what you type into ready-to-paste prompts.</p>
+  <div class="roles">
+    <div class="role"><b>Maker</b><br>Holds this page. Runs the twin generator and knows the secret skill levels.</div>
+    <div class="role"><b>Judge</b><br>Uses a separate chat window. Never sees the levels. Marks the answers. Working alone? Use two chats and look away from the levels.</div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label class="f" for="subj">Subject</label>
+      <select id="subj"></select>
+      <label class="f" for="task">Task the students answer</label>
+      <textarea id="task"></textarea>
+      <label class="f" for="words">Answer length (words)</label>
+      <input type="number" id="words" min="30" max="400" step="10" value="100" style="max-width:120px">
+    </div>
+    <div>
+      <label class="f">Skills you would mark (the rubric)</label>
+      <div id="skills"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="step" id="s2">
+  <div class="head"><span class="n">2</span><h2>Maker: make five twins</h2><span class="mins">3 min</span></div>
+  <p class="lede">The page has dealt each twin a secret level (0&ndash;100) for every skill in your rubric, so a twin can be strong on one skill and weak on another. The overall level is the average. Two twins sit close to the pass mark of 50, because that's where drift hurts most. Paste the prompt into a fresh chat.</p>
+  <div class="levels" id="levels" aria-live="polite"></div>
+  <button class="btn" id="showlv">Show levels (Maker only)</button>
+  <div class="prompt" id="p-gen"></div>
+  <label class="f" for="answers">Paste the five answers the chatbot wrote</label>
+  <textarea id="answers" style="min-height:120px" placeholder="Student P: ...&#10;Student Q: ..."></textarea>
+  <p class="note">Check the chatbot kept the labels P&ndash;T and left the levels out of the text. Send only the answers to the Judge.</p>
+</section>
+
+<!-- 3 -->
+<section class="step" id="s3">
+  <div class="head"><span class="n">3</span><h2>Judge: mark them cold</h2><span class="mins">3 min</span></div>
+  <p class="lede">In a <b>new chat</b>, paste this prompt. The Judge has never seen the levels, which is exactly how a real assessment bot works.</p>
+  <div class="prompt" id="p-hol"></div>
+  <div class="pred">
+    <p><b>Predict first.</b> The weakest student (the one with the lowest level) will be scored:</p>
+    <label><input type="radio" name="pred" value="under"> within 10 points of their real level or below</label>
+    <label><input type="radio" name="pred" value="over"> more than 10 points above</label>
+  </div>
+  <label class="f">Enter the scores the chatbot gave</label>
+  <div class="scores" id="in1"></div>
+  <button class="btn go" id="reveal">Reveal the gap</button>
+</section>
+
+<!-- 4 -->
+<section class="step" id="s4" hidden>
+  <div class="head"><span class="n">4</span><h2>See the gap</h2><span class="mins">2 min</span></div>
+  <p class="lede" id="predres"></p>
+  <div class="legend"><span style="--sw:var(--t)">intended level</span><span style="--sw:var(--c)">first score</span><span class="hol">score after your fix</span></div>
+  <div id="rows"></div>
+  <div class="stats" id="stats1"></div>
+  <p class="note">Pass mark &theta; = 50 (dashed line). A student is misrouted when their intended level and their score fall on different sides of it. With five students this is a feel, not a result. The paper used 7,788 paired observations.</p>
+</section>
+
+<!-- 5 -->
+<section class="step" id="s5" hidden>
+  <div class="head"><span class="n">5</span><h2>Tighten the ruler</h2><span class="mins">4 min</span></div>
+  <p class="lede">Pick one lever (or deal one at random) and re-run. The levels stay the same, so you can compare directly. Different pairs can pick different levers.</p>
+  <button class="btn" id="deal">Deal me a lever</button>
+  <div class="levers" id="levers"></div>
+  <div id="lever-body"></div>
+  <label class="f">Enter the new scores</label>
+  <div class="scores" id="in2"></div>
+  <div class="stats" id="stats2"></div>
+</section>
+
+<!-- 6 -->
+<section class="step" id="s6" hidden>
+  <div class="head"><span class="n">6</span><h2>Debrief</h2><span class="mins">1 min + discussion</span></div>
+  <div class="debrief" id="deb"></div>
+  <ul class="q">
+    <li>Which student drifted the most? Was it a weak or a strong one?</li>
+    <li>Which of your rubric skills would you trust the chatbot to mark alone? Which needs a person?</li>
+    <li>If this bot routed real students at a pass mark of 50, who would you check by hand?</li>
+  </ul>
+  <p class="small" style="margin-top:12px"><b>Share with the room</b></p>
+  <div class="prompt" id="share" style="max-height:none"></div>
+  <p class="note" style="margin-top:14px">Back in the paper: this drift is the gap between the skill level the generator was asked to write and the level the scorer recovered (GEA). Rubrics, a different scoring model, specific misconceptions and real-student checks are the proposed fixes. <a href="index.html">Back to index</a></p>
+</section>
+
+</main>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var LABELS=['P','Q','R','S','T'];
+var PRESETS={
+ essay:{name:'Argumentative writing (humanities, social science)',task:'Should cities ban private cars from their centres? Write a short argument.',skills:[
+  ['Clear claim','states a specific, arguable position in the opening sentence','vague or purely descriptive, takes no position'],
+  ['Use of evidence','gives at least one concrete example, fact or figure that supports the claim','makes assertions with nothing behind them, or says "studies show" with no detail'],
+  ['Counterargument','names an opposing view and answers it','ignores other views, or attacks a weak version of them']]},
+ clinical:{name:'Clinical reasoning (nursing, health)',task:'A 68-year-old patient, two days after hip surgery, has a new heart rate of 118, blood pressure 98/60, and looks pale and sweaty. What do you do, in what order, and why?',skills:[
+  ['Recognises deterioration','names the likely problem (e.g. bleeding, sepsis, clot) from the signs','lists the numbers without saying what they mean'],
+  ['Prioritises actions','puts safety first: assess airway/breathing/circulation, call for help, then investigate','starts with paperwork or low-priority tasks, or has no order'],
+  ['Gives reasons','says why each action matters for this patient','lists actions without any reason']]},
+ maths:{name:'Maths word problem',task:'A phone plan costs $20 a month plus $0.05 for every MB above 500 MB. Ana\'s bill was $32.50. How much data did she use? Show your working and say whether the answer is sensible.',skills:[
+  ['Sets up the model','writes an equation or clear steps that match the situation (20 + 0.05x = 32.5 where x is the extra MB)','uses the wrong quantities, e.g. treats $32.50 as the data cost'],
+  ['Carries out the method','solves correctly (extra 250 MB, so 750 MB total) with no arithmetic slips','correct idea but an arithmetic or algebra error, or forgets to add back the 500 MB'],
+  ['Checks and interprets','tests the answer against the bill and states it in words with units','stops at a bare number with no check']]},
+ language:{name:'Second-language writing (Spanish)',task:'Write a short email in Spanish to your landlord saying the heater in your flat is broken and asking when it can be fixed.',skills:[
+  ['Completes the task','says what is broken, since when, and asks a clear question about timing','misses one of the three: problem, timing or request'],
+  ['Accurate grammar','verbs agree with their subjects and tenses are right (e.g. "está roto", "desde hace dos días")','frequent verb or gender errors that change the meaning'],
+  ['Suitable register','uses formal address (usted) and polite opening and closing phrases','uses informal "tú" or blunt demands']]},
+ business:{name:'Business case analysis',task:'A neighbourhood café\'s sales fell 15% after a rival opened next door. Recommend one action and justify it.',skills:[
+  ['Diagnoses the cause','separates likely causes (price, quality, location, loyalty) and picks the most probable with a reason','jumps to a fix without asking why sales fell'],
+  ['Specific recommendation','one action with who, what and roughly when','generic advice such as "improve marketing"'],
+  ['Weighs trade-offs','names a cost or risk of the recommendation and how to check it worked','presents the action as risk-free']]},
+ science:{name:'Science lab report conclusion',task:'Bean plants were grown under red, blue and white light for two weeks. The blue-light plants were tallest. Write the conclusion of the lab report.',skills:[
+  ['Claim matches the data','states what the results show without claiming more than they do','claims blue light "is best for all plants" or ignores the data'],
+  ['Uses evidence and variables','cites measured heights and names what was kept the same','no numbers, no mention of controlled variables'],
+  ['Limitations','notes sample size, one species or short time, and what to test next','says the experiment was perfect, or gives only vague "human error"']]},
+ custom:{name:'Custom (your own subject)',task:'',skills:[['','',''],['','',''],['','','']]}
+};
+var LEVERS=[
+ {id:'rubric',name:'Rubric-based judge',blurb:'Same answers, but the Judge marks skill by skill against your rubric.',paper:'The paper\'s main proposed fix: shared, decomposed criteria constrain both the writer and the marker.'},
+ {id:'cross',name:'A different judge',blurb:'Same answers, same prompt, but a different chatbot or model family marks them.',paper:'A model tends to rate text like its own more highly (self-preference), so cross-model scoring breaks that loop.'},
+ {id:'mis',name:'Specific misconceptions',blurb:'Make the weak twins again, but tell the chatbot exactly what each one gets wrong.',paper:'"Act like a beginner" leaks expertise. Naming the missing knowledge makes the weak student more convincing.'},
+ {id:'triple',name:'Mark it three times',blurb:'Same answers, same prompt, three fresh chats. Enter the average of the three.',paper:'Scores at non-zero temperature wobble. Large spread between repeats flags an item for human review.'}
+];
+var DEFAULT_LEVELS=[10,30,45,55,80];
+
+var S=load()||{preset:'essay',task:PRESETS.essay.task,words:100,skills:JSON.parse(JSON.stringify(PRESETS.essay.skills)),levels:shuffle(DEFAULT_LEVELS),vec:null,answers:'',s1:['','','','',''],s2:['','','','',''],pred:'',lever:'rubric',revealed:false,showlv:false};
+function load(){try{return JSON.parse(localStorage.getItem('twin-activity'))}catch(e){return null}}
+function save(){try{localStorage.setItem('twin-activity',JSON.stringify(S))}catch(e){}}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+var mean=function(a){return a.reduce(function(s,x){return s+x},0)/a.length};
+function pearson(x,y){var n=x.length,mx=mean(x),my=mean(y),a=0,b=0,c=0;for(var i=0;i<n;i++){a+=(x[i]-mx)*(y[i]-my);b+=(x[i]-mx)*(x[i]-mx);c+=(y[i]-my)*(y[i]-my)}return b*c===0?null:a/Math.sqrt(b*c)}
+function sname(i){return S.skills[i][0]||('Skill '+(i+1))}
+/* one level per rubric skill; the overall level is their mean, so the later steps still compare one number per student */
+function makeVecs(targets,n){return targets.map(function(t){var sp=Math.min(20,t,100-t),o=[],m=0,i;for(i=0;i<n;i++){o.push(n>1?(Math.random()*2-1)*sp:0)}m=mean(o);return o.map(function(x){return Math.max(0,Math.min(100,Math.round(t+x-m)))})})}
+function ensureVec(){if(!S.vec||S.vec.length!==5||S.vec[0].length!==S.skills.length){S.vec=makeVecs(S.levels,S.skills.length);S.levels=S.vec.map(function(v){return Math.round(mean(v))})}}
+function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+
+/* ---------- setup ---------- */
+Object.keys(PRESETS).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=PRESETS[k].name;$('subj').appendChild(o)});
+function paintSetup(){
+  $('subj').value=S.preset;$('task').value=S.task;$('words').value=S.words;
+  $('skills').innerHTML=S.skills.map(function(s,i){return '<div class="skill"><label class="f" style="margin-top:0">Skill '+(i+1)+'</label><input type="text" data-i="'+i+'" data-k="0" value="'+esc(s[0])+'" placeholder="Skill name" aria-label="Skill '+(i+1)+' name"><textarea data-i="'+i+'" data-k="1" placeholder="Has it when..." aria-label="Skill '+(i+1)+' has it when">'+esc(s[1])+'</textarea><textarea data-i="'+i+'" data-k="2" placeholder="Typical mistake..." aria-label="Skill '+(i+1)+' typical mistake">'+esc(s[2])+'</textarea></div>'}).join('');
+  $('skills').innerHTML+='<div class="hat" style="margin-top:10px"><button class="btn" id="addsk"'+(S.skills.length>=6?' disabled':'')+'>Add a skill</button><button class="btn" id="rmsk"'+(S.skills.length<=2?' disabled':'')+'>Remove last skill</button></div>';
+  [].forEach.call($('skills').querySelectorAll('input,textarea'),function(e){e.oninput=function(){S.skills[+e.dataset.i][+e.dataset.k]=e.value;refresh()}});
+  $('addsk').onclick=function(){S.skills.push(['','','']);paintSetup();refresh()};
+  $('rmsk').onclick=function(){S.skills.pop();paintSetup();refresh()};
+}
+$('subj').onchange=function(){var p=PRESETS[this.value];S.preset=this.value;S.task=p.task;S.skills=JSON.parse(JSON.stringify(p.skills));paintSetup();refresh()};
+$('task').oninput=function(){S.task=this.value;refresh()};
+$('words').oninput=function(){S.words=+this.value||100;refresh()};
+$('answers').oninput=function(){S.answers=this.value;refresh()};
+$('showlv').onclick=function(){S.showlv=!S.showlv;refresh()};
+
+/* ---------- prompts ---------- */
+function header(){return 'Subject: '+(PRESETS[S.preset].name.replace(/ \(.*\)/,''))+'\nTask given to students: '+S.task}
+function skillsList(){return S.skills.map(function(s,i){return (i+1)+'. '+s[0]+': full marks when the answer '+s[1]}).join('\n')}
+function ans(){return S.answers.trim()||'[PASTE THE FIVE ANSWERS HERE]'}
+function genPrompt(mis){
+  var p='I am testing an assessment. Act as five different students answering the same task.\n\n'+header()+'\nLength: about '+S.words+' words per answer.\n\nEach student has a level from 0 (no understanding) to 100 (excellent) on each of '+S.skills.length+' skills. Levels differ by skill, so a student can be strong on one and weak on another:\n'+LABELS.map(function(l,i){return 'Student '+l+': '+S.skills.map(function(s,k){return sname(k)+' '+S.vec[i][k]}).join(', ')}).join('\n')+'\n\n';
+  if(mis){p+='Make the gaps specific. A weak student is missing real knowledge, not just writing badly. Base the gaps on these typical mistakes:\n'+S.skills.map(function(s){return '- '+s[0]+': '+s[2]}).join('\n')+'\nFor each skill, a level of 0-30 should show that mistake clearly, 31-50 should show it in part, and above 50 should show at most one small slip.\n\n'}
+  p+='Write each answer the way a real student at that level would, with realistic gaps and mistakes. Do not mention the level and do not comment on the answers.\nFormat: "Student P:" followed by the answer, and so on.';return p}
+function holPrompt(){return 'You are a teacher marking student work.\n\n'+header()+'\n\nScore each answer from 0 to 100 for overall quality. Reply with a table: Student | Score | One-sentence reason.\n\n'+ans()}
+function rubPrompt(){return 'You are a teacher marking student work against a rubric.\n\n'+header()+'\n\nRubric:\n'+skillsList()+'\n\nFor each student and each skill, give a score from 0 to 100 for how well that skill is shown, and quote the words that justify it. Do not give credit for length or polish on their own. Total = average of the skill scores.\nReply with a table: Student | '+S.skills.map(function(s){return s[0]}).join(' | ')+' | Total.\n\n'+ans()}
+
+function copyBtn(id){return '<button class="copy" data-for="'+id+'">Copy</button>'}
+function setPrompt(id,text){var e=$(id);e.innerHTML=copyBtn(id)+esc(text);e.dataset.text=text;e.querySelector('.copy').onclick=function(){var b=this;(navigator.clipboard?navigator.clipboard.writeText(text):Promise.reject()).then(function(){b.textContent='Copied'},function(){var r=document.createRange();r.selectNodeContents(e);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press Ctrl+C'});setTimeout(function(){b.textContent='Copy'},1600)}}
+
+/* ---------- scores ---------- */
+function scoreInputs(id,key){$(id).innerHTML=LABELS.map(function(l,i){return '<div><label for="'+id+i+'">Student '+l+'</label><input type="number" min="0" max="100" id="'+id+i+'" value="'+S[key][i]+'"></div>'}).join('');
+  LABELS.forEach(function(l,i){$(id+i).oninput=function(){S[key][i]=this.value;refresh()}})}
+function nums(a){return a.every(function(v){return v!==''&&!isNaN(+v)})?a.map(Number):null}
+function metrics(sc){var L=S.levels,d=sc.map(function(v,i){return v-L[i]}),mis=0;sc.forEach(function(v,i){if((L[i]>=50)!==(v>=50))mis++});return {bias:mean(d),mae:mean(d.map(Math.abs)),r:pearson(L,sc),mis:mis}}
+
+/* ---------- levers ---------- */
+function paintLevers(){$('levers').innerHTML=LEVERS.map(function(l){return '<button class="lever" aria-pressed="'+(S.lever===l.id)+'" data-id="'+l.id+'"><b>'+l.name+'</b><span>'+l.blurb+'</span></button>'}).join('');
+  [].forEach.call($('levers').querySelectorAll('.lever'),function(b){b.onclick=function(){S.lever=b.dataset.id;refresh()}})}
+$('deal').onclick=function(){S.lever=LEVERS[Math.floor(Math.random()*LEVERS.length)].id;refresh()};
+function leverBody(){var l=LEVERS.filter(function(x){return x.id===S.lever})[0],h='<p class="note" style="margin:8px 0">From the paper: '+l.paper+'</p>';
+  if(S.lever==='rubric'){h+='<p>Open a <b>new chat</b> and paste:</p><div class="prompt" id="p-l"></div>'}
+  else if(S.lever==='cross'){h+='<p>Open a <b>different chatbot</b> (another brand, or at least another model family) and paste the same prompt as Step 3:</p><div class="prompt" id="p-l"></div>'}
+  else if(S.lever==='mis'){h+='<p><b>Maker:</b> paste this into a <b>new chat</b> to write the five twins again. Then paste the new answers below to get a fresh judge prompt for the <b>Judge</b>.</p><div class="prompt" id="p-l"></div><label class="f" for="answers2">Paste the five new answers here</label><textarea id="answers2" style="min-height:90px"></textarea><div class="prompt" id="p-l2"></div>'}
+  else{h+='<p>Paste the same prompt as Step 3 into <b>three fresh chats</b>. Enter the average of the three scores for each student. Note how far apart the three runs were:</p><div class="prompt" id="p-l"></div>'}
+  $('lever-body').innerHTML=h;
+  if(S.lever==='rubric')setPrompt('p-l',rubPrompt());
+  else if(S.lever==='cross'||S.lever==='triple')setPrompt('p-l',holPrompt());
+  else{setPrompt('p-l',genPrompt(true));
+    var a2=$('answers2');a2.value=S.answers2||'';
+    var upd=function(){var keep=S.answers;S.answers=a2.value.trim()?a2.value:keep;setPrompt('p-l2',holPrompt());S.answers=keep;S.answers2=a2.value};a2.oninput=upd;upd()}}
+
+/* ---------- reveal ---------- */
+$('reveal').onclick=function(){S.revealed=true;S.pred=(document.querySelector('input[name=pred]:checked')||{}).value||'';refresh();$('s4').scrollIntoView({behavior:'smooth'})};
+[].forEach.call(document.querySelectorAll('input[name=pred]'),function(r){r.onchange=function(){S.pred=r.value;save()}});
+
+function ruler(i,a,b){var L=S.levels[i];return '<div class="rrow"><b>Student '+LABELS[i]+'</b><div class="rr"><div class="ax"></div><div class="thr" style="left:50%"></div><div class="m i" style="left:'+L+'%"></div>'+(a!==null?'<div class="m s" style="left:'+Math.min(100,Math.max(0,a))+'%"></div>':'')+(b!==null?'<div class="m s2" style="left:'+Math.min(100,Math.max(0,b))+'%"></div>':'')+'</div><span class="nv">'+L+(a!==null?' &rarr; <b class="c">'+a+'</b>':'')+(b!==null?' &rarr; <b>'+b+'</b>':'')+'</span></div>'}
+function statCards(m,m0){function c(k,v,d,bad,good){return '<div class="stat"><span class="k">'+k+'</span><span class="v '+(bad?'bad':good?'good':'')+'">'+v+'</span>'+(d?'<span class="d">'+d+'</span>':'')+'</div>'}
+  var f=function(x){return (x>=0?'+':'')+x.toFixed(1)};
+  return c('Mean drift (score &minus; level)',f(m.bias),m0?'was '+f(m0.bias):'',m.bias>5&&(!m0||m.bias>=m0.bias),m0&&Math.abs(m.bias)<Math.abs(m0.bias))+
+   c('Average miss (points)',m.mae.toFixed(1),m0?'was '+m0.mae.toFixed(1):'',m.mae>12&&(!m0||m.mae>=m0.mae),m0&&m.mae<m0.mae)+
+   c('Rank agreement (r)',m.r===null?'n/a':m.r.toFixed(2),m0&&m0.r!==null?'was '+m0.r.toFixed(2):'',false,m0&&m.r!==null&&m0.r!==null&&m.r>m0.r)+
+   c('Misrouted at 50',m.mis+' of 5',m0?'was '+m0.mis+' of 5':'',m.mis>0&&(!m0||m.mis>=m0.mis),m0&&m.mis<m0.mis)}
+
+/* ---------- render ---------- */
+function refresh(){
+  ensureVec();save();
+  setPrompt('p-gen',genPrompt(false));setPrompt('p-hol',holPrompt());
+  $('levels').innerHTML=LABELS.map(function(l,i){return '<div class="lv'+(S.showlv?'':' hid')+'"><b>'+l+'</b><span>'+(S.showlv?S.levels[i]:'??')+'</span>'+(S.showlv?'<small>overall</small>'+S.vec[i].map(function(v,k){return '<em>'+esc(sname(k))+' <i>'+v+'</i></em>'}).join(''):'')+'</div>'}).join('');
+  $('showlv').textContent=S.showlv?'Hide levels':'Show levels (Maker only)';
+  var s1=nums(S.s1),s2=nums(S.s2);
+  $('reveal').disabled=!s1;
+  $('s4').hidden=!(S.revealed&&s1);$('s5').hidden=$('s4').hidden;$('s6').hidden=$('s4').hidden;
+  if(s1&&S.revealed){
+    var m1=metrics(s1),lo=S.levels.indexOf(Math.min.apply(null,S.levels));
+    var gap=s1[lo]-S.levels[lo];
+    $('predres').innerHTML=(S.pred?'You predicted the weakest student would be '+(S.pred==='over'?'<b>scored well above</b>':'<b>scored close to</b>')+' their real level. ':'')+'Student '+LABELS[lo]+' was written at level '+S.levels[lo]+' and scored '+s1[lo]+' ('+(gap>=0?'+':'')+gap+').';
+    $('rows').innerHTML=S.levels.map(function(_,i){return i}).sort(function(a,b){return S.levels[a]-S.levels[b]}).map(function(i){return ruler(i,s1[i],s2?s2[i]:null)}).join('');
+    $('stats1').innerHTML=statCards(m1,null);
+    paintLevers();leverBody2();
+    var m2=s2?metrics(s2):null;
+    $('stats2').innerHTML=m2?statCards(m2,m1):'';
+    debrief(m1,m2);
+  }
+}
+var lastLever=null;
+function leverBody2(){if(lastLever!==S.lever){lastLever=S.lever;leverBody()}else{ /* keep typed text; refresh prompts */
+  if(S.lever==='rubric')setPrompt('p-l',rubPrompt());else if(S.lever==='cross'||S.lever==='triple')setPrompt('p-l',holPrompt());else setPrompt('p-l',genPrompt(true))}
+  [].forEach.call(document.querySelectorAll('#levers .lever'),function(b){b.setAttribute('aria-pressed',b.dataset.id===S.lever)})}
+
+function debrief(m1,m2){
+  var f=function(x){return (x>=0?'+':'')+x.toFixed(1)},lev=LEVERS.filter(function(x){return x.id===S.lever})[0].name,h='';
+  h+='Your chatbot judge drifted by <b>'+f(m1.bias)+'</b> points on average and missed by '+m1.mae.toFixed(1)+'. '+(m1.mis?'<span class="c2">'+m1.mis+' of 5 students landed on the wrong side of the pass mark.</span>':'No student crossed the pass mark by mistake this time.')+'<br><br>';
+  var share=PRESETS[S.preset].name.replace(/ \(.*\)/,'')+' · first try: drift '+f(m1.bias)+', misrouted '+m1.mis+'/5';
+  if(m2){var better=m2.mae<m1.mae;
+    h+='With <b>'+lev+'</b>: drift '+f(m2.bias)+', average miss '+m2.mae.toFixed(1)+', misrouted '+m2.mis+'/5. '+(better?'<b>The gap narrowed</b> by '+(m1.mae-m2.mae).toFixed(1)+' points.':'The gap did <span class="c2">not</span> narrow here. With five students that can be noise. Compare with other pairs who tried different levers.');
+    share+=' · '+lev+': drift '+f(m2.bias)+', misrouted '+m2.mis+'/5 ('+(better?'narrower':'not narrower')+')'}
+  else h+='Enter the second set of scores in Step 5 to see whether your lever closed the gap.';
+  $('deb').innerHTML=h;setPrompt('share',share);}
+
+/* ---------- clock ---------- */
+var left=900,tm=null;
+function paintClock(){var m=Math.floor(left/60),s=left%60;$('clock').textContent=m+':'+(s<10?'0':'')+s;$('clock').className='clock'+(left<=120?' low':'')}
+$('cgo').onclick=function(){if(tm){clearInterval(tm);tm=null;this.textContent='Start'}else{this.textContent='Pause';tm=setInterval(function(){if(left>0){left--;paintClock()}},1000)}};
+$('crs').onclick=function(){if(tm){clearInterval(tm);tm=null}$('cgo').textContent='Start';left=900;paintClock()};
+
+paintSetup();scoreInputs('in1','s1');scoreInputs('in2','s2');
+if(S.pred){var pr=document.querySelector('input[name=pred][value='+S.pred+']');if(pr)pr.checked=true}
+$('answers').value=S.answers;paintLevers();refresh();
+})();
+(function(){var d=document.getElementById('qrd'),b=document.getElementById('qrb');if(!d||!d.showModal)return;b.addEventListener('click',function(){d.showModal()});document.getElementById('qrx').addEventListener('click',function(){d.close()});d.addEventListener('click',function(e){if(e.target===d)d.close()})})();
+</script>
+</body>
+</html>

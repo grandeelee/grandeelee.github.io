@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital twins of students: intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#121A2B; --paper:#ECEFF3; --panel:#FFFFFF; --line:#C9D0DB;
+  --intended:#0B7A83; --scored:#D43D5C; --mute:#667086; --soft:#DDE3EA;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:clamp(17px,1.45vw,23px);line-height:1.5;overflow:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--intended);outline-offset:3px}
+
+/* stage */
+.deck{position:fixed;inset:0 0 56px 0}
+.slide{position:absolute;inset:0;padding:clamp(24px,5vh,64px) clamp(20px,6vw,96px);display:none;overflow-y:auto}
+.slide.on{display:block}
+.inner{max-width:1180px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(16px,3vh,32px)}
+h1,h2,h3{font-family:var(--display);line-height:1.04;letter-spacing:-.02em}
+h1{font-size:clamp(40px,6.6vw,104px);font-weight:800;max-width:14ch}
+h2{font-size:clamp(30px,4.2vw,64px);font-weight:700;max-width:20ch}
+h3{font-size:1.15em;font-weight:700;letter-spacing:-.01em}
+p.lede{font-size:1.18em;max-width:44ch;color:#2A3349}
+.mute{color:var(--mute)}
+.t{color:var(--intended)} .c{color:var(--scored)}
+.t,.c{font-weight:600}
+.small{font-size:.82em}
+code,.num{font-variant-numeric:tabular-nums}
+.chip{display:inline-block;padding:.1em .6em;border-radius:99px;background:var(--soft);font-size:.8em;font-weight:600}
+
+/* nav bar */
+.bar{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:14px;padding:0 clamp(16px,4vw,48px);background:var(--ink);color:#fff}
+.bar button{font:inherit;color:#fff;background:transparent;border:1px solid #3B4663;border-radius:8px;height:36px;min-width:44px;cursor:pointer}
+.bar button:hover{background:#22304F}
+.dots{display:flex;gap:6px;flex:1;justify-content:center}
+.dots button{min-width:0;width:26px;height:6px;padding:0;border:0;border-radius:3px;background:#3B4663}
+.dots button.on{background:#fff}
+.bar .where{font-size:.8em;color:#B7C0D3;white-space:nowrap}
+.bar a{font-size:.8em;color:#B7C0D3;text-decoration:none}
+
+/* the gap ruler (signature element) */
+.ruler{position:relative;height:84px;margin:8px 0}
+.ruler .axis{position:absolute;left:0;right:0;top:42px;height:4px;background:var(--ink);border-radius:2px}
+.ruler .ticks{position:absolute;left:0;right:0;top:50px;display:flex;justify-content:space-between;font-size:.7em;color:var(--mute)}
+.ruler .gap{position:absolute;top:36px;height:16px;background:repeating-linear-gradient(90deg,var(--scored) 0 6px,transparent 6px 10px);opacity:.35;border-radius:2px}
+.mk{position:absolute;top:0;width:0;height:84px}
+.mk i{position:absolute;left:-2px;top:20px;width:4px;height:44px;border-radius:2px;background:currentColor}
+.mk b{position:absolute;left:0;transform:translateX(-50%);top:-6px;white-space:nowrap;font-size:.78em;font-weight:600;color:inherit}
+.mk.low b{top:66px}
+.mk.t{color:var(--intended)} .mk.c{color:var(--scored)}
+.hero .mk.c{animation:slide 1.6s .5s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slide{from{left:var(--from)}to{left:var(--to)}}
+.thr{position:absolute;top:10px;height:64px;border-left:2px dashed var(--mute)}
+.thr span{position:absolute;top:-10px;left:6px;font-size:.7em;color:var(--mute);white-space:nowrap}
+
+/* panels */
+.row{display:grid;gap:clamp(12px,2vw,24px)}
+.cols2{grid-template-columns:repeat(2,1fr)} .cols3{grid-template-columns:repeat(3,1fr)} .cols4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border-radius:6px;padding:clamp(14px,1.8vw,24px);border-left:5px solid var(--line)}
+.card.focus{border-left-color:var(--intended);box-shadow:0 0 0 2px var(--intended) inset}
+.card.dim{opacity:.55}
+.card p{margin-top:.4em;font-size:.92em}
+.card .tag{font-size:.78em;font-weight:600;color:var(--intended);margin-top:.6em;display:block}
+
+/* skill bars */
+.bars{display:grid;gap:8px}
+.bar-r{display:grid;grid-template-columns:minmax(120px,1.2fr) 3fr 44px;gap:10px;align-items:center;font-size:.86em}
+.track{height:12px;background:var(--soft);border-radius:6px;position:relative}
+.track u{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--intended)}
+.track.s u{background:var(--scored)}
+.code{font-family:ui-monospace,"JetBrains Mono",Consolas,monospace;font-size:.72em;background:var(--ink);color:#DCE4F5;padding:14px 16px;border-radius:6px;line-height:1.55;white-space:pre-wrap}
+.code .cm{color:#8C9AB8}
+
+/* pipeline */
+.pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.node{flex:1 1 200px;background:var(--panel);padding:16px 18px;border-top:5px solid var(--ink);position:relative}
+.node.g{border-top-color:var(--intended)} .node.e{border-top-color:var(--scored)}
+.node small{display:block;color:var(--mute);margin-top:.3em;font-size:.82em}
+.arrow{flex:0 0 28px;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:1.4em}
+.hat{display:flex;gap:10px;flex-wrap:wrap}
+
+/* drift widget */
+.widget{background:var(--panel);border-radius:6px;padding:clamp(16px,2.4vw,32px)}
+.widget label{font-weight:600;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+input[type=range]{width:100%;margin:14px 0 10px;accent-color:var(--intended);height:28px}
+.verdict{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.verdict div{background:var(--paper);padding:10px 14px;border-radius:6px}
+.verdict .k{font-size:.74em;color:var(--mute);display:block}
+.verdict .v{font-family:var(--display);font-size:1.5em;font-weight:700;font-variant-numeric:tabular-nums}
+.verdict .v.bad{color:var(--scored)}
+
+/* big stats */
+.stat{font-family:var(--display);font-weight:800;font-size:clamp(34px,4.4vw,68px);letter-spacing:-.03em;line-height:1}
+.stat-l{font-size:.84em;color:var(--mute);margin-top:.3em;max-width:22ch}
+
+.note{font-size:.78em;color:var(--mute);max-width:70ch}
+.loopbox{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(12px,2vw,28px);align-items:center}
+.loop{width:100%;height:auto;max-height:44vh}
+.eq span{display:block;font-family:var(--body);font-weight:400;margin-top:.3em}
+.eq{font-family:var(--display);font-size:clamp(22px,3vw,44px);font-weight:600;background:var(--panel);padding:.5em .8em;border-radius:6px;display:inline-block;max-width:100%;overflow-x:auto}
+
+@media (max-width:820px){
+  .cols2,.cols3,.cols4,.loopbox{grid-template-columns:1fr}
+  .verdict{grid-template-columns:1fr}
+  .arrow{display:none}
+  .bar .where{display:none}
+  .dots button{width:14px}
+}
+@media (prefers-reduced-motion:reduce){.hero .mk.c{animation:none}}
+@media print{body{overflow:visible}.deck{position:static}.slide{display:block!important;position:static;page-break-after:always}.bar{display:none}}
+</style>
+</head>
+<body>
+
+<main class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide on" data-title="Title">
+<div class="inner hero">
+  <h1>Can a ruler check its own markings?</h1>
+  <p class="lede">Digital twins of students, and how to calibrate assessments and assessment bots with them.</p>
+  <div class="ruler" role="img" aria-label="A skill scale from 0 to 1. The intended skill is 0.30; the model scored it as 0.50.">
+    <div class="axis"></div>
+    <div class="gap" style="left:30%;width:20%"></div>
+    <div class="ticks"><span>0</span><span>0.5</span><span>1</span></div>
+    <div class="mk t" style="left:30%"><i></i><b>intended skill</b></div>
+    <div class="mk c low" style="left:50%;--from:30%;--to:50%"><i></i><b>scored skill</b></div>
+  </div>
+  <p class="small mute">30-minute workshop &middot; talk, demo, then hands-on with a web chatbot</p>
+</div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-title="Why simulate">
+<div class="inner">
+  <h2>Generated items can't be calibrated the old way.</h2>
+  <div class="row cols2">
+    <div class="card">
+      <h3>Classical calibration</h3>
+      <p>Fixed item bank. Each item gets difficulty and discrimination estimates from <strong>50&ndash;200 real responses</strong> before use.</p>
+    </div>
+    <div class="card focus">
+      <h3>LLM-generated assessment</h3>
+      <p>Every student can get a different item. The rubric changes each semester. There is no time to collect 50 responses per item.</p>
+    </div>
+  </div>
+  <p class="lede">The bootstrapping problem: you can't validate without student data, and you can't deploy without validation. Simulated students fill the gap.</p>
+  <p class="note">Prior work reports LLM-simulated respondents approximating human item calibration with correlations above 0.89 (Liu 2025). The catch is on the next slide.</p>
+</div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-title="Four uses">
+<div class="inner">
+  <h2>Four things simulated students can do. We focus on two.</h2>
+  <div class="row cols4">
+    <div class="card dim"><h3>Teacher training</h3><p>Practise diagnosing and responding to common misconceptions on a student who never gets tired.</p></div>
+    <div class="card focus"><h3>Item design</h3><p>Check whether a question and its rubric separate weak from strong answers, before a real student sees it.</p><span class="tag">Today</span></div>
+    <div class="card dim"><h3>Whole classroom</h3><p>Simulate a mixed class to plan pacing, grouping and how a lesson lands across levels.</p></div>
+    <div class="card focus"><h3>Tutor development</h3><p>Stress-test a tutor or assessment bot: does it ask the right next question, and route each student fairly?</p><span class="tag">Today</span></div>
+  </div>
+  <p class="lede">Both of today's uses share one question: <strong>when the twin gets a score, is the score right?</strong></p>
+</div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-title="What is a twin">
+<div class="inner">
+  <h2>A digital twin of a student is a skill profile an LLM can act out.</h2>
+  <div class="row cols2">
+    <div class="card">
+      <h3>The profile</h3>
+      <p class="mute">A vector of skills, each from 0 (absent) to 1 (mastered). Here, 4 of the 24 Python OOP skills in the paper.</p>
+      <div class="bars" style="margin-top:14px">
+        <div class="bar-r"><span>Class definition</span><div class="track"><u style="width:85%"></u></div><span class="num">0.85</span></div>
+        <div class="bar-r"><span>Constructor</span><div class="track"><u style="width:70%"></u></div><span class="num">0.70</span></div>
+        <div class="bar-r"><span>Setter with validation</span><div class="track"><u style="width:10%"></u></div><span class="num">0.10</span></div>
+        <div class="bar-r"><span>Polymorphism</span><div class="track"><u style="width:0%"></u></div><span class="num">0.00</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>The behaviour</h3>
+      <p class="mute">Prompt the model to answer a task as that student, mistakes included.</p>
+      <div class="code" style="margin-top:14px">class Account:
+    def __init__(self, owner, bal):
+        self.owner = owner
+        self.balance = bal   <span class="cm"># no setter, no check</span>
+
+    def deposit(self, amt):
+        self.balance = self.balance + amt</div>
+    </div>
+  </div>
+  <p class="note">Simulated students are cheap, repeatable and available before any real student has seen the item.</p>
+</div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="The closed loop">
+<div class="inner">
+  <h2>One LLM writes the item, plays the student, and grades the answer.</h2>
+  <div class="loopbox">
+    <svg viewBox="0 0 600 330" role="img" aria-label="One model generates an item, simulates a student answering it, and scores the answer. Nothing connects the loop to real student data." class="loop">
+      <defs>
+        <marker id="cl-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#121A2B"/></marker>
+      </defs>
+      <g font-family="Bricolage Grotesque, Trebuchet MS, sans-serif" font-weight="700" font-size="19" text-anchor="middle">
+        <rect x="225" y="8" width="150" height="62" rx="6" fill="#fff" stroke="#0B7A83" stroke-width="3"/>
+        <text x="300" y="34" fill="#0B7A83">generate</text><text x="300" y="57" fill="#0B7A83">item</text>
+        <rect x="442" y="150" width="150" height="62" rx="6" fill="#fff" stroke="#0B7A83" stroke-width="3"/>
+        <text x="517" y="176" fill="#0B7A83">simulate</text><text x="517" y="199" fill="#0B7A83">student</text>
+        <rect x="8" y="150" width="150" height="62" rx="6" fill="#fff" stroke="#D43D5C" stroke-width="3"/>
+        <text x="83" y="176" fill="#D43D5C">score</text><text x="83" y="199" fill="#D43D5C">response</text>
+      </g>
+      <g stroke="#121A2B" stroke-width="3" fill="none">
+        <path d="M377 39C480 42 517 90 517 146" marker-end="url(#cl-ah)"/>
+        <path d="M440 181H162" marker-end="url(#cl-ah)"/>
+        <path d="M83 146C83 90 120 42 221 39" marker-end="url(#cl-ah)"/>
+      </g>
+      <g font-family="Source Sans 3, Segoe UI, sans-serif" font-size="16" text-anchor="middle" fill="#667086">
+        <text x="300" y="114" font-weight="600" fill="#121A2B">same model, same weights</text>
+        <text x="300" y="136">no external anchor</text>
+      </g>
+      <path d="M300 190V244" stroke="#667086" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round" fill="none"/>
+      <rect x="170" y="250" width="260" height="62" rx="6" fill="none" stroke="#667086" stroke-width="2" stroke-dasharray="8 6"/>
+      <g font-family="Bricolage Grotesque, Trebuchet MS, sans-serif" text-anchor="middle">
+        <text x="300" y="276" font-size="18" font-weight="700" fill="#667086">real student data</text>
+        <text x="300" y="298" font-size="15" font-family="Source Sans 3, Segoe UI, sans-serif" fill="#667086">not available before launch</text>
+      </g>
+    </svg>
+    <div class="row">
+      <div class="card"><h3>It plays weak students badly</h3><p>Expert knowledge leaks through, and none of 11 LLMs matched real student score distributions.</p><span class="tag mute">Yuan 2026; Srivatsa 2025</span></div>
+      <div class="card"><h3>It favors its own writing</h3><p>LLMs rate their own outputs above equivalent text from other sources.</p><span class="tag mute">Panickssery 2024</span></div>
+      <div class="card"><h3>It disagrees with itself</h3><p>Even proprietary models score inconsistently at temperature above 0.</p><span class="tag mute">Wang 2024</span></div>
+    </div>
+  </div>
+  <p class="lede">The result can look consistent and still be wrong. So: when the model generates at skill <i>x</i>, does its own scoring recover <i>x</i>?</p>
+</div>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="The equation">
+<div class="inner">
+  <h2>Adaptive drift is the gap between what we asked for and what we scored.</h2>
+  <div class="loopbox">
+    <svg viewBox="0 0 600 200" role="img" aria-label="Loop: intended skill x is used to generate a response r, which is scored as x-hat; the gap between x-hat and x should be near zero." class="loop">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#121A2B"/></marker>
+        <marker id="ahc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#D43D5C"/></marker>
+      </defs>
+      <g font-family="Bricolage Grotesque, Trebuchet MS, sans-serif" font-weight="700" font-size="19">
+        <rect x="8" y="26" width="150" height="62" rx="6" fill="#fff" stroke="#0B7A83" stroke-width="3"/>
+        <text x="83" y="52" text-anchor="middle" fill="#0B7A83">intended</text><text x="83" y="75" text-anchor="middle" fill="#0B7A83">skill x</text>
+        <rect x="225" y="26" width="150" height="62" rx="6" fill="#fff" stroke="#121A2B" stroke-width="3"/>
+        <text x="300" y="52" text-anchor="middle" fill="#121A2B">student</text><text x="300" y="75" text-anchor="middle" fill="#121A2B">response r</text>
+        <rect x="442" y="26" width="150" height="62" rx="6" fill="#fff" stroke="#D43D5C" stroke-width="3"/>
+        <text x="517" y="52" text-anchor="middle" fill="#D43D5C">scored</text><text x="517" y="75" text-anchor="middle" fill="#D43D5C">skill x&#770;</text>
+      </g>
+      <g stroke="#121A2B" stroke-width="3" fill="none">
+        <path d="M160 57H221" marker-end="url(#ah)"/>
+        <path d="M377 57H438" marker-end="url(#ah)"/>
+      </g>
+      <path d="M517 92C517 190 83 190 83 94" stroke="#D43D5C" stroke-width="3" stroke-dasharray="7 6" fill="none" marker-end="url(#ahc)"/>
+      <g font-family="Source Sans 3, Segoe UI, sans-serif" font-size="15" text-anchor="middle">
+        <text x="191" y="44" fill="#667086">generate</text>
+        <text x="408" y="44" fill="#667086">score</text>
+        <text x="300" y="156" fill="#D43D5C" font-weight="600">gap = x&#770; &#8722; x: should be close to 0</text>
+      </g>
+    </svg>
+    <div class="eq" aria-label="Expected score of a response generated at skill x should approximately equal x">E[ score( generate(<i>x</i>) ) ] &asymp; <i>x</i><span class="mute small">Generative-Evaluative Agreement (GEA)</span></div>
+  </div>
+</div>
+</section>
+
+<!-- 5b -->
+<section class="slide" data-title="Drift in action">
+<div class="inner">
+  <h2>Small drift near the threshold sends a student down the wrong path.</h2>
+  <div class="widget">
+    <label for="x"><span>Drag the student's <span class="t">intended skill</span></span><span class="num" id="xv">0.45</span></label>
+    <input id="x" type="range" min="0" max="1" step="0.01" value="0.45">
+    <div class="ruler" id="rl" style="margin-top:22px">
+      <div class="axis"></div><div class="gap" id="rg"></div>
+      <div class="ticks"><span>0</span><span>0.5</span><span>1</span></div>
+      <div class="thr" style="left:50%"><span>routing threshold</span></div>
+      <div class="mk t" id="mt"><i></i><b>intended</b></div>
+      <div class="mk c low" id="mc"><i></i><b>scored</b></div>
+    </div>
+    <div class="verdict">
+      <div><span class="k">Drift (scored &minus; intended)</span><span class="v" id="dv">+0.10</span></div>
+      <div><span class="k">Should be routed to</span><span class="v" id="r1">Low path</span></div>
+      <div><span class="k">Actually routed to</span><span class="v" id="r2">High path</span></div>
+    </div>
+  </div>
+  <p class="note">Schematic shaped after Figure 4 of the paper (weak skill overscored by about +0.20, converging near the diagonal above 0.8). Not a fit to the raw data.</p>
+</div>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-title="What helps">
+<div class="inner">
+  <h2>Four levers narrow the gap. You'll pull some of them in a minute.</h2>
+  <div class="row cols2">
+    <div class="card focus"><h3>Break the rubric into skills</h3><p>Score each skill separately, with a clear line between "has it" and "doesn't", then average. The paper's main proposal.</p></div>
+    <div class="card"><h3>Use a different model to score</h3><p>A model rates its own writing higher. Let another one grade.</p></div>
+    <div class="card"><h3>Say which misconceptions are active</h3><p>"Act like a beginner" leaks expertise. "Never validates input, believes class variables are per-object" doesn't.</p></div>
+    <div class="card"><h3>Check against a few real students</h3><p>10&ndash;20 real answers anchor the simulated numbers.</p></div>
+  </div>
+  <p class="lede">Next: a live demo of the drift, then you try it with a chatbot in your browser.</p>
+  <p class="note">Source: Lee, Wang, Lye &amp; Peh, "Generative-Evaluative Agreement: A Necessary Validity Criterion for LLM-Enabled Adaptive Assessment", BEA 2026.</p>
+</div>
+</section>
+
+</main>
+
+<nav class="bar" aria-label="Slides">
+  <a href="index.html">Index</a>
+  <button id="prev" aria-label="Previous slide">&larr;</button>
+  <div class="dots" id="dots"></div>
+  <span class="where" id="where"></span>
+  <button id="next" aria-label="Next slide">&rarr;</button>
+</nav>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')), dots=document.getElementById('dots'), where=document.getElementById('where'), i=0;
+  slides.forEach(function(s,n){var b=document.createElement('button');b.setAttribute('aria-label','Go to slide '+(n+1)+': '+s.dataset.title);b.onclick=function(){go(n)};dots.appendChild(b)});
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){s.classList.toggle('on',k===i);if(k===i)s.scrollTop=0});
+    [].forEach.call(dots.children,function(d,k){d.classList.toggle('on',k===i)});
+    where.textContent=(i+1)+' / '+slides.length+'  '+slides[i].dataset.title;
+    try{history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  document.getElementById('prev').onclick=function(){go(i-1)};
+  document.getElementById('next').onclick=function(){go(i+1)};
+  document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='INPUT')return;
+    if(['ArrowRight','PageDown',' '].indexOf(e.key)>-1){e.preventDefault();go(i+1)}
+    if(['ArrowLeft','PageUp'].indexOf(e.key)>-1){e.preventDefault();go(i-1)}
+  });
+  go((parseInt(location.hash.slice(1),10)||1)-1);
+
+  /* drift widget: schematic after paper Fig. 4 */
+  var x=document.getElementById('x');
+  function bias(v){return 0.17*Math.max(0,1-v/0.8)+0.03}
+  function draw(){
+    var v=+x.value, o=Math.min(1,v+bias(v)), d=o-v;
+    document.getElementById('xv').textContent=v.toFixed(2);
+    document.getElementById('mt').style.left=(v*100)+'%';
+    document.getElementById('mc').style.left=(o*100)+'%';
+    var g=document.getElementById('rg');g.style.left=(v*100)+'%';g.style.width=(d*100)+'%';
+    var dv=document.getElementById('dv');dv.textContent=(d>=0?'+':'')+d.toFixed(2);
+    var a=v>=0.5?'High path':'Low path', b=o>=0.5?'High path':'Low path';
+    document.getElementById('r1').textContent=a;
+    var r2=document.getElementById('r2');r2.textContent=b;r2.className='v'+(a!==b?' bad':'');
+    dv.className='v'+(d>0.08?' bad':'');
+  }
+  x.addEventListener('input',draw);draw();
+})();
+</script>
+</body>
+</html>
