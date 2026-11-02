@@ -21,6 +21,14 @@ li span{color:var(--mute);font-size:.9em}
 li .m{font-weight:600;color:var(--t);text-align:right}
 li.todo a{border-left-color:#C9D0DB;pointer-events:none;opacity:.6}
 li.todo .m{color:var(--mute)}
+.cite{margin-top:40px;background:#fff;border-left:5px solid var(--c);border-radius:6px;padding:18px 22px}
+.cite h2{font:700 1.2em "Bricolage Grotesque",sans-serif;margin-bottom:8px}
+.cite p{max-width:none;font-size:.95em}
+.cite a{color:var(--t)}
+.cite details{margin-top:12px}
+.cite summary{cursor:pointer;font-weight:600;color:var(--t)}
+.cite pre{margin-top:8px;padding:12px 14px;background:var(--paper);border-radius:6px;font:.8em/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+.cite button{margin-top:8px;font:600 .85em inherit;font-family:inherit;padding:6px 14px;border:2px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -32,6 +40,43 @@ li.todo .m{color:var(--mute)}
     <li><a href="demo.html"><b>Demo</b><span class="m">~8 min</span><span>Real simulated cohort: one student, the whole class, skill by skill.</span></a></li>
     <li><a href="activity.html"><b>Activity</b><span class="m">~15 min</span><span>In pairs with a free web chatbot: make five twins, catch the drift, try one fix. Any subject.</span></a></li>
   </ol>
+  <section class="cite" aria-labelledby="cite-h">
+    <h2 id="cite-h">Cite this work</h2>
+    <p>Grandee Lee, Yue Wang, Che Yee Lye, and Luke Peh. 2026. <a href="https://aclanthology.org/2026.bea-1.54/">Generative-Evaluative Agreement: A Necessary Validity Criterion for LLM-Enabled Adaptive Assessment</a>. In <i>Proceedings of the 21st Workshop on Innovative Use of NLP for Building Educational Applications (BEA 2026)</i>, pages 798&ndash;812, San Diego, California, USA. Association for Computational Linguistics. <a href="https://doi.org/10.18653/v1/2026.bea-1.54">doi:10.18653/v1/2026.bea-1.54</a></p>
+    <details>
+      <summary>BibTeX</summary>
+      <pre id="bib">@inproceedings{lee-etal-2026-generative,
+    title = "Generative-Evaluative Agreement: A Necessary Validity Criterion for {LLM}-Enabled Adaptive Assessment",
+    author = "Lee, Grandee  and
+      Wang, Yue  and
+      Lye, Che Yee  and
+      Peh, Luke",
+    editor = "Kochmar, Ekaterina  and
+      Alhafni, Bashar  and
+      Bann{\`o}, Stefano  and
+      Bexte, Marie  and
+      Burstein, Jill  and
+      Horbach, Andrea  and
+      Laarmann-Quante, Ronja  and
+      Tack, Anais  and
+      Yaneva, Victoria  and
+      Yuan, Zheng",
+    booktitle = "Proceedings of the 21st Workshop on Innovative Use of {NLP} for Building Educational Applications ({BEA} 2026)",
+    month = jul,
+    year = "2026",
+    address = "San Diego, California, USA",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2026.bea-1.54/",
+    doi = "10.18653/v1/2026.bea-1.54",
+    pages = "798--812",
+    ISBN = "979-8-89176-409-5"
+}</pre>
+      <button type="button" id="bibcopy">Copy BibTeX</button>
+    </details>
+  </section>
 </main>
+<script>
+(function(){var b=document.getElementById("bibcopy");b.addEventListener("click",function(){var t=document.getElementById("bib").textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent="Copied"},function(){var r=document.createRange();r.selectNodeContents(document.getElementById("bib"));var x=getSelection();x.removeAllRanges();x.addRange(r);b.textContent="Selected: press Ctrl+C"});setTimeout(function(){b.textContent="Copy BibTeX"},2500)})})();
+</script>
 </body>
 </html>
